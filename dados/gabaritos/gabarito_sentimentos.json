@@ -1,0 +1,83 @@
+{
+  "descricao": "Gabarito oficial de classificação de sentimentos e necessidade de revisão (RF22)",
+  "criterios_classificacao": {
+    "positiva": "Manifestação expressa e inequívoca de satisfação, elogio ou gratidão.",
+    "negativa": "Manifestação expressa de insatisfação, reclamação, revolta ou crítica a falha de serviço.",
+    "neutra": "Comunicação factual, descritiva ou procedimental sem carga emotiva evidente.",
+    "indeterminada": "Presença de ironia/sarcasmo, sentimentos opostos conflitantes (misto) ou ausência de contexto opinativo."
+  },
+  "avaliacoes": [
+    {
+      "id": "AV-01",
+      "polaridade_esperada": "positiva",
+      "necessidade_revisao": false,
+      "justificativa": "Elogio expresso e direto ao atendimento."
+    },
+    {
+      "id": "AV-02",
+      "polaridade_esperada": "positiva",
+      "necessidade_revisao": false,
+      "justificativa": "Satisfação com esclarecimento de dúvidas."
+    },
+    {
+      "id": "AV-03",
+      "polaridade_esperada": "positiva",
+      "necessidade_revisao": false,
+      "justificativa": "Agradecimento e parabenização pelo suporte."
+    },
+    {
+      "id": "AV-04",
+      "polaridade_esperada": "negativa",
+      "necessidade_revisao": false,
+      "justificativa": "Crítica à demora e telefones mudos."
+    },
+    {
+      "id": "AV-05",
+      "polaridade_esperada": "negativa",
+      "necessidade_revisao": false,
+      "justificativa": "Reclamação de orientação errada sobre aulas."
+    },
+    {
+      "id": "AV-06",
+      "polaridade_esperada": "negativa",
+      "necessidade_revisao": false,
+      "justificativa": "Insatisfação com sistema indisponível e custo gerado."
+    },
+    {
+      "id": "AV-07",
+      "polaridade_esperada": "neutra",
+      "necessidade_revisao": false,
+      "justificativa": "Descrição estritamente factual de cumprimento de prazo."
+    },
+    {
+      "id": "AV-08",
+      "polaridade_esperada": "neutra",
+      "necessidade_revisao": false,
+      "justificativa": "Registro factual de entrega de documentos."
+    },
+    {
+      "id": "AV-09",
+      "polaridade_esperada": "neutra",
+      "necessidade_revisao": false,
+      "justificativa": "Constatação objetiva de ocorrência do sorteio."
+    },
+    {
+      "id": "AV-10",
+      "polaridade_esperada": "indeterminada",
+      "necessidade_revisao": true,
+      "justificativa": "Ironia/sarcasmo: parabenização aparente seguida de crítica severa a quatro semanas de espera."
+    },
+    {
+      "id": "AV-11",
+      "polaridade_esperada": "indeterminada",
+      "necessidade_revisao": true,
+      "justificativa": "Mensagem mista: elogio ao servidor e reclamação da infraestrutura/sistema."
+    },
+    {
+      "id": "AV-12",
+      "polaridade_esperada": "indeterminada",
+      "necessidade_revisao": true,
+      "justificativa": "Falta de contexto opinativo: mero registro protocolar numérico sem opinião expressa."
+    }
+  ]
+}

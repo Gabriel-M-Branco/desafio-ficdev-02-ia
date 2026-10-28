@@ -1,0 +1,62 @@
+IDENTIFICADOR: DOC-SECITECI-001
+TITULO: EDITAL Nº 006/2026/SECITECI-MT - PROCESSO SELETIVO DE ALUNOS PARA CURSOS TÉCNICOS NAS ETECS 2026/2
+VERSAO: 1.0
+DATA_PUBLICACAO: 31/03/2026
+AUTORIDADE: SECRETARIA DE ESTADO DE CIÊNCIA, TECNOLOGIA E INOVAÇÃO - SECITECI/MT
+
+1. DAS DISPOSIÇÕES PRELIMINARES
+1.1. O Processo Seletivo destina-se ao preenchimento de vagas para Cursos Técnicos de Nível Médio, nas modalidades Subsequente e Concomitante, ofertados pelas Escolas Técnicas Estaduais de Educação Profissional e Tecnológica (ETECs).
+1.2. A seleção de candidatos será realizada exclusivamente por meio de Sorteio Público Eletrônico.
+1.3. A inscrição e a realização do curso são inteiramente gratuitas.
+1.4. É expressamente vedada a inscrição do candidato em mais de um curso ou turno no mesmo processo seletivo.
+1.5. A formação de turmas adicionais poderá ocorrer havendo disponibilidade orçamentária e capacidade física instalada, mediante autorização prévia da SECITECI.
+
+3. DA DISTRIBUIÇÃO DAS VAGAS E COTAS
+3.1. As vagas serão distribuídas em:
+  - AC (Ampla Concorrência): 40% das vagas;
+  - L1 (Estudantes Negros - pretos ou pardos): 20% das vagas;
+  - L2 (Estudantes oriundos integralmente de Escola Pública): 20% das vagas;
+  - L3 (Estudantes Indígenas): 15% das vagas;
+  - L4 (Candidatos com Deficiência - PcD): 5% das vagas.
+3.2. Os candidatos que optarem por concorrer às cotas L1, L2, L3 ou L4 deverão comprovar documentalmente a condição declarada no ato de inscrição.
+3.2.2. O candidato que não comprovar os requisitos da cota pretendida será transferido para a lista de Ampla Concorrência (AC), desde que não tenha cometido fraude documental intencional.
+3.2.3. As vagas reservadas que não forem preenchidas por falta de candidatos habilitados serão revertidas automaticamente para a Ampla Concorrência.
+3.3. A ordem de convocação do sorteio público obedecerá rigorosamente à ordem crescente dos números sorteados.
+3.11. Quadro de Cursos e Localidades Selecionadas:
+  - ETEC Cuiabá (Sede Cuiabá): Técnico em Enfermagem (1600h, Noturno, 40 vagas), Técnico em Recursos Humanos (800h, Noturno, 40 vagas).
+  - ETEC Cuiabá (Turma Descentralizada no Distrito de Mimoso): Técnico em Agropecuária (1200h, Noturno, 40 vagas).
+  - ETEC Barra do Garças (Sede Barra do Garças): Técnico em Guia de Turismo (800h, Noturno, 40 vagas).
+  - ETEC Cáceres (Sede Cáceres): Técnico em Segurança do Trabalho (1200h, Noturno, 40 vagas), Técnico em Enfermagem (1600h, Noturno, 40 vagas).
+
+4. DAS INSCRIÇÕES
+4.1. As inscrições serão realizadas exclusivamente pela internet no endereço eletrônico oficial da SECITECI.
+4.2. Período original de inscrição: das 08h00 do dia 07/04/2026 até às 23h59 do dia 03/05/2026.
+
+5. DO CRONOGRAMA OFICIAL BASE
+Item 1: Publicação do Edital - 31/03/2026
+Item 2: Período de Inscrição - 07/04 a 03/05/2026
+Item 3: Prazo para envio de documentos da autodeclaração racial - 06/04 a 03/05/2026
+Item 8: Sorteio Público das Vagas - 22 e 23/05/2026 às 09h00
+Item 12: Divulgação oficial dos classificados - 11/06/2026
+Item 13: Convocação dos aprovados (1ª Chamada) - 11/06/2026
+Item 14: Matrícula da 1ª Chamada - 15 a 19/06/2026
+Item 19: Início das aulas para todos os cursos - 21/07/2026
+Item 20: Convocação de vagas remanescentes (4ª Chamada) - 22/07/2026
+
+6. DA SELEÇÃO E HOMOLOGAÇÃO
+6.7. Quando o número de inscritos homologados for igual ou inferior ao número de vagas ofertadas no curso/turno, os candidatos serão automaticamente selecionados, sendo dispensado o sorteio para aquela turma, permanecendo obrigatória a validação documental.
+
+10. DA EFETIVAÇÃO DA MATRÍCULA
+10.1. A matrícula é ato formal e presencial, a ser realizada na secretaria da respectiva ETEC responsável pela oferta.
+10.4. O candidato convocado deverá comparecer pessoalmente portando documento oficial de identidade com foto, CPF, certidão de nascimento ou casamento, comprovante de residência atualizado e histórico escolar de conclusão do Ensino Médio. Não será aceito envio de documentação por e-mail para a 1ª, 2ª e 3ª chamadas regulares.
+
+11. DAS VAGAS REMANESCENTES E DISTINÇÃO DE CHAMADAS
+11.1. As condições de aprovado, classificado e matriculado são juridicamente distintas:
+  - Aprovado: candidato sorteado dentro do número de vagas imediatas;
+  - Classificado: candidato sorteado além do número de vagas, compondo lista de espera;
+  - Matriculado: candidato aprovado ou convocado que compareceu no prazo e teve sua documentação validada pela secretaria escolar.
+11.3.1. Na 4ª chamada de vagas remanescentes, poderão manifestar interesse os candidatos já classificados em lista de espera, admitindo-se a manifestação de interesse por e-mail institucional da unidade escolar.
+11.3.2. A 5ª chamada destina-se a vagas remanescentes não preenchidas, permitindo preenchimento por ordem de chegada no balcão da secretaria da ETEC, inclusive por interessados que não tenham participado do processo seletivo inicial.
+
+12. DO QUÓRUM MÍNIMO E DISPOSIÇÕES GERAIS
+12.2. A SECITECI reserva-se o direito de não iniciar o curso quando o número de alunos matriculados for inferior a 80% (oitenta por cento) das vagas ofertadas na turma, visando a eficiência do gasto público.

@@ -1,0 +1,56 @@
+[
+  {
+    "id": "SOL-01",
+    "tipo": "texto",
+    "subtipo": "completa",
+    "canal": "email",
+    "protocolo": "2026-000142",
+    "data": "14/10/2026",
+    "texto_original": "Prezados, Meu nome é Marcos Vinícius de Almeida Santos, nasci em 12/08/2008, em Cuiabá, e solicito a efetivação da minha matrícula no curso Técnico em Enfermagem, eixo tecnológico Saúde, com carga horária de 1200 horas, turno noturno. O curso tem início em 01/02/2027 e a data da matrícula é 14/10/2026. Meus demais dados são: CPF 123.456.789-00; RG 1234567-8; nome da mãe, Lúcia Helena de Almeida Santos; e-mail marcos.almeida.teste@examplo.com. Declaro estar ciente de que a matrícula será automaticamente cancelada se eu faltar, sem justificativa comprovada, nos dois primeiros dias de aula consecutivos ou em três dias de aula, consecutivos ou não, nos dez primeiros dias de aula. Peço que me informem quais documentos ainda preciso apresentar. Atenciosamente, Marcos Vinícius de Almeida Santos"
+  },
+  {
+    "id": "SOL-02",
+    "tipo": "audio",
+    "subtipo": "completa",
+    "canal": "voz",
+    "protocolo": "2026-000142",
+    "data": "14/10/2026",
+    "texto_original": "Bom dia. Meu protocolo é 2026-000142, de 14 de outubro de 2026. Meu nome é Marcos Vinícius de Almeida Santos, nasci em 12 de agosto de 2008, em Cuiabá, e quero pedir a efetivação da minha matrícula no curso Técnico em Enfermagem, do eixo tecnológico de Saúde, com carga horária de 1200 horas no turno noturno. Meu CPF é 123456789-00, meu RG é 1234567-8, o nome da minha mãe é Lúcia Helena de Almeida Santos e o meu e-mail é marcos.almeida.teste@exemplo.com. Declaro estar ciente de que a matrícula será cancelada automaticamente se eu faltar sem justificativa comprovada nos dois primeiros dias de aula consecutivos ou em três dias de aula, consecutivos ou não, nos dez primeiros dias de aula. Peço que informem quais os documentos ainda preciso apresentar. Muito obrigado."
+  },
+  {
+    "id": "SOL-03",
+    "tipo": "ocr",
+    "subtipo": "completa",
+    "canal": "documento_digitalizado",
+    "protocolo": "2026-000142",
+    "data": "14/10/2026",
+    "texto_original": "FICHA DE MATRÍCULA ETEC SECITECI. Protocolo: 2026-000142. Nome: Marcos Vinícius de Almeida Santos. CPF: 123.456.789-00. RG: 1234567-8. Data Nasc: 12/08/2008. Naturalidade: Cuiabá. Mãe: Lúcia Helena de Almeida Santos. Pai: em branco. Curso: Técnico em Enfermagem. Eixo: Saúde. CH: 1200 horas. Turno: Noturno. Data Matrícula: 14/10/2026. E-mail: marcos.almeida.teste@examplo.com."
+  },
+  {
+    "id": "SOL-04",
+    "tipo": "texto",
+    "subtipo": "completa",
+    "canal": "formulario_web",
+    "protocolo": "2026-000588",
+    "data": "25/02/2026",
+    "texto_original": "Solicito a concessão de Auxílio Alimentação e Auxílio Transporte do Programa de Permanência Estudantil da ETEC Cuiabá. Meu nome é Juliana Rocha Mendes, CPF 987.654.321-11, RG 9876543-SSP/MT, matriculada no 1º semestre do curso Técnico em Recursos Humanos (noturno). Minha família é composta por 3 pessoas e temos renda bruta total de R$ 2.400,00 (per capita de R$ 800,00), comprovada pelos holerites em anexo. Meu e-mail para contato é juliana.mendes@exemplo.com."
+  },
+  {
+    "id": "SOL-05",
+    "tipo": "texto",
+    "subtipo": "incompleta",
+    "canal": "chat",
+    "protocolo": "não localizado",
+    "data": "15/06/2026",
+    "texto_original": "Olá, meu nome é João. Gostaria de saber se meu nome saiu na lista de convocados e se já estou matriculado na turma da noite. Preciso levar algum documento amanhã?"
+  },
+  {
+    "id": "SOL-06",
+    "tipo": "texto",
+    "subtipo": "ambigua",
+    "canal": "email",
+    "protocolo": "2026-000921",
+    "data": "10/08/2026",
+    "texto_original": "Prezados, sou Carla Ribeiro e fui aprovada para Técnico em Enfermagem em Barra do Garças, mas resido em Cuiabá. Vi uma notícia de que as aulas de Enfermagem foram adiadas para 05/10/2026 em Barra do Garças, mas também ouvi dizer que na ETEC Cuiabá as aulas começaram em 21/07/2026. Posso fazer minha matrícula presencial na ETEC Cuiabá e assistir as aulas em Cuiabá a partir de outubro?"
+  }
+]

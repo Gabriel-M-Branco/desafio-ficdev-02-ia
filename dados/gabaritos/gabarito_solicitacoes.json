@@ -1,0 +1,118 @@
+{
+  "descricao": "Gabarito oficial de conferência para as 6 solicitações do Desafio 02 (RF14/RF15)",
+  "casos": [
+    {
+      "id": "SOL-01",
+      "categoria_esperada": "Matrícula e Ingresso",
+      "solicitante_esperado": "Marcos Vinícius de Almeida Santos",
+      "protocolo_esperado": "2026-000142",
+      "campos_ausentes_esperados": [
+        "orgao_expedidor",
+        "uf",
+        "nome_pai",
+        "telefone"
+      ],
+      "necessidade_revisao": false,
+      "fatos_essenciais": [
+        "solicita efetivação de matrícula",
+        "curso Técnico em Enfermagem",
+        "pede relação de documentos pendentes"
+      ]
+    },
+    {
+      "id": "SOL-02",
+      "categoria_esperada": "Matrícula e Ingresso",
+      "solicitante_esperado": "Marcos Vinícius de Almeida Santos",
+      "protocolo_esperado": "2026-000142",
+      "campos_ausentes_esperados": [
+        "orgao_expedidor",
+        "uf",
+        "nome_pai",
+        "telefone"
+      ],
+      "necessidade_revisao": false,
+      "fatos_essenciais": [
+        "áudio transcrito",
+        "matrícula Enfermagem",
+        "documentos pendentes"
+      ]
+    },
+    {
+      "id": "SOL-03",
+      "categoria_esperada": "Matrícula e Ingresso",
+      "solicitante_esperado": "Marcos Vinícius de Almeida Santos",
+      "protocolo_esperado": "2026-000142",
+      "campos_ausentes_esperados": [
+        "orgao_expedidor",
+        "uf",
+        "nome_pai",
+        "telefone"
+      ],
+      "necessidade_revisao": false,
+      "fatos_essenciais": [
+        "ficha de matrícula manuscrita OCR",
+        "Enfermagem Cuiabá"
+      ]
+    },
+    {
+      "id": "SOL-04",
+      "categoria_esperada": "Assistência Estudantil",
+      "solicitante_esperado": "Juliana Rocha Mendes",
+      "protocolo_esperado": "2026-000588",
+      "campos_ausentes_esperados": [
+        "data_nascimento",
+        "naturalidade",
+        "nome_mae",
+        "nome_pai",
+        "telefone"
+      ],
+      "necessidade_revisao": false,
+      "fatos_essenciais": [
+        "solicita Auxílio Alimentação e Transporte",
+        "aluna Técnico Recursos Humanos",
+        "renda per capita R$ 800,00"
+      ]
+    },
+    {
+      "id": "SOL-05",
+      "categoria_esperada": "revisão",
+      "solicitante_esperado": "João",
+      "protocolo_esperado": null,
+      "campos_ausentes_esperados": [
+        "protocolo",
+        "cpf",
+        "rg",
+        "curso",
+        "email",
+        "telefone",
+        "data_nascimento",
+        "nome_mae"
+      ],
+      "necessidade_revisao": true,
+      "fatos_essenciais": [
+        "solicitação incompleta sem sobrenome, documento ou curso informado",
+        "exige interpelação ao cidadão"
+      ]
+    },
+    {
+      "id": "SOL-06",
+      "categoria_esperada": "Matrícula e Ingresso",
+      "solicitante_esperado": "Carla Ribeiro",
+      "protocolo_esperado": "2026-000921",
+      "campos_ausentes_esperados": [
+        "cpf",
+        "rg",
+        "data_nascimento",
+        "naturalidade",
+        "nome_mae",
+        "nome_pai",
+        "telefone"
+      ],
+      "necessidade_revisao": true,
+      "fatos_essenciais": [
+        "solicitação ambígua confundindo polo de aprovação e polo de residência",
+        "pretende transferência indevida entre Barra do Garças e Cuiabá"
+      ]
+    }
+  ]
+}
