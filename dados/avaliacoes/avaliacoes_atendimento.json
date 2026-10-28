@@ -2,72 +2,84 @@
   {
     "id": "AV-01",
     "texto": "O atendimento na secretaria da ETEC Cuiabá foi excelente e muito rápido! O atendente me orientou claramente sobre a matrícula.",
+    "categoria_servico": "Matrícula e Ingresso",
     "canal": "presencial",
     "data": "15/06/2026"
   },
   {
     "id": "AV-02",
     "texto": "Consegui tirar todas as minhas dúvidas sobre a heteroidentificação com a equipe. Foram muito educados e solícitos.",
+    "categoria_servico": "Matrícula e Ingresso",
     "canal": "chat",
     "data": "18/05/2026"
   },
   {
     "id": "AV-03",
     "texto": "Muito satisfeito com o suporte recebido no processo de inscrição para o curso de Enfermagem. Parabéns à equipe da SECITECI.",
+    "categoria_servico": "Matrícula e Ingresso",
     "canal": "email",
     "data": "20/05/2026"
   },
   {
     "id": "AV-04",
     "texto": "Demora absurda para responder e ninguém atende os telefones informados no edital. Total descaso com o estudante.",
+    "categoria_servico": "Outros / Informações Gerais",
     "canal": "telefone",
     "data": "10/05/2026"
   },
   {
     "id": "AV-05",
     "texto": "Péssima orientação da secretaria. Me passaram informações desatualizadas sobre o início das aulas e quase perdi o semestre.",
+    "categoria_servico": "Cursos e Horários",
     "canal": "presencial",
     "data": "22/07/2026"
   },
   {
     "id": "AV-06",
     "texto": "O sistema de envio de documentos ficou fora do ar no último dia do prazo. Tive que gastar dinheiro com transporte para vir até aqui reclamar.",
+    "categoria_servico": "Documentação e Certidões",
     "canal": "web",
     "data": "13/05/2026"
   },
   {
     "id": "AV-07",
     "texto": "Protocolo de solicitação de histórico acadêmico atendido no prazo regular informado de 5 dias úteis.",
+    "categoria_servico": "Documentação e Certidões",
     "canal": "email",
     "data": "02/06/2026"
   },
   {
     "id": "AV-08",
     "texto": "Compareci para entrega dos documentos de renda e recebi o comprovante de protocolo carimbado.",
+    "categoria_servico": "Assistência Estudantil",
     "canal": "presencial",
     "data": "25/02/2026"
   },
   {
     "id": "AV-09",
     "texto": "O sorteio público foi realizado e a lista de classificados foi divulgada na página oficial no dia previsto.",
+    "categoria_servico": "Matrícula e Ingresso",
     "canal": "web",
     "data": "29/05/2026"
   },
   {
     "id": "AV-10",
     "texto": "Parabéns pelo sistema maravilhoso! Só precisei esperar quatro semanas na fila para me informarem que faltava uma assinatura no comprovante.",
+    "categoria_servico": "Assistência Estudantil",
     "canal": "web",
     "data": "14/06/2026"
   },
   {
     "id": "AV-11",
     "texto": "O atendente Carlos foi extremamente educado e prestativo comigo, mas a infraestrutura da secretaria e a lentidão do sistema tornam o atendimento horrível.",
+    "categoria_servico": "Matrícula e Ingresso",
     "canal": "presencial",
     "data": "16/06/2026"
   },
   {
     "id": "AV-12",
     "texto": "Registro de atendimento nº 4092-2026 referente à solicitação de certidão de conclusão.",
+    "categoria_servico": "Documentação e Certidões",
     "canal": "sistema",
     "data": "05/06/2026"
   }

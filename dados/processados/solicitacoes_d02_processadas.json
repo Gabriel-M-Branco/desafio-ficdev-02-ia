@@ -1,0 +1,732 @@
+[
+  {
+    "id": "SOL-01",
+    "tipo": "texto",
+    "subtipo": "completa",
+    "ficha_validada": {
+      "versao_esquema": "2.0.0",
+      "protocolo": "2026-000142",
+      "data": "14/10/2026",
+      "solicitante": "Marcos Vinícius de Almeida Santos",
+      "cpf": "123.456.789-00",
+      "rg": "1234567-8",
+      "orgao_expedidor": null,
+      "uf": null,
+      "data_nascimento": "12/08/2008",
+      "naturalidade": "Cuiabá",
+      "nome_mae": "Lúcia Helena de Almeida Santos",
+      "nome_pai": null,
+      "curso": "Técnico em Enfermagem",
+      "eixo_tecnologico": "Saúde",
+      "carga_horaria": "1200 horas",
+      "turno": "noturno",
+      "inicio_curso": "01/02/2027",
+      "email": "marcos.almeida.teste@examplo.com",
+      "telefone": null,
+      "assunto": "Requerimento de Matrícula e Ingresso - Técnico em Enfermagem",
+      "pedido": "solicito a efetivação da minha matrícula no curso Técnico em Enfermagem, eixo tecnológico Saúde, com carga horária de 1200 horas, turno noturno.",
+      "categoria": "Matrícula e Ingresso",
+      "entidades": {
+        "pessoas": [
+          "Marcos Vinícius de Almeida Santos"
+        ],
+        "orgaos": [],
+        "locais": [
+          "Cuiabá"
+        ],
+        "datas": [
+          "01/02/2027",
+          "12/08/2008",
+          "14/10/2026"
+        ],
+        "protocolos": []
+      },
+      "informacoes_inferidas": {
+        "categoria_inferida": "Matrícula e Ingresso",
+        "assunto_inferido": "Requerimento de Matrícula e Ingresso - Técnico em Enfermagem",
+        "ambiguidade_detectada": false,
+        "justificativa_triagem": "Solicitação completa com campos essenciais validados.",
+        "modalidade_entrada": "texto"
+      },
+      "resumo": "Solicitação registrada por Marcos Vinícius de Almeida Santos (protocolo sem protocolo informado) referente ao curso Técnico em Enfermagem. Solicita efetivação de matrícula e consulta a relação de documentos pendentes para entrega. Menciona localidade (Cuiabá) e datas de referência (01/02/2027, 12/08/2008).",
+      "campos_ausentes": [
+        "nome_pai",
+        "orgao_expedidor",
+        "telefone",
+        "uf"
+      ],
+      "necessidade_revisao": false
+    },
+    "separacao_literal_inferido": {
+      "extracao_literal": {
+        "protocolo": "2026-000142",
+        "data": "14/10/2026",
+        "solicitante": "Marcos Vinícius de Almeida Santos",
+        "cpf": "123.456.789-00",
+        "rg": "1234567-8",
+        "orgao_expedidor": null,
+        "uf": null,
+        "data_nascimento": "12/08/2008",
+        "naturalidade": "Cuiabá",
+        "nome_mae": "Lúcia Helena de Almeida Santos",
+        "nome_pai": null,
+        "curso": "Técnico em Enfermagem",
+        "eixo_tecnologico": "Saúde",
+        "carga_horaria": "1200 horas",
+        "turno": "noturno",
+        "inicio_curso": "01/02/2027",
+        "email": "marcos.almeida.teste@examplo.com",
+        "telefone": null,
+        "pedido": "solicito a efetivação da minha matrícula no curso Técnico em Enfermagem, eixo tecnológico Saúde, com carga horária de 1200 horas, turno noturno.",
+        "entidades": {
+          "pessoas": [
+            "Marcos Vinícius de Almeida Santos"
+          ],
+          "orgaos": [],
+          "locais": [
+            "Cuiabá"
+          ],
+          "datas": [
+            "01/02/2027",
+            "12/08/2008",
+            "14/10/2026"
+          ],
+          "protocolos": []
+        }
+      },
+      "informacao_inferida": {
+        "categoria": "Matrícula e Ingresso",
+        "assunto": "Requerimento de Matrícula e Ingresso - Técnico em Enfermagem",
+        "resumo": "Solicitação registrada por Marcos Vinícius de Almeida Santos (protocolo sem protocolo informado) referente ao curso Técnico em Enfermagem. Solicita efetivação de matrícula e consulta a relação de documentos pendentes para entrega. Menciona localidade (Cuiabá) e datas de referência (01/02/2027, 12/08/2008).",
+        "necessidade_revisao": false,
+        "categoria_inferida": "Matrícula e Ingresso",
+        "assunto_inferido": "Requerimento de Matrícula e Ingresso - Técnico em Enfermagem",
+        "ambiguidade_detectada": false,
+        "justificativa_triagem": "Solicitação completa com campos essenciais validados.",
+        "modalidade_entrada": "texto"
+      },
+      "campos_ausentes": [
+        "nome_pai",
+        "orgao_expedidor",
+        "telefone",
+        "uf"
+      ]
+    }
+  },
+  {
+    "id": "SOL-02",
+    "tipo": "audio",
+    "subtipo": "completa",
+    "ficha_validada": {
+      "versao_esquema": "2.0.0",
+      "protocolo": "2026-000142",
+      "data": "14/10/2026",
+      "solicitante": "Marcos Vinícius de Almeida Santos",
+      "cpf": "123.456.789-00",
+      "rg": "1234567-8",
+      "orgao_expedidor": null,
+      "uf": null,
+      "data_nascimento": "12/08/2008",
+      "naturalidade": "Cuiabá",
+      "nome_mae": "Lúcia Helena de Almeida Santos",
+      "nome_pai": null,
+      "curso": "Técnico em Enfermagem",
+      "eixo_tecnologico": "Saúde",
+      "carga_horaria": "1200 horas",
+      "turno": "noturno",
+      "inicio_curso": "01/02/2027",
+      "email": "marcos.almeida.teste@exemplo.com",
+      "telefone": null,
+      "assunto": "Requerimento de Matrícula e Ingresso - Técnico em Enfermagem",
+      "pedido": "quero pedir a efetivação da minha matrícula no curso Técnico em Enfermagem, do eixo tecnológico de Saúde, com carga horária de 1200 horas no turno noturno.",
+      "categoria": "Matrícula e Ingresso",
+      "entidades": {
+        "pessoas": [
+          "Marcos Vinícius de Almeida Santos"
+        ],
+        "orgaos": [],
+        "locais": [
+          "Cuiabá"
+        ],
+        "datas": [
+          "12/08/2008",
+          "14/10/2026"
+        ],
+        "protocolos": [
+          "2026-000142"
+        ]
+      },
+      "informacoes_inferidas": {
+        "categoria_inferida": "Matrícula e Ingresso",
+        "assunto_inferido": "Requerimento de Matrícula e Ingresso - Técnico em Enfermagem",
+        "ambiguidade_detectada": false,
+        "justificativa_triagem": "Solicitação completa com campos essenciais validados.",
+        "modalidade_entrada": "audio"
+      },
+      "resumo": "Solicitação registrada por Marcos Vinícius de Almeida Santos (protocolo 2026-000142) referente ao curso Técnico em Enfermagem. Solicita efetivação de matrícula e consulta a relação de documentos pendentes para entrega. Menciona localidade (Cuiabá) e datas de referência (12/08/2008, 14/10/2026).",
+      "campos_ausentes": [
+        "nome_pai",
+        "orgao_expedidor",
+        "telefone",
+        "uf"
+      ],
+      "necessidade_revisao": false
+    },
+    "separacao_literal_inferido": {
+      "extracao_literal": {
+        "protocolo": "2026-000142",
+        "data": "14/10/2026",
+        "solicitante": "Marcos Vinícius de Almeida Santos",
+        "cpf": "123.456.789-00",
+        "rg": "1234567-8",
+        "orgao_expedidor": null,
+        "uf": null,
+        "data_nascimento": "12/08/2008",
+        "naturalidade": "Cuiabá",
+        "nome_mae": "Lúcia Helena de Almeida Santos",
+        "nome_pai": null,
+        "curso": "Técnico em Enfermagem",
+        "eixo_tecnologico": "Saúde",
+        "carga_horaria": "1200 horas",
+        "turno": "noturno",
+        "inicio_curso": "01/02/2027",
+        "email": "marcos.almeida.teste@exemplo.com",
+        "telefone": null,
+        "pedido": "quero pedir a efetivação da minha matrícula no curso Técnico em Enfermagem, do eixo tecnológico de Saúde, com carga horária de 1200 horas no turno noturno.",
+        "entidades": {
+          "pessoas": [
+            "Marcos Vinícius de Almeida Santos"
+          ],
+          "orgaos": [],
+          "locais": [
+            "Cuiabá"
+          ],
+          "datas": [
+            "12/08/2008",
+            "14/10/2026"
+          ],
+          "protocolos": [
+            "2026-000142"
+          ]
+        }
+      },
+      "informacao_inferida": {
+        "categoria": "Matrícula e Ingresso",
+        "assunto": "Requerimento de Matrícula e Ingresso - Técnico em Enfermagem",
+        "resumo": "Solicitação registrada por Marcos Vinícius de Almeida Santos (protocolo 2026-000142) referente ao curso Técnico em Enfermagem. Solicita efetivação de matrícula e consulta a relação de documentos pendentes para entrega. Menciona localidade (Cuiabá) e datas de referência (12/08/2008, 14/10/2026).",
+        "necessidade_revisao": false,
+        "categoria_inferida": "Matrícula e Ingresso",
+        "assunto_inferido": "Requerimento de Matrícula e Ingresso - Técnico em Enfermagem",
+        "ambiguidade_detectada": false,
+        "justificativa_triagem": "Solicitação completa com campos essenciais validados.",
+        "modalidade_entrada": "audio"
+      },
+      "campos_ausentes": [
+        "nome_pai",
+        "orgao_expedidor",
+        "telefone",
+        "uf"
+      ]
+    }
+  },
+  {
+    "id": "SOL-03",
+    "tipo": "ocr",
+    "subtipo": "completa",
+    "ficha_validada": {
+      "versao_esquema": "2.0.0",
+      "protocolo": "2026-000142",
+      "data": "14/10/2026",
+      "solicitante": "Marcos Vinícius de Almeida Santos",
+      "cpf": "123.456.789-00",
+      "rg": "1234567-8",
+      "orgao_expedidor": null,
+      "uf": null,
+      "data_nascimento": "12/08/2008",
+      "naturalidade": "Cuiabá",
+      "nome_mae": "Lúcia Helena de Almeida Santos",
+      "nome_pai": null,
+      "curso": "Técnico em Enfermagem",
+      "eixo_tecnologico": "Saúde",
+      "carga_horaria": "1200 horas",
+      "turno": "noturno",
+      "inicio_curso": "01/02/2027",
+      "email": "marcos.almeida.teste@examplo.com",
+      "telefone": null,
+      "assunto": "Requerimento de Matrícula e Ingresso - Técnico em Enfermagem",
+      "pedido": "FICHA DE MATRÍCULA ETEC SECITECI. Protocolo: 2026-000142. Nome: Marcos Vinícius de Almeida Santos. CPF: 123.456.789-00. RG: 1234567-8. Data Nasc: 12/08/2008. Naturalidade: Cuiabá. Mãe: Lúcia Helena de",
+      "categoria": "Matrícula e Ingresso",
+      "entidades": {
+        "pessoas": [
+          "Marcos Vinícius de Almeida Santos"
+        ],
+        "orgaos": [
+          "ETEC",
+          "SECITECI"
+        ],
+        "locais": [
+          "Cuiabá"
+        ],
+        "datas": [
+          "12/08/2008",
+          "14/10/2026"
+        ],
+        "protocolos": [
+          "2026-000142"
+        ]
+      },
+      "informacoes_inferidas": {
+        "categoria_inferida": "Matrícula e Ingresso",
+        "assunto_inferido": "Requerimento de Matrícula e Ingresso - Técnico em Enfermagem",
+        "ambiguidade_detectada": false,
+        "justificativa_triagem": "Solicitação completa com campos essenciais validados.",
+        "modalidade_entrada": "ocr"
+      },
+      "resumo": "Solicitação registrada por Marcos Vinícius de Almeida Santos (protocolo 2026-000142) referente ao curso Técnico em Enfermagem. Trata-se de ficha de matrícula digitalizada via OCR para Técnico em Enfermagem em Cuiabá. Menciona localidade (Cuiabá) e datas de referência (12/08/2008, 14/10/2026).",
+      "campos_ausentes": [
+        "nome_pai",
+        "orgao_expedidor",
+        "telefone",
+        "uf"
+      ],
+      "necessidade_revisao": false
+    },
+    "separacao_literal_inferido": {
+      "extracao_literal": {
+        "protocolo": "2026-000142",
+        "data": "14/10/2026",
+        "solicitante": "Marcos Vinícius de Almeida Santos",
+        "cpf": "123.456.789-00",
+        "rg": "1234567-8",
+        "orgao_expedidor": null,
+        "uf": null,
+        "data_nascimento": "12/08/2008",
+        "naturalidade": "Cuiabá",
+        "nome_mae": "Lúcia Helena de Almeida Santos",
+        "nome_pai": null,
+        "curso": "Técnico em Enfermagem",
+        "eixo_tecnologico": "Saúde",
+        "carga_horaria": "1200 horas",
+        "turno": "noturno",
+        "inicio_curso": "01/02/2027",
+        "email": "marcos.almeida.teste@examplo.com",
+        "telefone": null,
+        "pedido": "FICHA DE MATRÍCULA ETEC SECITECI. Protocolo: 2026-000142. Nome: Marcos Vinícius de Almeida Santos. CPF: 123.456.789-00. RG: 1234567-8. Data Nasc: 12/08/2008. Naturalidade: Cuiabá. Mãe: Lúcia Helena de",
+        "entidades": {
+          "pessoas": [
+            "Marcos Vinícius de Almeida Santos"
+          ],
+          "orgaos": [
+            "ETEC",
+            "SECITECI"
+          ],
+          "locais": [
+            "Cuiabá"
+          ],
+          "datas": [
+            "12/08/2008",
+            "14/10/2026"
+          ],
+          "protocolos": [
+            "2026-000142"
+          ]
+        }
+      },
+      "informacao_inferida": {
+        "categoria": "Matrícula e Ingresso",
+        "assunto": "Requerimento de Matrícula e Ingresso - Técnico em Enfermagem",
+        "resumo": "Solicitação registrada por Marcos Vinícius de Almeida Santos (protocolo 2026-000142) referente ao curso Técnico em Enfermagem. Trata-se de ficha de matrícula digitalizada via OCR para Técnico em Enfermagem em Cuiabá. Menciona localidade (Cuiabá) e datas de referência (12/08/2008, 14/10/2026).",
+        "necessidade_revisao": false,
+        "categoria_inferida": "Matrícula e Ingresso",
+        "assunto_inferido": "Requerimento de Matrícula e Ingresso - Técnico em Enfermagem",
+        "ambiguidade_detectada": false,
+        "justificativa_triagem": "Solicitação completa com campos essenciais validados.",
+        "modalidade_entrada": "ocr"
+      },
+      "campos_ausentes": [
+        "nome_pai",
+        "orgao_expedidor",
+        "telefone",
+        "uf"
+      ]
+    }
+  },
+  {
+    "id": "SOL-04",
+    "tipo": "texto",
+    "subtipo": "completa",
+    "ficha_validada": {
+      "versao_esquema": "2.0.0",
+      "protocolo": "2026-000588",
+      "data": "25/02/2026",
+      "solicitante": "Juliana Rocha Mendes",
+      "cpf": "987.654.321-11",
+      "rg": "9876543",
+      "orgao_expedidor": "SSP/MT",
+      "uf": "MT",
+      "data_nascimento": null,
+      "naturalidade": null,
+      "nome_mae": null,
+      "nome_pai": null,
+      "curso": "Técnico em Recursos Humanos",
+      "eixo_tecnologico": "Gestão e Negócios",
+      "carga_horaria": "800 horas",
+      "turno": "noturno",
+      "inicio_curso": "25/02/2026",
+      "email": "juliana.mendes@exemplo.com",
+      "telefone": null,
+      "assunto": "Requerimento de Assistência Estudantil - Técnico em Recursos Humanos",
+      "pedido": "Solicito a concessão de Auxílio Alimentação e Auxílio Transporte do Programa de Permanência Estudantil da ETEC Cuiabá.",
+      "categoria": "Assistência Estudantil",
+      "entidades": {
+        "pessoas": [
+          "Juliana Rocha Mendes"
+        ],
+        "orgaos": [
+          "ETEC",
+          "ETEC Cuiabá",
+          "SSP/MT"
+        ],
+        "locais": [
+          "Cuiabá"
+        ],
+        "datas": [],
+        "protocolos": []
+      },
+      "informacoes_inferidas": {
+        "categoria_inferida": "Assistência Estudantil",
+        "assunto_inferido": "Requerimento de Assistência Estudantil - Técnico em Recursos Humanos",
+        "ambiguidade_detectada": false,
+        "justificativa_triagem": "Solicitação completa com campos essenciais validados.",
+        "modalidade_entrada": "texto"
+      },
+      "resumo": "Solicitação registrada por Juliana Rocha Mendes (protocolo sem protocolo informado) referente ao curso Técnico em Recursos Humanos. Requer concessão de Auxílio Alimentação e Auxílio Transporte informando renda per capita de R$ 800,00. Menciona localidade (Cuiabá) e datas de referência (data não informada).",
+      "campos_ausentes": [
+        "data_nascimento",
+        "naturalidade",
+        "nome_mae",
+        "nome_pai",
+        "telefone"
+      ],
+      "necessidade_revisao": false
+    },
+    "separacao_literal_inferido": {
+      "extracao_literal": {
+        "protocolo": "2026-000588",
+        "data": "25/02/2026",
+        "solicitante": "Juliana Rocha Mendes",
+        "cpf": "987.654.321-11",
+        "rg": "9876543",
+        "orgao_expedidor": "SSP/MT",
+        "uf": "MT",
+        "data_nascimento": null,
+        "naturalidade": null,
+        "nome_mae": null,
+        "nome_pai": null,
+        "curso": "Técnico em Recursos Humanos",
+        "eixo_tecnologico": "Gestão e Negócios",
+        "carga_horaria": "800 horas",
+        "turno": "noturno",
+        "inicio_curso": "25/02/2026",
+        "email": "juliana.mendes@exemplo.com",
+        "telefone": null,
+        "pedido": "Solicito a concessão de Auxílio Alimentação e Auxílio Transporte do Programa de Permanência Estudantil da ETEC Cuiabá.",
+        "entidades": {
+          "pessoas": [
+            "Juliana Rocha Mendes"
+          ],
+          "orgaos": [
+            "ETEC",
+            "ETEC Cuiabá",
+            "SSP/MT"
+          ],
+          "locais": [
+            "Cuiabá"
+          ],
+          "datas": [],
+          "protocolos": []
+        }
+      },
+      "informacao_inferida": {
+        "categoria": "Assistência Estudantil",
+        "assunto": "Requerimento de Assistência Estudantil - Técnico em Recursos Humanos",
+        "resumo": "Solicitação registrada por Juliana Rocha Mendes (protocolo sem protocolo informado) referente ao curso Técnico em Recursos Humanos. Requer concessão de Auxílio Alimentação e Auxílio Transporte informando renda per capita de R$ 800,00. Menciona localidade (Cuiabá) e datas de referência (data não informada).",
+        "necessidade_revisao": false,
+        "categoria_inferida": "Assistência Estudantil",
+        "assunto_inferido": "Requerimento de Assistência Estudantil - Técnico em Recursos Humanos",
+        "ambiguidade_detectada": false,
+        "justificativa_triagem": "Solicitação completa com campos essenciais validados.",
+        "modalidade_entrada": "texto"
+      },
+      "campos_ausentes": [
+        "data_nascimento",
+        "naturalidade",
+        "nome_mae",
+        "nome_pai",
+        "telefone"
+      ]
+    }
+  },
+  {
+    "id": "SOL-05",
+    "tipo": "texto",
+    "subtipo": "incompleta",
+    "ficha_validada": {
+      "versao_esquema": "2.0.0",
+      "protocolo": null,
+      "data": "15/06/2026",
+      "solicitante": "João",
+      "cpf": null,
+      "rg": null,
+      "orgao_expedidor": null,
+      "uf": null,
+      "data_nascimento": null,
+      "naturalidade": null,
+      "nome_mae": null,
+      "nome_pai": null,
+      "curso": null,
+      "eixo_tecnologico": null,
+      "carga_horaria": null,
+      "turno": "noturno",
+      "inicio_curso": null,
+      "email": null,
+      "telefone": null,
+      "assunto": "Requerimento de revisão",
+      "pedido": "Gostaria de saber se meu nome saiu na lista de convocados e se já estou matriculado na turma da noite.",
+      "categoria": "revisão",
+      "entidades": {
+        "pessoas": [
+          "João"
+        ],
+        "orgaos": [],
+        "locais": [],
+        "datas": [],
+        "protocolos": []
+      },
+      "informacoes_inferidas": {
+        "categoria_inferida": "revisão",
+        "assunto_inferido": "Requerimento de revisão",
+        "ambiguidade_detectada": false,
+        "justificativa_triagem": "Dados essenciais de identificação/curso ausentes.",
+        "modalidade_entrada": "texto"
+      },
+      "resumo": "Solicitação apresentada por João (sem protocolo informado) junto ao atendimento institucional da SECITECI-MT. Relato incompleto sem sobrenome, documento de identificação ou curso especificado, exigindo complementação cadastral. Encaminhado para conferência documental conforme as normas vigentes do edital.",
+      "campos_ausentes": [
+        "carga_horaria",
+        "cpf",
+        "curso",
+        "data_nascimento",
+        "eixo_tecnologico",
+        "email",
+        "inicio_curso",
+        "naturalidade",
+        "nome_mae",
+        "nome_pai",
+        "orgao_expedidor",
+        "protocolo",
+        "rg",
+        "telefone",
+        "uf"
+      ],
+      "necessidade_revisao": true
+    },
+    "separacao_literal_inferido": {
+      "extracao_literal": {
+        "protocolo": null,
+        "data": "15/06/2026",
+        "solicitante": "João",
+        "cpf": null,
+        "rg": null,
+        "orgao_expedidor": null,
+        "uf": null,
+        "data_nascimento": null,
+        "naturalidade": null,
+        "nome_mae": null,
+        "nome_pai": null,
+        "curso": null,
+        "eixo_tecnologico": null,
+        "carga_horaria": null,
+        "turno": "noturno",
+        "inicio_curso": null,
+        "email": null,
+        "telefone": null,
+        "pedido": "Gostaria de saber se meu nome saiu na lista de convocados e se já estou matriculado na turma da noite.",
+        "entidades": {
+          "pessoas": [
+            "João"
+          ],
+          "orgaos": [],
+          "locais": [],
+          "datas": [],
+          "protocolos": []
+        }
+      },
+      "informacao_inferida": {
+        "categoria": "revisão",
+        "assunto": "Requerimento de revisão",
+        "resumo": "Solicitação apresentada por João (sem protocolo informado) junto ao atendimento institucional da SECITECI-MT. Relato incompleto sem sobrenome, documento de identificação ou curso especificado, exigindo complementação cadastral. Encaminhado para conferência documental conforme as normas vigentes do edital.",
+        "necessidade_revisao": true,
+        "categoria_inferida": "revisão",
+        "assunto_inferido": "Requerimento de revisão",
+        "ambiguidade_detectada": false,
+        "justificativa_triagem": "Dados essenciais de identificação/curso ausentes.",
+        "modalidade_entrada": "texto"
+      },
+      "campos_ausentes": [
+        "carga_horaria",
+        "cpf",
+        "curso",
+        "data_nascimento",
+        "eixo_tecnologico",
+        "email",
+        "inicio_curso",
+        "naturalidade",
+        "nome_mae",
+        "nome_pai",
+        "orgao_expedidor",
+        "protocolo",
+        "rg",
+        "telefone",
+        "uf"
+      ]
+    }
+  },
+  {
+    "id": "SOL-06",
+    "tipo": "texto",
+    "subtipo": "ambigua",
+    "ficha_validada": {
+      "versao_esquema": "2.0.0",
+      "protocolo": "2026-000921",
+      "data": "10/08/2026",
+      "solicitante": "Carla Ribeiro",
+      "cpf": null,
+      "rg": null,
+      "orgao_expedidor": null,
+      "uf": null,
+      "data_nascimento": null,
+      "naturalidade": null,
+      "nome_mae": null,
+      "nome_pai": null,
+      "curso": "Técnico em Enfermagem",
+      "eixo_tecnologico": null,
+      "carga_horaria": null,
+      "turno": null,
+      "inicio_curso": "05/10/2026",
+      "email": null,
+      "telefone": null,
+      "assunto": "Requerimento de Matrícula e Ingresso - Técnico em Enfermagem",
+      "pedido": "Posso fazer minha matrícula presencial na ETEC Cuiabá e assistir as aulas em Cuiabá a partir de outubro?",
+      "categoria": "Matrícula e Ingresso",
+      "entidades": {
+        "pessoas": [
+          "Carla Ribeiro"
+        ],
+        "orgaos": [
+          "ETEC",
+          "ETEC Cuiabá"
+        ],
+        "locais": [
+          "Barra do Garças",
+          "Cuiabá"
+        ],
+        "datas": [
+          "05/10/2026",
+          "21/07/2026"
+        ],
+        "protocolos": []
+      },
+      "informacoes_inferidas": {
+        "categoria_inferida": "Matrícula e Ingresso",
+        "assunto_inferido": "Requerimento de Matrícula e Ingresso - Técnico em Enfermagem",
+        "ambiguidade_detectada": true,
+        "justificativa_triagem": "Conflito/ambiguidade entre polo de aprovação e polo de matrícula pretendido.",
+        "modalidade_entrada": "texto"
+      },
+      "resumo": "Solicitação registrada por Carla Ribeiro (protocolo sem protocolo informado) referente ao curso Técnico em Enfermagem. Apresenta dúvida ambígua confundindo aprovação no polo de Barra do Garças com realização de matrícula e aulas em Cuiabá. Menciona localidade (Barra do Garças, Cuiabá) e datas de referência (05/10/2026, 21/07/2026).",
+      "campos_ausentes": [
+        "carga_horaria",
+        "cpf",
+        "data_nascimento",
+        "eixo_tecnologico",
+        "email",
+        "naturalidade",
+        "nome_mae",
+        "nome_pai",
+        "orgao_expedidor",
+        "rg",
+        "telefone",
+        "turno",
+        "uf"
+      ],
+      "necessidade_revisao": true
+    },
+    "separacao_literal_inferido": {
+      "extracao_literal": {
+        "protocolo": "2026-000921",
+        "data": "10/08/2026",
+        "solicitante": "Carla Ribeiro",
+        "cpf": null,
+        "rg": null,
+        "orgao_expedidor": null,
+        "uf": null,
+        "data_nascimento": null,
+        "naturalidade": null,
+        "nome_mae": null,
+        "nome_pai": null,
+        "curso": "Técnico em Enfermagem",
+        "eixo_tecnologico": null,
+        "carga_horaria": null,
+        "turno": null,
+        "inicio_curso": "05/10/2026",
+        "email": null,
+        "telefone": null,
+        "pedido": "Posso fazer minha matrícula presencial na ETEC Cuiabá e assistir as aulas em Cuiabá a partir de outubro?",
+        "entidades": {
+          "pessoas": [
+            "Carla Ribeiro"
+          ],
+          "orgaos": [
+            "ETEC",
+            "ETEC Cuiabá"
+          ],
+          "locais": [
+            "Barra do Garças",
+            "Cuiabá"
+          ],
+          "datas": [
+            "05/10/2026",
+            "21/07/2026"
+          ],
+          "protocolos": []
+        }
+      },
+      "informacao_inferida": {
+        "categoria": "Matrícula e Ingresso",
+        "assunto": "Requerimento de Matrícula e Ingresso - Técnico em Enfermagem",
+        "resumo": "Solicitação registrada por Carla Ribeiro (protocolo sem protocolo informado) referente ao curso Técnico em Enfermagem. Apresenta dúvida ambígua confundindo aprovação no polo de Barra do Garças com realização de matrícula e aulas em Cuiabá. Menciona localidade (Barra do Garças, Cuiabá) e datas de referência (05/10/2026, 21/07/2026).",
+        "necessidade_revisao": true,
+        "categoria_inferida": "Matrícula e Ingresso",
+        "assunto_inferido": "Requerimento de Matrícula e Ingresso - Técnico em Enfermagem",
+        "ambiguidade_detectada": true,
+        "justificativa_triagem": "Conflito/ambiguidade entre polo de aprovação e polo de matrícula pretendido.",
+        "modalidade_entrada": "texto"
+      },
+      "campos_ausentes": [
+        "carga_horaria",
+        "cpf",
+        "data_nascimento",
+        "eixo_tecnologico",
+        "email",
+        "naturalidade",
+        "nome_mae",
+        "nome_pai",
+        "orgao_expedidor",
+        "rg",
+        "telefone",
+        "turno",
+        "uf"
+      ]
+    }
+  }
+]

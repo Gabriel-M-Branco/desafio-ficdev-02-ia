@@ -6,7 +6,7 @@ ENV PYTHONUNBUFFERED=1
 
 WORKDIR /app
 
-# Instala dependências do sistema operacional necessárias (ffmpeg e bibliotecas gráficas)
+# Instala dependências do sistema operacional necessárias (ffmpeg e bibliotecas gráficas/OCR)
 RUN apt-get update && apt-get install -y --no-install-recommends \
     ffmpeg \
     libgl1 \
@@ -19,7 +19,7 @@ RUN apt-get update && apt-get install -y --no-install-recommends \
 # Define o prefixo canônico do tessdata no Debian/Ubuntu
 ENV TESSDATA_PREFIX=/usr/share/tesseract-ocr/5/tessdata
 ENV HOST=0.0.0.0
-ENV PORT=8000
+ENV PORT=8501
 
 # Copia e instala as dependências Python
 COPY requirements.txt .
@@ -28,8 +28,8 @@ RUN pip install --no-cache-dir -r requirements.txt
 # Copia o código da aplicação e arquivos de configuração
 COPY . .
 
-# Expõe a porta 8000 para acesso à API e Interface Web
-EXPOSE 8000
+# Expõe a porta 8501 para acesso à Interface Oficial em Streamlit (RF20)
+EXPOSE 8501
 
-# Executa o ponto de entrada oficial documentado
-CMD ["python", "-m", "src.main"]
+# Executa a interface oficial em Streamlit
+CMD ["streamlit", "run", "src/app.py", "--server.port=8501", "--server.address=0.0.0.0"]

@@ -278,10 +278,13 @@ def test_rf10_geracao_admin_tambem_bloqueada(web,monkeypatch):
     gerar.assert_not_called()
 
 
-@pytest.mark.parametrize("url", ["/","/static/styles.css","/static/app.js","/styles.css","/app.js"])
-def test_assets_interface_sem_expor_diretorios(web,url):
-    _,pedir=web
-    assert pedir("GET",url).status_code==200
+def test_interface_oficial_consolidada_em_streamlit_sem_assets_legados(web):
+    _, pedir = web
+    r_home = pedir("GET", "/")
+    assert r_home.status_code == 200
+    assert "Streamlit" in r_home.json()["interface_oficial"]
+    for url_legada in ("/static/styles.css", "/static/app.js", "/styles.css", "/app.js"):
+        assert pedir("GET", url_legada).status_code == 404
 
 
 @pytest.mark.parametrize("caso", ["audio_transcricao","visao_documento"])
@@ -329,7 +332,7 @@ def test_config_web_reflete_provedor_real_sem_segredos(web, monkeypatch):
     assert "segredo-" not in resposta.text
 
 
-@pytest.mark.parametrize("url", ["/", "/static/app.js", "/app.js", "/static/styles.css", "/styles.css"])
+@pytest.mark.parametrize("url", ["/", "/api/config"])
 def test_interface_runtime_nao_reutiliza_cache_antigo(web, url):
     _, pedir = web
     resposta = pedir("GET", url)
@@ -337,21 +340,29 @@ def test_interface_runtime_nao_reutiliza_cache_antigo(web, url):
     assert "no-store" in resposta.headers["cache-control"]
 
 
-def test_html_versiona_assets_pelo_conteudo_atual(web, monkeypatch, tmp_path):
-    import hashlib
-    main, pedir = web
-    pasta = tmp_path / "src/web"
-    pasta.mkdir(parents=True)
-    (pasta / "index.html").write_text('<script src="/static/app.js"></script><link href="/static/styles.css">', encoding="utf-8")
-    (pasta / "app.js").write_bytes(b"versao1")
-    (pasta / "styles.css").write_bytes(b"estilo")
-    monkeypatch.setattr(main, "BASE_DIR", tmp_path)
-    a = pedir("GET", "/").text
-    assert '/static/app.js?v=' + hashlib.sha256(b"versao1").hexdigest()[:16] in a
-    (pasta / "app.js").write_bytes(b"versao2")
-    b = pedir("GET", "/").text
-    assert a != b
-    assert '/static/app.js?v=' + hashlib.sha256(b"versao2").hexdigest()[:16] in b
+def test_openai_e_adaptador_simulado_configuraveis(llm, monkeypatch):
+    cliente, sdk = llm
+    cliente.text_provider = "openai"
+    cliente.openai_key = "sk-credencial-ficticia"
+    monkeypatch.setenv("OPENAI_MODEL", "gpt-4o-mini")
+    monkeypatch.setenv("TEXT_FALLBACK_PROVIDER", "none")
+    post = Mock(return_value=SimpleNamespace(status_code=200, json=lambda: {
+        "model": "gpt-4o-mini",
+        "id": "chatcmpl-teste",
+        "usage": {"prompt_tokens": 10, "completion_tokens": 15, "total_tokens": 25},
+        "choices": [{"finish_reason": "stop", "message": {"content": "Resposta OpenAI mockada"}}],
+    }))
+    monkeypatch.setattr("requests.post", post)
+    r_openai = cliente.generate("Entrada OpenAI")
+    assert r_openai.status == "success" and r_openai.provider == "OpenAI_API"
+    assert r_openai.model == "gpt-4o-mini" and r_openai.total_tokens == 25
+    assert not r_openai.is_mock
+
+    # Troca para adaptador simulado identificado (RF21 / T12)
+    r_sim = cliente.generate("Entrada Simulada", provider_override="adaptador_simulado")
+    assert r_sim.status == "success" and r_sim.provider == "Adaptador_Simulado_Identificado"
+    assert r_sim.is_mock is True
+    sdk.chat_completion.assert_not_called()
 
 
 @pytest.mark.parametrize("nome", ["../fora.pdf", "C:\\fora.pdf", "outra/pasta.pdf", "arquivo.txt"])

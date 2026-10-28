@@ -1,5 +1,5 @@
 """
-Módulo de Auditoria, Rastreabilidade, LGPD e Avaliação de Qualidade (RF11, RF12, RF13)
+Módulo de Auditoria, Rastreabilidade, LGPD e Avaliação de Qualidade (RF11, RF12, RF13, RF21)
 """
 
 import json
@@ -14,17 +14,64 @@ from typing import Dict, Any, List, Optional
 
 from src import resolver_caminho, caminho_relativo
 
+CHAVES_METRICAS_TOKENS_PERMITIDAS = {
+    "max_tokens",
+    "prompt_tokens",
+    "completion_tokens",
+    "total_tokens",
+    "tokens",
+    "tokens_estimados",
+}
+
 
 class AuditLogger:
     """
-    Registrador de auditoria estruturada e rastreabilidade completa (RF11).
-    Garante integridade, anonimização de credenciais e vínculo estrito com arquivos de entrada.
+    Registrador de auditoria estruturada e rastreabilidade completa (RF11, RF21).
+    Garante integridade, anonimização de credenciais, mascaramento de PII e vínculo
+    com versão de esquema, consulta, IDs recuperados e versão do índice.
     """
 
     def __init__(self, log_dir: str = "resultados/logs"):
         self.log_dir = resolver_caminho(log_dir)
         self.log_dir.mkdir(parents=True, exist_ok=True)
         self.trail_file = self.log_dir / "audit_trail.jsonl"
+
+    @staticmethod
+    def _mascarar_texto_pii_e_segredos(texto: str) -> str:
+        if not isinstance(texto, str) or not texto:
+            return texto
+        limpo = re.sub(r"\bhf_[A-Za-z0-9]{12,}\b", "[REDACTED_HF_TOKEN]", texto)
+        limpo = re.sub(r"\bsk-[A-Za-z0-9_\-]{12,}\b", "[REDACTED_API_KEY]", limpo)
+        limpo = re.sub(r"\b(\d{3})\.(\d{3})\.(\d{3})-(\d{2})\b", r"***. \2.***-**".replace(" ", ""), limpo)
+        limpo = re.sub(
+            r"\b([a-zA-Z0-9_.+-]+)@([a-zA-Z0-9-]+\.[a-zA-Z0-9-.]+)\b",
+            lambda m: f"{m.group(1)[0]}***@{m.group(2)}" if m.group(1) else f"***@{m.group(2)}",
+            limpo,
+        )
+        return limpo
+
+    @classmethod
+    def _mascarar_estrutura(cls, obj: Any) -> Any:
+        if isinstance(obj, str):
+            return cls._mascarar_texto_pii_e_segredos(obj)
+        if isinstance(obj, list):
+            return [cls._mascarar_estrutura(x) for x in obj]
+        if isinstance(obj, dict):
+            saida = {}
+            for k, v in obj.items():
+                k_low = str(k).lower()
+                if k_low not in CHAVES_METRICAS_TOKENS_PERMITIDAS and any(
+                    term in k_low for term in ["key", "token", "secret", "auth", "pwd", "chave", "senha"]
+                ):
+                    saida[k] = "[REDACTED]"
+                elif k_low == "cpf" and isinstance(v, str):
+                    saida[k] = LGPDManager.mascarar_dado_sensivel(v, "cpf")
+                elif k_low == "email" and isinstance(v, str):
+                    saida[k] = LGPDManager.mascarar_dado_sensivel(v, "email")
+                else:
+                    saida[k] = cls._mascarar_estrutura(v)
+            return saida
+        return obj
 
     def registrar_execucao(
         self,
@@ -38,35 +85,52 @@ class AuditLogger:
         duracao_segundos: float,
         decisao_humana: Optional[Dict[str, Any]] = None,
         erros: Optional[List[str]] = None,
+        versao_esquema: str = "2.0.0",
+        consulta: Optional[str] = None,
+        ids_recuperados: Optional[List[str]] = None,
+        versao_indice: Optional[str] = None,
     ) -> str:
         """
-        Salva um evento no log de auditoria sem expor senhas/chaves de API (RF11).
+        Salva um evento no log de auditoria sem expor senhas/chaves de API (RF11, RF21),
+        preservando métricas numéricas de tokens (como max_tokens).
         """
         exec_id = f"EXEC_{datetime.now().strftime('%Y%m%d_%H%M%S')}_{uuid.uuid4().hex[:6]}"
 
-        # Sanitiza parâmetros removendo possíveis chaves de API
+        # Sanitiza parâmetros removendo possíveis chaves de API sem mascarar contadores numéricos de tokens
         params_limpos = {}
         for k, v in (parametros or {}).items():
-            if any(term in k.lower() for term in ["key", "token", "secret", "auth", "pwd"]):
+            k_low = str(k).lower()
+            if k_low in CHAVES_METRICAS_TOKENS_PERMITIDAS and isinstance(v, (int, float)):
+                params_limpos[k] = v
+            elif any(term in k_low for term in ["key", "token", "secret", "auth", "pwd", "chave", "senha"]):
                 params_limpos[k] = "[REDACTED]"
+            elif isinstance(v, str):
+                params_limpos[k] = self._mascarar_texto_pii_e_segredos(v)
             else:
                 params_limpos[k] = v
 
         falhou = len(erros or []) > 0 or (isinstance(resultado, dict) and resultado.get("sucesso") is False)
+        consulta_mascarada = self._mascarar_texto_pii_e_segredos(consulta) if consulta else None
+
         registro = {
             "id_execucao": exec_id,
             "timestamp": datetime.now().isoformat(),
-            "modalidade": modalidade,  # texto, audio, visao, imagem
-            "arquivo_origem": caminho_relativo(arquivo_origem),
+            "modalidade": modalidade,
+            "arquivo_origem": caminho_relativo(arquivo_origem) if arquivo_origem else "entrada_direta",
             "provedor": provedor,
             "modelo": modelo,
             "versao_prompt": versao_prompt,
+            "versao_esquema": versao_esquema,
+            "consulta": consulta_mascarada,
+            "ids_recuperados": ids_recuperados if ids_recuperados is not None else [],
+            "versao_indice": versao_indice or "N/A",
             "parametros": params_limpos,
             "duracao_segundos": duracao_segundos,
             "erros": erros or [],
             "resultado_resumo": {
                 "sucesso": not falhou,
                 "campos_extraidos": len(resultado.get("extracao", {})) if isinstance(resultado, dict) else 0,
+                "status_decisao": resultado.get("status_decisao") if isinstance(resultado, dict) else None,
             },
             "decisao_humana": decisao_humana or (
                 {
@@ -78,7 +142,7 @@ class AuditLogger:
                 else {
                     "status": "pendente_revisao",
                     "operador": "aguardando_validacao",
-                    "justificativa": "Aguardando deliberação de servidor responsável no painel web.",
+                    "justificativa": "Aguardando deliberação de servidor responsável no painel Streamlit.",
                 }
             ),
         }
@@ -87,10 +151,11 @@ class AuditLogger:
         with open(self.trail_file, "a", encoding="utf-8") as f:
             f.write(json.dumps(registro, ensure_ascii=False) + "\n")
 
-        # Grava arquivo individual detalhado para o caso
+        # Grava arquivo individual detalhado para o caso com PII e segredos mascarados (RF12, RF21)
+        detalhes_limpos = self._mascarar_estrutura(resultado)
         individual_file = self.log_dir / f"{exec_id}.json"
         with open(individual_file, "w", encoding="utf-8") as f:
-            json.dump({**registro, "detalhes_completos": resultado}, f, ensure_ascii=False, indent=2)
+            json.dump({**registro, "detalhes_completos": detalhes_limpos}, f, ensure_ascii=False, indent=2)
 
         return exec_id
 
@@ -115,7 +180,7 @@ class AuditLogger:
 
     def atualizar_decisao_humana(self, exec_id: str, decisao: str, justificativa: str, operador: str = "Servidor Público", texto_final: Optional[str] = None) -> bool:
         """
-        Atualiza o status de Human-in-the-Loop de uma execução (RF13).
+        Atualiza o status de Human-in-the-Loop de uma execução (RF13, RF20).
         decisao: 'APROVADO', 'REJEITADO', 'CORRIGIDO'
         """
         if (not re.fullmatch(r"[A-Za-z0-9_-]+", exec_id) or decisao not in {"APROVADO", "CORRIGIDO", "REJEITADO"}
@@ -132,6 +197,7 @@ class AuditLogger:
                 "provedor": "revisao_operador",
                 "modelo": "N/A",
                 "versao_prompt": "PRODUCAO",
+                "versao_esquema": "2.0.0",
                 "parametros": {},
                 "duracao_segundos": 0.0,
                 "erros": [],
@@ -168,6 +234,10 @@ class AuditLogger:
                     "provedor": dado.get("provedor", ""),
                     "modelo": dado.get("modelo", ""),
                     "versao_prompt": dado.get("versao_prompt", ""),
+                    "versao_esquema": dado.get("versao_esquema", "2.0.0"),
+                    "consulta": dado.get("consulta"),
+                    "ids_recuperados": dado.get("ids_recuperados", []),
+                    "versao_indice": dado.get("versao_indice", "N/A"),
                     "parametros": dado.get("parametros", {}),
                     "duracao_segundos": dado.get("duracao_segundos", 0.0),
                     "erros": dado.get("erros", []),
@@ -198,7 +268,7 @@ class AuditLogger:
         """Decisões atuais dos casos, excluindo TTS e eventos auxiliares do denominador."""
         contagens = {k: 0 for k in ("APROVADO", "CORRIGIDO", "REJEITADO", "pendente_revisao", "nao_aplicavel")}
         for evento in self.listar_execucoes():
-            if evento.get("modalidade") not in {"texto", "audio", "visao", "imagem"}:
+            if evento.get("modalidade") not in {"texto", "audio", "visao", "imagem", "rag_minuta"}:
                 continue
             try:
                 dado = json.loads((self.log_dir / (evento["id_execucao"] + ".json")).read_text(encoding="utf-8"))
@@ -217,7 +287,7 @@ class AuditLogger:
 
 class LGPDManager:
     """
-    Gestão de Conformidade com a Lei Geral de Proteção de Dados (RF12).
+    Gestão de Conformidade com a Lei Geral de Proteção de Dados (RF12, RF21).
     Classificação, finalidade, análise de riscos e minimização de dados enviados a provedores.
     """
 
@@ -266,7 +336,6 @@ class LGPDManager:
         },
     }
 
-    # Campos contextuais mapeados formalmente com risco de identificação associativa (LGPD)
     for _campo in ("protocolo", "data", "orgao_expedidor", "naturalidade", "uf", "nome_pai",
                    "curso", "eixo_tecnologico", "carga_horaria", "turno", "inicio_curso", "telefone",
                    "assunto", "pedido", "categoria", "nivel_confianca", "campos_ausentes", "necessidade_revisao"):
@@ -304,13 +373,10 @@ class LGPDManager:
 
         texto = str(texto_minuta)
 
-        # 1. Mascara CPFs formatados (ex: 123.456.789-00 -> ***.456.789-**)
         def _sub_cpf(m):
             return f"***.{m.group(2)}.***-**"
         texto = re.sub(r"\b(\d{3})\.(\d{3})\.(\d{3})-(\d{2})\b", _sub_cpf, texto)
 
-        # 2. Mascara e-mails no corpo da minuta (ex: marcos.almeida.teste@exemplo.com -> m***@exemplo.com)
-        # Se estiver em linha de cabeçalho tipo "E-mail: marcos@...", remove ou mascara
         def _sub_email(m):
             user = m.group(1)
             dominio = m.group(2)
@@ -318,13 +384,8 @@ class LGPDManager:
             return f"{prefix}***@{dominio}"
         texto = re.sub(r"\b([a-zA-Z0-9_.+-]+)@([a-zA-Z0-9-]+\.[a-zA-Z0-9-.]+)\b", _sub_email, texto)
 
-        # 3. Suprime referências redundantes a RG no corpo (ex: ", RG 1234567-8" ou "RG: 1234567-8")
         texto = re.sub(r",?\s*(?:portador do\s+)?RG\s*(?:n[ºo°]?\s*)?[\d\w.-]+,?", "", texto, flags=re.IGNORECASE)
-
-        # 4. Suprime menções desnecessárias a filiação (ex: ", filho de Fulana de Tal")
         texto = re.sub(r",?\s*filh[oa]\s+de\s+[A-ZÁÀÂÃÉÈÊÍÏÓÔÕÖÚÇa-záàâãéèêíïóôõöúç\s]+?(?=,\s*solicita|,\s*nascid|\.|$)", "", texto, flags=re.IGNORECASE)
-
-        # 5. Remove linhas soltas tipo "E-mail: m***@..." em cabeçalhos de endereçamento
         texto = re.sub(r"(?im)^\s*E-?mail\s*:\s*[^\n]+\n?", "", texto)
 
         return texto.strip()
@@ -493,7 +554,6 @@ class QualityEvaluator:
         texto = "".join(c for c in texto if not unicodedata.combining(c)
                         and unicodedata.category(c) != "Cf")
         texto = " ".join(texto.split())
-        # Equivalências apenas do marcador de ausência, não de valores reais.
         if not texto or re.fullmatch(r"nao[\s_\-\u2010-\u2015]*localizad[oa]\s*[.!;:]?", texto):
             return "nao localizado"
         return texto
@@ -501,7 +561,6 @@ class QualityEvaluator:
     @classmethod
     def _normalizar_campo_comparacao(cls, campo, valor):
         texto = cls._normalizar_valor_comparacao(valor)
-        # Normalização de pontuação para evitar divergência espúria em CPFs, RGs, telefones e protocolos
         if campo in {"cpf", "rg", "telefone"} and re.fullmatch(r"[\d.()\s+\-x]+", texto):
             limpo = re.sub(r"[.()\s+\-]", "", texto)
             if campo != "cpf" or len(limpo) == 11 and limpo.isdigit():
@@ -548,9 +607,11 @@ class QualityEvaluator:
             "taxa_fidelidade_percentual": round(acertos/avaliaveis*100, 1) if avaliaveis else None,
             "taxa_completude_percentual": round(extraidos_disponiveis/len(disponiveis)*100, 1) if disponiveis else None,
             "criterio_metricas": "Fidelidade exclui apenas ausências coincidentes; completude considera dados disponíveis na fonte. Ausências não contam como acertos.",
-            "comparativo_campos": comparativo, "erros_encontrados": erros,
+            "comparativo_campos": detalhes if False else comparativo, "erros_encontrados": erros,
             "omissoes_extracao": omissoes,
             "status_qualidade": "Requer revisão" if erros or omissoes else "Dados conferidos; pendências na fonte" if pendencias
                 else "Conferido com referência" if avaliaveis else "Sem dados avaliáveis",
             "tipo_avaliacao": "fidelidade", "conformidade_formato": cls.avaliar_conformidade_regras(extracao)}
 
+
+audit_logger = AuditLogger()

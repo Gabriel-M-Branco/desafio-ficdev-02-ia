@@ -1,24 +1,46 @@
 {
   "project_name": "Central Inteligente de Atendimento e Comunicação Institucional - GOV.MT",
-  "version": "1.0.0",
+  "version": "2.0.0",
   "paths": {
     "dados_originais": "dados/originais",
+    "dados_acervo": "dados/acervo",
+    "dados_solicitacoes": "dados/solicitacoes",
+    "dados_avaliacoes": "dados/avaliacoes",
     "dados_gabaritos": "dados/gabaritos",
     "dados_processados": "dados/processados",
+    "indice_vetorial": "indice/indice_vetorial.json",
     "resultados_minutas": "resultados/minutas",
     "resultados_audios": "resultados/audios",
     "resultados_imagens": "resultados/imagens",
     "resultados_logs": "resultados/logs",
+    "resultados_metricas": "resultados/metricas",
     "prompts_dir": "prompts",
     "logo_institucional": "dados/originais/brasao.png"
   },
   "models": {
+    "llm_openai": "gpt-4o-mini",
     "llm_primary": "Qwen/Qwen2.5-72B-Instruct",
     "llm_fallback": "meta-llama/Llama-3.3-70B-Instruct",
+    "llm_simulated_adapter": "simulador-institucional-govmt-v2",
     "vision": "Qwen/Qwen2.5-VL-7B-Instruct",
     "stt": "openai/whisper-large-v3-turbo",
     "image": "black-forest-labs/FLUX.1-schnell",
     "tts_voice": "pt-BR-AntonioNeural"
+  },
+  "rag": {
+    "indice_dimensao": 512,
+    "top_k": 3,
+    "score_minimo_abstencao": 0.14,
+    "chunking_config_a": {
+      "nome": "Config A (400 chars / 80 overlap)",
+      "tamanho_chunk": 400,
+      "sobreposicao": 80
+    },
+    "chunking_config_b": {
+      "nome": "Config B (800 chars / 150 overlap)",
+      "tamanho_chunk": 800,
+      "sobreposicao": 150
+    }
   },
   "generation_params": {
     "temperature": 0.1,
@@ -31,6 +53,14 @@
     "Assistência Estudantil",
     "Cursos e Horários",
     "Outros / Informações Gerais"
+  ],
+  "categories_d02": [
+    "inscrição",
+    "matrícula",
+    "cronograma",
+    "heteroidentificação",
+    "assistência estudantil",
+    "revisão"
   ],
   "gov_mt": {
     "orgao": "GOVERNO DO ESTADO DE MATO GROSSO",

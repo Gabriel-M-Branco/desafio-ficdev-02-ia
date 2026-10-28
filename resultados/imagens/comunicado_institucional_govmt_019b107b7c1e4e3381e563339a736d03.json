@@ -1,0 +1,52 @@
+{
+  "identificador": "019b107b7c1e4e3381e563339a736d03",
+  "titulo": "COMUNICADO OFICIAL: MATRÍCULAS E INGRESSO ETEC 2026",
+  "sucesso": false,
+  "data_geracao": "2026-10-28T11:59:10.059521-04:00",
+  "modelo_ia_utilizado": "black-forest-labs/FLUX.1-schnell",
+  "provedor_solicitado": "fal-ai",
+  "provedor_efetivo": null,
+  "ia_gerada": false,
+  "estado_imagem": "nao_gerada",
+  "endpoint": null,
+  "parametros_geracao": {
+    "width": 1024,
+    "height": 1024,
+    "num_inference_steps": 4,
+    "guidance_scale": 0.0,
+    "seed": 42
+  },
+  "timeout_seconds": 60,
+  "prompt_estruturado": {
+    "contexto": "Illustration-only asset about technical education and student enrollment. All titles, subjects, institutional marks and captions will be added separately by software after generation",
+    "sujeito": "A diverse group of fictional young adult students walking together in a welcoming technical school courtyard, carrying plain backpacks and closed notebooks with solid unmarked covers",
+    "composicao": "Central students surrounded by simple geometric trees and plain campus architecture with unmarked facades. Open welcoming educational setting, abstract technology shapes, generous clean space, no reception counter or display surfaces",
+    "estilo": "High-quality modern flat vector illustration for an official Brazilian public technical school enrollment announcement, harmonious palette of royal blue (#004A8F), emerald green (#008B47) and golden yellow (#F7B500)",
+    "iluminacao": "Crisp vector shapes, balanced composition, soft lighting, professional and welcoming atmosphere",
+    "proporcao": "Square 1:1 composition",
+    "restricoes": "No text, no letters, no typography, no logos, no watermarks. No words, numbers, pseudo-writing, glyphs, labels, signs, signboards, plaques, banners, posters, billboards, school name signs, emblems or coats of arms anywhere. No writing on buildings, clothing, backpacks or notebooks. Do not draw a blank sign or any lettering surface. No medical coats, no stethoscopes, no clinical or hospital environment. Fictional people only",
+    "prompt_completo_en": "Illustration-only asset about technical education and student enrollment. All titles, subjects, institutional marks and captions will be added separately by software after generation. A diverse group of fictional young adult students walking together in a welcoming technical school courtyard, carrying plain backpacks and closed notebooks with solid unmarked covers. Central students surrounded by simple geometric trees and plain campus architecture with unmarked facades. Open welcoming educational setting, abstract technology shapes, generous clean space, no reception counter or display surfaces. High-quality modern flat vector illustration for an official Brazilian public technical school enrollment announcement, harmonious palette of royal blue (#004A8F), emerald green (#008B47) and golden yellow (#F7B500). Crisp vector shapes, balanced composition, soft lighting, professional and welcoming atmosphere. Square 1:1 composition. No text, no letters, no typography, no logos, no watermarks. No words, numbers, pseudo-writing, glyphs, labels, signs, signboards, plaques, banners, posters, billboards, school name signs, emblems or coats of arms anywhere. No writing on buildings, clothing, backpacks or notebooks. Do not draw a blank sign or any lettering surface. No medical coats, no stethoscopes, no clinical or hospital environment. Fictional people only"
+  },
+  "restricoes_aplicadas": "No text, no letters, no typography, no logos, no watermarks. No words, numbers, pseudo-writing, glyphs, labels, signs, signboards, plaques, banners, posters, billboards, school name signs, emblems or coats of arms anywhere. No writing on buildings, clothing, backpacks or notebooks. Do not draw a blank sign or any lettering surface. No medical coats, no stethoscopes, no clinical or hospital environment. Fictional people only",
+  "declaracao_proveniencia": "CONTEÚDO SINTÉTICO GERADO POR IA - Consulte o status de revisão",
+  "status_revisao": "pendente_revisao",
+  "custo_usd": null,
+  "custo_status": "não informado pelo provedor",
+  "template_institucional": "GOV.MT Oficial Padrão SECITECI",
+  "conformidade_seguranca": {
+    "sem_pessoas_reais": null,
+    "sem_direitos_autorais_terceiros": null,
+    "ilustracao_sem_texto_placas_logos": null,
+    "tarja_visivel_aplicada": false,
+    "revisao_humana_obrigatoria": true
+  },
+  "erro": {
+    "codigo": "falha_geracao",
+    "tipo": "RuntimeError",
+    "status_http": null,
+    "codigos_provedor": [],
+    "mensagem": "HF_TOKEN ausente."
+  },
+  "tempo_processamento_segundos": 0.0007186000002548099,
+  "arquivo_metadados": "resultados/imagens/comunicado_institucional_govmt_019b107b7c1e4e3381e563339a736d03.json"
+}

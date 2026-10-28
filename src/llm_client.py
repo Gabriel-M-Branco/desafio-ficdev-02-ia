@@ -1,6 +1,7 @@
 """
-Cliente de Comunicação com Modelos de IA (RF04)
-Hugging Face e OpenRouter opcional; falhas explícitas e extração heurística rastreável.
+Cliente de Comunicação com Modelos de IA (RF01, RF04, RF21)
+Suporte a OpenAI, Hugging Face, OpenRouter e Adaptador Simulado Identificado;
+falhas explícitas e extração heurística rastreável.
 """
 
 import os
@@ -47,16 +48,30 @@ class LLMClient:
     def __init__(self, config_path: str = "config.json"):
         self.config = self._load_config(config_path)
         self.hf_token = os.getenv("HF_TOKEN", "").strip()
-        # Suporta tanto OPENROUTER_API_KEY quanto OPENAI_API_KEY como alias multiuso
-        self.openrouter_key = (os.getenv("OPENROUTER_API_KEY") or os.getenv("OPENAI_API_KEY") or "").strip()
+        self.openai_key = os.getenv("OPENAI_API_KEY", "").strip()
+        self.openrouter_key = os.getenv("OPENROUTER_API_KEY", "").strip()
         self.execution_mode = os.getenv("EXECUTION_MODE", "auto").lower()
 
         # Modelos configurados
         models_cfg = self.config.get("models", {})
         self.hf_model = models_cfg.get("llm_primary", "Qwen/Qwen2.5-72B-Instruct")
-        self.text_provider = os.getenv("TEXT_PROVIDER", "openrouter" if self.openrouter_key else "huggingface").strip().lower()
-        self.primary_model = (os.getenv("OPENROUTER_MODEL", "openrouter/free").strip()
-                              if self.text_provider == "openrouter" else self.hf_model)
+        self.openai_model = os.getenv("OPENAI_MODEL", models_cfg.get("llm_openai", "gpt-4o-mini")).strip()
+        self.openai_base_url = os.getenv("OPENAI_BASE_URL", "https://api.openai.com/v1/chat/completions").strip()
+        self.simulated_model = models_cfg.get("llm_simulated_adapter", "simulador-institucional-govmt-v2")
+
+        default_provider = (
+            "openai" if self.openai_key and not self.openrouter_key
+            else ("openrouter" if self.openrouter_key else "huggingface")
+        )
+        self.text_provider = os.getenv("TEXT_PROVIDER", default_provider).strip().lower()
+        if self.text_provider == "openai":
+            self.primary_model = self.openai_model
+        elif self.text_provider == "openrouter":
+            self.primary_model = os.getenv("OPENROUTER_MODEL", "openrouter/free").strip()
+        elif self.text_provider == "adaptador_simulado":
+            self.primary_model = self.simulated_model
+        else:
+            self.primary_model = self.hf_model
         self.fallback_model = models_cfg.get("llm_fallback", "meta-llama/Llama-3.3-70B-Instruct")
 
         # Parâmetros padrão
@@ -82,19 +97,25 @@ class LLMClient:
         return max(1, int(len(text) / 4))
 
     def _sanitize_log_message(self, message: str) -> str:
-        """Garante que segredos ou tokens nunca sejam vazados em logs (RF04, RF11)."""
+        """Garante que segredos ou tokens nunca sejam vazados em logs (RF04, RF11, RF21)."""
         clean = message
         if self.hf_token and len(self.hf_token) > 4:
             clean = clean.replace(self.hf_token, "[REDACTED_HF_TOKEN]")
+        if self.openai_key and len(self.openai_key) > 4:
+            clean = clean.replace(self.openai_key, "[REDACTED_OPENAI_KEY]")
         if self.openrouter_key and len(self.openrouter_key) > 4:
             clean = clean.replace(self.openrouter_key, "[REDACTED_OPENROUTER_KEY]")
+        clean = re.sub(r"\bsk-[A-Za-z0-9_\-]{12,}\b", "[REDACTED_API_KEY]", clean)
+        clean = re.sub(r"\bhf_[A-Za-z0-9]{12,}\b", "[REDACTED_HF_TOKEN]", clean)
         return clean
 
     def generate(self, prompt, system_instruction=None, model=None, temperature=None,
-                 max_tokens=None, timeout=None, response_format=None) -> LLMResponse:
-        """Somente provedores reais. Indisponibilidade nunca vira resposta fictícia."""
+                 max_tokens=None, timeout=None, response_format=None,
+                 provider_override: Optional[str] = None) -> LLMResponse:
+        """Provedores configuráveis (OpenAI, OpenRouter, Hugging Face e Adaptador Simulado Identificado em RF21)."""
         inicio = time.perf_counter()
-        modelo = model or self.primary_model
+        provedor_ativo = (provider_override or self.text_provider).strip().lower()
+        modelo = model or (self.simulated_model if provedor_ativo == "adaptador_simulado" else self.primary_model)
         temp = self.default_temp if temperature is None else temperature
         limite = self.default_max_tokens if max_tokens is None else max_tokens
         espera = self.default_timeout if timeout is None else timeout
@@ -102,7 +123,7 @@ class LLMClient:
         mensagens.append({"role": "user", "content": prompt})
 
         import math
-        def resposta(texto, provedor, modelo_efetivo, status="success", detalhe_erro=None, finish_reason=None, response_id=None, usage=None):
+        def resposta(texto, provedor, modelo_efetivo, status="success", detalhe_erro=None, finish_reason=None, response_id=None, usage=None, is_mock=False):
             entrada = self._estimate_tokens(prompt + (system_instruction or "")) if texto else 0
             saida = self._estimate_tokens(texto)
             fonte, custo = "estimado", None
@@ -117,7 +138,7 @@ class LLMClient:
                 completion_tokens=saida, total_tokens=entrada+saida, cost_usd=custo,
                 status=status,
                 error_message=detalhe_erro if detalhe_erro else (None if texto else "Geração indisponível; nenhum conteúdo simulado foi produzido."),
-                is_mock=False,
+                is_mock=is_mock,
                 finish_reason=finish_reason,
                 provider_response_id=response_id,
                 token_usage_source=fonte,
@@ -132,17 +153,33 @@ class LLMClient:
             if isinstance(exc, ValueError): return "empty_or_invalid_response"
             return "service_unavailable"
 
+        if provedor_ativo == "adaptador_simulado":
+            texto_simulado = (
+                "[ADAPTADOR_SIMULADO_IDENTIFICADO | Origem: simulador-institucional-govmt-v2] "
+                "Síntese gerada pela segunda configuração de geração compatível (RF21), "
+                "operando sobre o mesmo índice vetorial sem reconstrução."
+            )
+            return resposta(
+                texto_simulado,
+                "Adaptador_Simulado_Identificado",
+                self.simulated_model,
+                status="success",
+                finish_reason="stop",
+                response_id="sim-rf21-001",
+                is_mock=True,
+            )
+
         if self.execution_mode not in {"auto", "api"}:
             return resposta("", "none", modelo, "remote_disabled")
 
-        if self.text_provider not in {"openrouter", "huggingface"}:
+        if provedor_ativo not in {"openai", "openrouter", "huggingface"}:
             return resposta("", "none", modelo, "invalid_provider")
 
         def chamar_hf():
             if not self.hf_token:
                 return resposta("", "none", self.hf_model, "credentials_missing")
             from huggingface_hub import InferenceClient
-            modelo_hf = (model if self.text_provider == "huggingface" else None) or self.hf_model
+            modelo_hf = (model if provedor_ativo == "huggingface" else None) or self.hf_model
             cliente = InferenceClient(token=self.hf_token, timeout=espera)
             parametros = {"response_format": response_format} if response_format else {}
             dado = cliente.chat_completion(messages=mensagens, model=modelo_hf,
@@ -155,13 +192,46 @@ class LLMClient:
                             finish_reason=getattr(dado.choices[0], "finish_reason", None),
                             usage=usage)
 
+        def chamar_openai():
+            if not self.openai_key:
+                return resposta("", "none", self.openai_model, "credentials_missing")
+            import requests
+            modelo_oa = (model if provedor_ativo == "openai" else None) or os.getenv("OPENAI_MODEL", self.openai_model)
+            parametros = {"model": modelo_oa, "messages": mensagens, "temperature": temp, "max_tokens": limite}
+            if response_format:
+                parametros["response_format"] = response_format
+            dado = requests.post(
+                self.openai_base_url,
+                headers={"Authorization": f"Bearer {self.openai_key}", "Content-Type": "application/json"},
+                json=parametros,
+                timeout=espera,
+                allow_redirects=False,
+            )
+            if dado.status_code != 200:
+                erro = RuntimeError(f"OpenAI HTTP {dado.status_code}")
+                erro.response = dado
+                raise erro
+            corpo = dado.json()
+            escolhas = corpo.get("choices") or [{}]
+            texto = escolhas[0].get("message", {}).get("content")
+            if not isinstance(texto, str) or not texto.strip():
+                raise ValueError("Resposta OpenAI vazia.")
+            return resposta(
+                texto,
+                "OpenAI_API",
+                corpo.get("model") or modelo_oa,
+                finish_reason=escolhas[0].get("finish_reason"),
+                response_id=corpo.get("id"),
+                usage=corpo.get("usage"),
+            )
+
         def chamar_openrouter():
             if not self.openrouter_key:
                 return resposta("", "none", modelo, "credentials_missing")
             import requests
-            modelo_or = (model if self.text_provider == "openrouter" else None) or os.getenv("OPENROUTER_MODEL", "openrouter/free")
+            modelo_or = (model if provedor_ativo == "openrouter" else None) or os.getenv("OPENROUTER_MODEL", "openrouter/free")
             gratuito = modelo_or == "openrouter/free" or modelo_or.endswith(":free")
-            if self.text_provider != "openrouter" and not gratuito:
+            if provedor_ativo != "openrouter" and not gratuito:
                 return resposta("", "none", modelo_or, "fallback_model_not_free")
             parametros = {"model": modelo_or, "messages": mensagens, "temperature": temp, "max_tokens": limite}
             if response_format:
@@ -187,15 +257,21 @@ class LLMClient:
                             response_id=corpo.get("id"),
                             usage=corpo.get("usage"))
 
-        provedores = [self.text_provider]
-        if self.text_provider == "huggingface" and os.getenv("OPENROUTER_ENABLED", "false").lower() == "true":
+        provedores = [provedor_ativo]
+        if provedor_ativo == "huggingface" and os.getenv("OPENROUTER_ENABLED", "false").lower() == "true":
             provedores.append("openrouter")
-        if self.text_provider == "openrouter" and os.getenv("TEXT_FALLBACK_PROVIDER", "none").lower() == "huggingface":
-            provedores.append("huggingface")
+        fallback_cfg = os.getenv("TEXT_FALLBACK_PROVIDER", "none").lower()
+        if provedor_ativo in {"openrouter", "openai"} and fallback_cfg in {"huggingface", "openrouter", "openai"} and fallback_cfg not in provedores:
+            provedores.append(fallback_cfg)
 
         for indice, provedor in enumerate(provedores):
             try:
-                resultado = chamar_openrouter() if provedor == "openrouter" else chamar_hf()
+                if provedor == "openai":
+                    resultado = chamar_openai()
+                elif provedor == "openrouter":
+                    resultado = chamar_openrouter()
+                else:
+                    resultado = chamar_hf()
             except Exception as exc:
                 resultado = resposta("", provedor, modelo, classificar(exc))
             if resultado.status == "success":
@@ -203,10 +279,6 @@ class LLMClient:
             if indice + 1 < len(provedores):
                 print(f"[Texto] {provedor} falhou ({resultado.status}); fallback explicitamente habilitado: {provedores[indice + 1]}.", flush=True)
         return resultado
-
-
-
-
 
     def _extrair_entidades_dinamico(self, texto: str, diag_seg: Dict[str, Any]) -> Dict[str, Any]:
         """

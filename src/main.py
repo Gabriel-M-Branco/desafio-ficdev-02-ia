@@ -1,12 +1,13 @@
 """
-Ponto de Entrada Oficial da Central Inteligente de Atendimento - GOV.MT (RF01)
-Suporta execução como Servidor Web FastAPI (padrão), CLI interativa (--cli) e Execução Completa de Pipeline (--run-all).
+Ponto de Entrada Oficial da Central Inteligente de Atendimento - GOV.MT (RF01, RF20)
+Suporta execução da Interface Oficial Streamlit (padrão), Servidor API (--api), CLI interativa (--cli) e Execução Completa de Pipeline (--run-all).
 """
 
 import os
 import sys
 import json
 import argparse
+import subprocess
 import uuid
 import re
 import hashlib
@@ -30,11 +31,11 @@ from src.pdf_generator import gerar_minuta_pdf
 from src.web_files import arquivo_publico
 from src.image_access import ImageAccessError, exigir_revisor_imagem, identidade_revisor, carregar_imagem, imagem_publicavel
 
-# Inicialização da Aplicação FastAPI
+# Inicialização da Aplicação FastAPI (Serviço de Integração e Endpoints Internos)
 app = FastAPI(
     title="Central Inteligente de Atendimento e Comunicação Institucional - GOV.MT",
     description="Sistema de triagem multimodal, extração estruturada, geração de minutas seguras e acessibilidade com governança humana.",
-    version="1.0.0",
+    version="2.0.0",
 )
 
 # Inicialização dos serviços centrais
@@ -52,16 +53,15 @@ def operador_padrao_web():
     }
 
 
-# Habilita operador institucional padrão para a interface web interativa (RF10)
+# Habilita operador institucional padrão para a interface interativa (RF10)
 if os.getenv("RF10_ADMINISTRATIVO_HABILITADO", "true").lower() in ("true", "1", "yes"):
     app.dependency_overrides[exigir_revisor_imagem] = operador_padrao_web
-
 
 
 @app.middleware("http")
 async def interface_sem_cache(request, call_next):
     resposta = await call_next(request)
-    if request.url.path in {"/", "/app.js", "/styles.css", "/favicon.ico", "/favicon.png"} or request.url.path.startswith("/static/"):
+    if (request.url.path == "/" or request.url.path.startswith("/api/")) and "cache-control" not in resposta.headers:
         resposta.headers["Cache-Control"] = "no-store, max-age=0"
         resposta.headers["Pragma"] = "no-cache"
     return resposta
@@ -72,8 +72,8 @@ async def erro_acesso_imagem(request, exc):
     return JSONResponse(status_code=exc.status_code, content={"detail": exc.detail},
                         headers={"Cache-Control": "no-store"})
 
-# Montagem de arquivos estáticos da interface web e arquivos de resultados resolvidos dinamicamente
-app.mount("/static", StaticFiles(directory=str(BASE_DIR / "src" / "web")), name="static")
+
+# Montagem segura de arquivos públicos resolvidos dinamicamente (sem expor /dados ou /resultados diretamente)
 class ArquivosPublicos(StaticFiles):
     def lookup_path(self, path):
         if not arquivo_publico(BASE_DIR, path):
@@ -122,48 +122,25 @@ class RequisicaoGerarPdf(BaseModel):
 
 
 # ==============================================================================
-# Rotas Principais da API e Interface Web
+# Rotas Principais da API (Interface Oficial Consolidada no Streamlit - RF20)
 # ==============================================================================
 @app.get("/")
 def home():
-    """Serve a Interface Web Institucional."""
-    pasta = BASE_DIR / "src/web"
-    html = (pasta / "index.html").read_text(encoding="utf-8")
-    for nome in ("app.js", "styles.css"):
-        versao = hashlib.sha256((pasta / nome).read_bytes()).hexdigest()[:16]
-        html = html.replace(f"/static/{nome}", f"/static/{nome}?v={versao}")
-    return HTMLResponse(html)
-
-
-@app.get("/styles.css")
-def obter_styles_css():
-    return FileResponse(str(BASE_DIR / "src/web/styles.css"))
-
-
-@app.get("/app.js")
-def obter_app_js():
-    return FileResponse(str(BASE_DIR / "src/web/app.js"))
-
-
-@app.get("/favicon.ico", include_in_schema=False)
-def obter_favicon_ico():
-    caminho = BASE_DIR / "src/web/favicon.ico"
-    if caminho.exists():
-        return FileResponse(str(caminho), media_type="image/x-icon")
-    return FileResponse(str(BASE_DIR / "dados/originais/brasao.png"), media_type="image/png")
-
-
-@app.get("/favicon.png", include_in_schema=False)
-def obter_favicon_png():
-    caminho = BASE_DIR / "src/web/favicon.png"
-    if caminho.exists():
-        return FileResponse(str(caminho), media_type="image/png")
-    return FileResponse(str(BASE_DIR / "dados/originais/brasao.png"), media_type="image/png")
+    """Informa que a Interface Oficial consolidada está no Streamlit (src/app.py - RF20)."""
+    return JSONResponse(
+        content={
+            "sistema": "Central Inteligente de Atendimento e Consulta Institucional - GOV.MT",
+            "versao": "2.0.0",
+            "interface_oficial": "Streamlit (streamlit run src/app.py)",
+            "status": "ativo",
+        },
+        headers={"Cache-Control": "no-store, max-age=0"},
+    )
 
 
 @app.get("/api/config")
 def obter_configuracoes():
-    """Retorna o estado e parametrizações do sistema (RF01)."""
+    """Retorna o estado e parametrizações do sistema (RF01, RF20, RF21)."""
     img_prov = image_generator.image_provider
     if img_prov == "cloudflare":
         img_habilitado = bool(os.getenv("CLOUDFLARE_ACCOUNT_ID") and os.getenv("CLOUDFLARE_API_TOKEN"))
@@ -174,19 +151,29 @@ def obter_configuracoes():
     else:
         img_habilitado = bool(image_generator.image_endpoint)
 
+    prov_texto = llm_client.text_provider
+    if prov_texto == "openai":
+        chave_texto = bool(getattr(llm_client, "openai_key", ""))
+    elif prov_texto == "openrouter":
+        chave_texto = bool(llm_client.openrouter_key)
+    elif prov_texto in {"adaptador_simulado", "simulated", "simulado"}:
+        chave_texto = True
+    else:
+        chave_texto = bool(llm_client.hf_token)
+
     return {
         "projeto": llm_client.config.get("project_name", "Central de Atendimento GOV.MT"),
-        "versao": "1.0.0",
+        "versao": llm_client.config.get("version", "2.0.0"),
+        "interface_oficial": "streamlit",
         "execution_mode": llm_client.execution_mode,
+        "has_openai_key": bool(getattr(llm_client, "openai_key", "")),
         "has_hf_token": bool(llm_client.hf_token),
         "has_openrouter_key": bool(llm_client.openrouter_key),
         "modelos": llm_client.config.get("models", {}),
         "texto": {
             "provedor": llm_client.text_provider,
             "modelo": llm_client.primary_model,
-            "habilitado": (llm_client.execution_mode in {"auto", "api"}) and bool(
-                llm_client.openrouter_key if llm_client.text_provider == "openrouter" else llm_client.hf_token
-            ),
+            "habilitado": (llm_client.execution_mode in {"auto", "api"}) and chave_texto,
         },
         "stt": {"provedor": audio_processor._obter_provedor_stt(), "modelo": audio_processor.stt_model},
         "tts": {
@@ -627,7 +614,6 @@ def obter_detalhes_log(id_execucao: str):
         raise HTTPException(status_code=500, detail=f"Erro ao carregar log: {str(e)}")
 
 
-
 @app.get("/api/lgpd/relatorio")
 def relatorio_lgpd():
     """Retorna relatório e matriz de conformidade LGPD (RF12)."""
@@ -745,6 +731,7 @@ def executar_cli_interativa():
     print("4. Gerar Peça Visual Oficial (RF10)")
     print("5. Executar Experimento dos 3 Prompts (RF02)")
     print("6. Executar Pipeline Completo (--run-all)")
+    print("7. Executar Matriz de Avaliação Desafio 02 (T01-T15)")
     print("0. Sair")
     opcao = input("\nSelecione uma opção: ").strip()
 
@@ -789,6 +776,11 @@ def executar_cli_interativa():
         print("Experimento concluído e salvo em 'prompts/matriz_comparativa.md'.")
     elif opcao == "6":
         executar_pipeline_completo()
+    elif opcao == "7":
+        from src.metrics import AvaliadorDesafio02
+        av = AvaliadorDesafio02()
+        res = av.executar_matriz_testes_completa()
+        print(json.dumps(res, indent=2, ensure_ascii=False))
     else:
         print("Encerrando CLI.")
 
@@ -800,10 +792,11 @@ def main():
     parser = argparse.ArgumentParser(description="Central Inteligente de Atendimento GOV.MT")
     parser.add_argument("--run-all", action="store_true", help="Executa o pipeline completo de ponta a ponta e salva evidências.")
     parser.add_argument("--cli", action="store_true", help="Inicia o modo interativo em linha de comando.")
+    parser.add_argument("--api", action="store_true", help="Inicia o serviço interno FastAPI.")
     default_host = os.getenv("HOST", "127.0.0.1")
-    default_port = int(os.getenv("PORT", "8000"))
-    parser.add_argument("--port", type=int, default=default_port, help=f"Porta do servidor web (padrão: {default_port}).")
-    parser.add_argument("--host", type=str, default=default_host, help=f"Host do servidor web (padrão: {default_host}).")
+    default_port = int(os.getenv("PORT", "8501"))
+    parser.add_argument("--port", type=int, default=default_port, help=f"Porta da interface (padrão: {default_port}).")
+    parser.add_argument("--host", type=str, default=default_host, help=f"Host da interface (padrão: {default_host}).")
 
     args = parser.parse_args()
 
@@ -812,13 +805,23 @@ def main():
             executar_pipeline_completo()
         elif args.cli:
             executar_cli_interativa()
+        elif args.api:
+            uvicorn.run(app, host=args.host, port=args.port, log_level="info")
         else:
             url_amigavel = f"http://localhost:{args.port}" if args.host in {"0.0.0.0", "127.0.0.1"} else f"http://{args.host}:{args.port}"
             print("\n" + "=" * 60)
-            print("  CENTRAL INTELIGENTE DE ATENDIMENTO GOV.MT (WEB UI)")
+            print("  CENTRAL INTELIGENTE DE ATENDIMENTO GOV.MT (STREAMLIT UI)")
             print(f"  Acesse no navegador: {url_amigavel}")
             print("=" * 60 + "\n")
-            uvicorn.run(app, host=args.host, port=args.port, log_level="info")
+            subprocess.run(
+                [
+                    sys.executable, "-m", "streamlit", "run",
+                    str(resolver_caminho("src/app.py")),
+                    "--server.port", str(args.port),
+                    "--server.address", args.host,
+                ],
+                check=False,
+            )
     except HTTPException as exc:
         print(f"HTTP {exc.status_code}: {exc.detail}")
 
