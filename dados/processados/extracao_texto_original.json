@@ -1,0 +1,31 @@
+{
+  "protocolo": "2026-000142",
+  "data": "14/10/2026",
+  "solicitante": "Marcos Vinícius de Almeida Santos",
+  "cpf": "123.456.789-00",
+  "rg": "1234567-8",
+  "orgao_expedidor": "não localizado",
+  "data_nascimento": "12/08/2008",
+  "naturalidade": "Cuiabá",
+  "uf": "não localizado",
+  "nome_mae": "Lúcia Helena de Almeida Santos",
+  "nome_pai": "não localizado",
+  "curso": "Técnico em Enfermagem",
+  "eixo_tecnologico": "Saúde",
+  "carga_horaria": "1200 horas",
+  "turno": "noturno",
+  "inicio_curso": "01/02/2027",
+  "email": "marcos.almeida.teste@examplo.com",
+  "telefone": "não localizado",
+  "assunto": "Efetivação de matrícula e documentação pendente",
+  "pedido": "Solicitação de efetivação de matrícula no curso Técnico em Enfermagem e orientações sobre documentos pendentes a apresentar",
+  "categoria": "Matrícula e Ingresso",
+  "nivel_confianca": "alta",
+  "campos_ausentes": [
+    "orgao_expedidor",
+    "uf",
+    "nome_pai",
+    "telefone"
+  ],
+  "necessidade_revisao": true
+}

@@ -1,0 +1,30 @@
+# Ambientes virtuais
+.venv/
+env/
+venv/
+ENV/
+
+# Arquivos de ambiente e segredos (RF01, RF04, RF11, RF12)
+.env
+*.env
+!.env.example
+
+# Bytecode e caches do Python
+__pycache__/
+*.py[cod]
+*$py.class
+*.so
+.pytest_cache/
+.coverage
+htmlcov/
+
+# Logs e arquivos de sistema
+*.log
+.DS_Store
+Thumbs.db
+
+# Artefatos e evidências de execução
+prompts/experimento_*/
+scratch/
+documentacao/relatorio_lgpd_execucao.json
+

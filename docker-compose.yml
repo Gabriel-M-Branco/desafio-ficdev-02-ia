@@ -1,0 +1,28 @@
+services:
+  app:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    container_name: central_atendimento_gov_mt
+    restart: unless-stopped
+    ports:
+      - "8000:8000"
+    environment:
+      - HF_TOKEN=${HF_TOKEN:-}
+      - OPENROUTER_API_KEY=${OPENROUTER_API_KEY:-}
+      - TEXT_PROVIDER=${TEXT_PROVIDER:-openrouter}
+      - OPENROUTER_MODEL=${OPENROUTER_MODEL:-google/gemini-3.8-flash}
+      - TEXT_FALLBACK_PROVIDER=${TEXT_FALLBACK_PROVIDER:-none}
+      - EXECUTION_MODE=${EXECUTION_MODE:-auto}
+      - IMAGE_PROVIDER=${IMAGE_PROVIDER:-cloudflare}
+      - CLOUDFLARE_ACCOUNT_ID=${CLOUDFLARE_ACCOUNT_ID:-}
+      - CLOUDFLARE_API_TOKEN=${CLOUDFLARE_API_TOKEN:-}
+      - CLOUDFLARE_IMAGE_MODEL=${CLOUDFLARE_IMAGE_MODEL:-@cf/black-forest-labs/flux-1-schnell}
+      - STT_PROVIDER=${STT_PROVIDER:-local}
+      - TTS_PROVIDER=${TTS_PROVIDER:-sapi5}
+      - TESSDATA_PREFIX=/usr/share/tesseract-ocr/5/tessdata
+      - HOST=0.0.0.0
+      - PORT=8000
+    volumes:
+      - ./resultados:/app/resultados
+      - ./dados/processados:/app/dados/processados

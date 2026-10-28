@@ -1,0 +1,510 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Central Inteligente de Atendimento - GOV.MT</title>
+  <link rel="icon" type="image/x-icon" href="/favicon.ico">
+  <link rel="icon" type="image/png" sizes="32x32" href="/favicon.png">
+  <link rel="shortcut icon" href="/favicon.ico">
+  <link rel="stylesheet" href="/static/styles.css">
+  <!-- Fontes locais do sistema: a demonstração não depende de Google Fonts. -->
+</head>
+<body>
+  <!-- Faixa Tricolor Oficial GOV.MT -->
+  <div class="gov-top-bar">
+    <div class="bar-blue"></div>
+    <div class="bar-green"></div>
+    <div class="bar-yellow"></div>
+  </div>
+
+  <!-- Cabecalho Institucional -->
+  <header class="gov-header">
+    <div class="header-container">
+      <div class="brand-group">
+        <img src="/arquivos/dados/originais/brasao.png" alt="Brasão do Estado de Mato Grosso" class="gov-logo" onerror="this.style.display='none'">
+        <div class="brand-text">
+          <h1>GOVERNO DO ESTADO DE MATO GROSSO</h1>
+          <h2>SECRETARIA DE ESTADO DE CIÊNCIA, TECNOLOGIA E INOVAÇÃO (SECITECI/MT)</h2>
+          <p>Central Inteligente de Atendimento e Comunicação Institucional - ETEC Cuiabá</p>
+        </div>
+      </div>
+      <div class="header-status-panel">
+        <div class="header-badges">
+          <span class="badge badge-hitl" title="Nenhuma resposta é enviada sem deliberação prévia de um servidor responsável">🛡️ Revisão humana obrigatória</span>
+          <span id="badge-api-mode" aria-live="polite" class="badge badge-mode">Carregando modo...</span>
+        </div>
+        <div id="modos-multimodais" class="header-multimodal-chips" role="status" aria-label="Status dos motores de IA">
+          <span class="multimodal-chip">🎙️ STT: Carregando...</span>
+          <span class="multimodal-chip">🔊 TTS: Carregando...</span>
+          <span class="multimodal-chip">📄 OCR: Local</span>
+          <span class="multimodal-chip chip-rf10">🎨 Imagem: Carregando...</span>
+        </div>
+      </div>
+    </div>
+  </header>
+  <!-- Navegacao Principal em Abas -->
+  <nav class="main-nav">
+    <div class="nav-container">
+      <button class="nav-tab active" data-tab="tab-atendimento">
+        Central de Atendimento
+      </button>
+      <button class="nav-tab" data-tab="tab-experimento">
+        Experimento de Prompts (RF02)
+      </button>
+      <button class="nav-tab" data-tab="tab-multimodal">
+        Áudio e OCR (RF06, RF08)
+      </button>
+      <button class="nav-tab" data-tab="tab-imagem">
+        Comunicação Visual (RF10)
+      </button>
+      <button class="nav-tab" data-tab="tab-auditoria">
+        Auditoria e LGPD (RF11, RF12)
+      </button>
+    </div>
+  </nav>
+
+  <!-- Conteudo Principal -->
+  <main class="main-content">
+    
+    <!-- ABA 1: CENTRAL DE ATENDIMENTO E REVISAO HUMANA (RF03, RF05, RF09, RF13) -->
+    <section id="tab-atendimento" class="tab-pane active">
+      <div class="pane-grid">
+        <!-- Coluna da Esquerda: Entrada de Solicitacao -->
+        <div class="card card-input" id="card-entrada-solicitacao">
+          <div class="card-header">
+            <h3>1. Entrada de Solicitação do Cidadão</h3>
+            <span class="badge badge-info">Conteúdo Não Confiável</span>
+          </div>
+          <div class="card-body">
+            <div class="form-group">
+              <label for="caso-predefinido">Carregar Manifestação por Modalidade (Multimodal Omnichannel):</label>
+              <select id="caso-predefinido" class="form-control">
+                <option value="texto_original">📝 Modalidade 1: Mensagem de Texto (entrada_texto.txt)</option>
+                <option value="audio_transcricao">🎙️ Modalidade 2: Mensagem de Voz / Áudio (entrada_audio.mp3 - Whisper STT)</option>
+                <option value="visao_documento">📑 Modalidade 3: Imagem / Ficha Digitalizada (entrada_pdf-imagem.pdf - OCR local)</option>
+                <option value="prompt_injection">🛡️ Teste de Segurança: Tentativa de Prompt Injection (RF03)</option>
+                <option value="personalizado">✏️ Personalizado (Digitar ou colar livremente)</option>
+              </select>
+            </div>
+
+            <div class="form-group form-group-textarea">
+              <label for="input-texto-solicitacao">Texto da Solicitação:</label>
+              <textarea id="input-texto-solicitacao" class="form-control code-font" rows="8" placeholder="Insira aqui o texto da solicitação..."></textarea>
+            </div>
+
+            <div class="form-actions">
+              <button id="btn-processar-solicitacao" class="btn btn-primary">
+                Processar Solicitação (RF03/RF05)
+              </button>
+              <button id="btn-limpar-texto" class="btn btn-secondary">Limpar</button>
+            </div>
+          </div>
+        </div>
+
+        <!-- Coluna da Direita: Extracao Estruturada e Minuta Oficial -->
+        <div class="card card-output card-output-shrunk" id="card-analise-minuta">
+          <div class="card-header">
+            <h3>2. Análise Estruturada e Minuta Gerada</h3>
+            <span id="badge-status-revisao" class="badge badge-warning">Aguardando Processamento</span>
+          </div>
+          <div class="card-body">
+            <!-- Abas internas: Minuta, Conferência, JSON, Métricas -->
+            <div class="sub-nav">
+              <button class="sub-tab active" data-subtab="subtab-minuta">Minuta de Resposta Oficial (RF09)</button>
+              <button class="sub-tab" data-subtab="subtab-conferencia" id="btn-subtab-conferencia">
+                Painel de Conferência (RF13) <span id="badge-divergencias-count" class="badge-tab-count badge badge-danger">0</span>
+              </button>
+              <button class="sub-tab" data-subtab="subtab-json">JSON Estruturado Extraído (RF05)</button>
+              <button class="sub-tab" data-subtab="subtab-metricas">Métricas e Segurança</button>
+            </div>
+
+            <div id="subtab-minuta" class="subtab-pane active">
+              <!-- Banner Dinâmico de Diagnóstico de Conferência do Operador -->
+              <div id="banner-conferencia-operador" class="conferencia-banner" style="display: none;"></div>
+
+              <!-- Estado Vazio Encolhido (Quando ainda não há minuta gerada) -->
+              <div id="minuta-empty-state" class="minuta-empty-state">
+                <div class="empty-icon-wrap">
+                  <span class="empty-icon">📋</span>
+                </div>
+                <div class="empty-text-wrap">
+                  <h4>Aguardando Processamento da Solicitação</h4>
+                  <p>Nenhuma minuta gerada no momento. Selecione ou insira a manifestação na coluna à esquerda e clique em <strong>Processar Solicitação (RF03/RF05)</strong>.</p>
+                </div>
+              </div>
+
+              <!-- Conteúdo Ativo da Minuta (Exibido após processamento) -->
+              <div id="minuta-conteudo-ativo" class="minuta-conteudo-ativo" style="display: none;">
+                <div class="alert alert-notice">
+                  <strong>Revisão de Minuta:</strong> Nenhum envio automático. Realize a conferência do texto antes de registrar a decisão e gerar o documento oficial.
+                </div>
+                <div class="form-group">
+                  <label for="editor-minuta">Texto da Minuta Oficial (Editavel pelo Servidor):</label>
+                  <textarea id="editor-minuta" class="form-control doc-editor" rows="12"></textarea>
+                </div>
+
+                <!-- Acoes do Documento Oficial -->
+                <div class="form-actions mb-3">
+                  <button id="btn-exportar-pdf" class="btn btn-secondary">
+                    Visualizar / Baixar Minuta em PDF Oficial
+                  </button>
+                </div>
+
+                <!-- Controles de Acessibilidade TTS -->
+                <div class="tts-section">
+                  <button id="btn-gerar-tts" class="btn btn-access">
+                    Gerar Áudio Acessível (RF07)
+                  </button>
+                  <div id="tts-audio-container" class="audio-player-wrapper" style="display: none;">
+                    <audio id="tts-audio-player" controls></audio>
+                    <span class="tts-note">Campos “não localizado” recebem aviso sonoro na narração.</span>
+                  </div>
+                </div>
+
+                <!-- Painel de Revisao Humana (Human-in-the-Loop) -->
+                <div class="hitl-box">
+                  <h4>Decisao do Servidor Responsavel (RF13)</h4>
+                  <div class="form-group">
+                    <label for="justificativa-revisao">Justificativa da Decisao (Obrigatoria para registro no log de auditoria):</label>
+                    <input type="text" id="justificativa-revisao" class="form-control" placeholder="Ex: Dados cadastrais conferidos com os registros da ETEC. Aprovado para emissão.">
+                  </div>
+                  <div class="hitl-actions">
+                    <button id="btn-aprovar-minuta" class="btn btn-success">Aprovar Resposta</button>
+                    <button id="btn-corrigir-minuta" class="btn btn-warning">Salvar com Correções</button>
+                    <button id="btn-rejeitar-minuta" class="btn btn-danger">Rejeitar / Solicitar Nova Geração</button>
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            <!-- Sub-aba de Conferência de Dados (RF13) -->
+            <div id="subtab-conferencia" class="subtab-pane">
+              <!-- Resumo da Auditoria e Métricas de Qualidade -->
+              <div class="audit-summary-grid">
+                <div class="audit-card">
+                  <span class="audit-card-title">Fidelidade aos Dados</span>
+                  <span id="audit-taxa-fidelidade" class="audit-card-value">-</span>
+                  <span id="audit-status-qualidade" class="badge badge-ok">Aguardando</span>
+                </div>
+                <div class="audit-card">
+                  <span class="audit-card-title">Campos Conformes</span>
+                  <span id="audit-campos-acertos" class="audit-card-value text-green">-</span>
+                  <span class="audit-card-sub">Dados coincidentes com a referência</span>
+                </div>
+                <div class="audit-card">
+                  <span class="audit-card-title">Divergências / Erros</span>
+                  <span id="audit-campos-erros" class="audit-card-value text-danger">0</span>
+                  <span id="audit-sub-erros" class="audit-card-sub">Nenhuma divergência</span>
+                </div>
+                <div class="audit-card">
+                  <span class="audit-card-title">Pendências Documentais</span>
+                  <span id="audit-campos-pendencias" class="audit-card-value text-warning">0</span>
+                  <span class="audit-card-sub">Campos "não localizado"</span>
+                </div>
+              </div>
+
+              <!-- Filtros da Tabela de Conferência -->
+              <div class="conferencia-filters">
+                <div class="filter-group">
+                  <button type="button" class="btn btn-filter active" data-filter="todos">Todos os Campos</button>
+                  <button type="button" class="btn btn-filter" data-filter="divergentes">Apenas Divergências / Erros</button>
+                  <button type="button" class="btn btn-filter" data-filter="pendencias">Apenas Pendências</button>
+                </div>
+                <div class="filter-hint">
+                  Campos com discrepância em relação aos formatos e regras oficiais estão destacados.
+                </div>
+              </div>
+
+              <!-- Barra de Escolha de Formatos pelo Servidor (Human-in-the-Loop) -->
+              <div class="format-global-bar">
+                <span class="format-global-title"><strong>Exibição de CPF/RG:</strong> não altera os dados, a minuta ou a conferência.</span>
+                <div class="format-global-buttons">
+                  <button type="button" id="btn-aplicar-mascaras-todas" class="btn-format-global">
+                    Máscara de CPF
+                  </button>
+                  <button type="button" id="btn-aplicar-digitos-todas" class="btn-format-global">
+                    Apenas dígitos (CPF/RG)
+                  </button>
+                </div>
+              </div>
+
+              <!-- Tabela Comparativa Detalhada -->
+              <div class="table-responsive mt-3">
+                <table class="table-gov table-conferencia" id="tabela-conferencia">
+                  <thead>
+                    <tr>
+                      <th style="min-width: 130px; width: 20%;">Campo / Dado</th>
+                      <th style="min-width: 140px; width: 23%;">Valor Extraído</th>
+                      <th style="min-width: 160px; width: 26%;">Referência / Formato Esperado</th>
+                      <th style="min-width: 110px; width: 16%;">Diagnóstico</th>
+                      <th style="min-width: 130px; width: 15%; text-align: center;">Ação</th>
+                    </tr>
+                  </thead>
+                  <tbody id="tabela-conferencia-body">
+                    <tr>
+                      <td colspan="5" style="text-align:center; padding: 24px; color: #64748B;">
+                        Processe uma solicitação para visualizar a conferência detalhada campo a campo.
+                      </td>
+                    </tr>
+                    <tr id="tr-empty-filter" style="display:none;">
+                      <td colspan="5" style="text-align:center; padding: 24px; color: #16A34A; font-weight: 600;"></td>
+                    </tr>
+                  </tbody>
+                </table>
+              </div>
+            </div>
+
+            <div id="subtab-json" class="subtab-pane">
+              <pre id="json-extracao-view" class="json-viewer">Aguardando execução...</pre>
+            </div>
+
+            <div id="subtab-metricas" class="subtab-pane">
+              <div class="metrics-grid">
+                <div class="metric-card">
+                  <span class="metric-label">Tempo de Resposta</span>
+                  <span id="metric-duracao" class="metric-val">-</span>
+                </div>
+                <div class="metric-card">
+                  <span class="metric-label">Tokens Estimados</span>
+                  <span id="metric-tokens" class="metric-val">-</span>
+                </div>
+                <div class="metric-card">
+                  <span class="metric-label">Custo Estimado</span>
+                  <span id="metric-custo" class="metric-val">Não informado</span>
+                </div>
+                <div class="metric-card">
+                  <span class="metric-label">Protecao Injecao</span>
+                  <span id="metric-injection" class="metric-val badge-ok">Ativa</span>
+                </div>
+              </div>
+              <div id="comparacao-gabarito-view" class="gabarito-eval-box"></div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- ABA 2: EXPERIMENTO DE ENGENHARIA DE PROMPTS (RF02) -->
+    <section id="tab-experimento" class="tab-pane">
+      <div class="card">
+        <div class="card-header">
+          <h3>Experimento Controlado: Comparação de Prompts A, B e C (RF02)</h3>
+          <button id="btn-rodar-experimento" class="btn btn-primary">
+            Executar Experimento de Prompts
+          </button>
+        </div>
+        <div class="card-body">
+          <p class="section-desc">
+            Execução com o mesmo caso de entrada e modelo para comparar: <strong>Prompt A</strong> (zero-shot curto),
+            <strong>Prompt B</strong> (estruturado manualmente com Persona, Contexto, Tarefa, Formato e Critérios) e
+            <strong>Prompt C</strong> (produzido com metaprompt e blindagem de segurança).
+          </p>
+
+          <!-- Tabela de Comparacao -->
+          <div class="table-responsive">
+            <table class="table-gov">
+              <thead>
+                <tr>
+                  <th>Critério de Avaliacao</th>
+                  <th>Prompt A (Zero-Shot Curto)</th>
+                  <th>Prompt B (Estruturado Manual)</th>
+                  <th>Prompt C (Metaprompt / Produção)</th>
+                </tr>
+              </thead>
+              <tbody id="tbody-experimento-comparativo">
+                <tr>
+                  <td><strong>Fidelidade ao Contexto</strong></td>
+                  <td>Média (resposta informal, omite requisitos)</td>
+                  <td>Alta (segue o padrão e campos solicitados)</td>
+                  <td><span class="badge badge-ok">Excelente (100% documental)</span></td>
+                </tr>
+                <tr>
+                  <td><strong>Dados Inventados (Alucinação)</strong></td>
+                  <td>Risco Alto (tende a inferir datas/valores)</td>
+                  <td>Baixo Risco (orientado a não inventar)</td>
+                  <td><span class="badge badge-ok">Alucinação Zero ("não localizado")</span></td>
+                </tr>
+                <tr>
+                  <td><strong>Formato de Saída</strong></td>
+                  <td>Texto livre corrido sem padrão</td>
+                  <td>Texto estruturado com marcadores</td>
+                  <td><span class="badge badge-info">JSON Estruturado + Minuta Oficial</span></td>
+                </tr>
+                <tr>
+                  <td><strong>Tom e Adequação Institucional</strong></td>
+                  <td>Informal / Genérico</td>
+                  <td>Formal / Padrão GOV.MT</td>
+                  <td><span class="badge badge-ok">Oficial Padrão GOV.MT</span></td>
+                </tr>
+                <tr>
+                  <td><strong>Tratamento de Lacunas</strong></td>
+                  <td>Omissão de campos ausentes</td>
+                  <td>Aviso parcial de pendência</td>
+                  <td><span class="badge badge-ok">Obrigatório "não localizado"</span></td>
+                </tr>
+                <tr>
+                  <td><strong>Blindagem contra Prompt Injection</strong></td>
+                  <td>Inexistente (vulnerável a comandos)</td>
+                  <td>Parcial (instruções gerais)</td>
+                  <td><span class="badge badge-ok">Robusta com Envelope XML</span></td>
+                </tr>
+                <tr>
+                  <td><strong>Tempo até Resultado Utilizável</strong></td>
+                  <td id="exp-tempo-a">25.72s</td>
+                  <td id="exp-tempo-b">15.24s</td>
+                  <td id="exp-tempo-c">15.42s</td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+
+          <!-- Justificativa da Escolha do Prompt -->
+          <div class="alert alert-info" style="margin-top: 16px; border-left: 4px solid var(--gov-blue); background: var(--gov-blue-light); padding: 14px 18px; border-radius: 8px;">
+            <strong style="color: var(--gov-blue-dark); font-size: 0.95rem;">🏆 Prompt Selecionado para Produção: Prompt C (Metaprompting com Blindagem XML)</strong>
+            <p style="margin: 6px 0 0 0; font-size: 0.85rem; color: #1E293B; line-height: 1.5;">
+              <strong>Justificativa da Escolha:</strong> O <em>Prompt C</em> cumpre com rigor todos os requisitos de segurança institucional (imunização de dados externos via tags <code>&lt;conteudo_nao_confiavel&gt;</code>), garantia de alucinação zero com a regra do <code>"não localizado"</code> e entrega em JSON estruturado pronto para validação de esquemas no padrão GOV.MT.
+            </p>
+          </div>
+
+          <div class="prompt-details-grid">
+            <div class="prompt-box">
+              <h4>Prompt A (Zero-Shot)</h4>
+              <pre id="exp-out-a">Clique em 'Executar Experimento de Prompts' para gerar...</pre>
+            </div>
+            <div class="prompt-box">
+              <h4>Prompt B (Estruturado)</h4>
+              <pre id="exp-out-b">Clique em 'Executar Experimento de Prompts' para gerar...</pre>
+            </div>
+            <div class="prompt-box">
+              <h4>Prompt C (Metaprompt - Selecionado)</h4>
+              <pre id="exp-out-c">Clique em 'Executar Experimento de Prompts' para gerar...</pre>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- ABA 3: TRANSCRICAO DE AUDIO E VISAO MULTIMODAL (RF06, RF08) -->
+    <section id="tab-multimodal" class="tab-pane">
+      <div class="pane-grid">
+        <!-- Audio STT (RF06) -->
+        <div class="card">
+          <div class="card-header">
+            <h3>Mensagem de Voz / Áudio (RF06)</h3>
+            <span class="badge badge-info">Provedor conforme configuração</span>
+          </div>
+          <div class="card-body">
+            <p>Arquivo: <code>dados/originais/entrada_audio.mp3</code></p>
+            <audio id="audio-input-player" src="/arquivos/dados/originais/entrada_audio.mp3" controls class="w-full mb-3"></audio>
+            <button id="btn-processar-audio" class="btn btn-primary w-full">
+              Transcrever Áudio e Validar Entidades
+            </button>
+            <div id="resultado-audio-stt" class="mt-3"></div>
+          </div>
+        </div>
+
+        <!-- Visao e OCR (RF08) -->
+        <div class="card">
+          <div class="card-header">
+            <h3>Documento Digitalizado / Visão (RF08)</h3>
+            <span class="badge badge-info">Tesseract / PyMuPDF local</span>
+          </div>
+          <div class="card-body">
+            <p>Arquivo: <code>dados/originais/entrada_pdf-imagem.pdf</code> (Ficha de Matrícula)</p><p class="alert alert-notice">O PDF oficial tem baixa legibilidade. OCR concluído não significa campos corretos; revisão humana obrigatória.</p>
+            <button id="btn-processar-visao" class="btn btn-primary w-full">
+              Executar Leitura Visual e OCR
+            </button>
+            <div id="resultado-visao-ocr" class="mt-3"></div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- ABA 4: PECA VISUAL INSTITUCIONAL GOV.MT (RF10) -->
+    <section id="tab-imagem" class="tab-pane">
+      <div class="card">
+        <div class="card-header">
+          <h3>Geração de Peça Visual Padronizada GOV.MT (RF10)</h3>
+          <button id="btn-gerar-imagem-peca" disabled class="btn btn-primary">
+            Gerar Comunicado Visual Oficial
+          </button>
+        </div>
+        <div class="card-body">
+          <p class="section-desc">
+            Abordagem Híbrida: Arte central ilustrada (sem texto, cores oficiais azul, verde e amarelo) e
+            composição programática em Pillow com Brasão do Estado de Mato Grosso e tarja de proveniência de conteudo sintético.
+          </p>
+
+          <div class="image-preview-wrapper">
+            <div class="image-box">
+              <img id="img-peca-visual" src="/arquivos/dados/originais/brasao.png" alt="Prévia da Peça Visual" class="gov-piece-image" onerror="this.style.display='none'">
+            </div>
+            <div class="image-meta-box">
+              <h4>Metadados da Peça Sintética (RF10)</h4>
+              <div id="meta-peca-visual">
+                <p>Clique no botão <strong>Gerar Comunicado Visual Oficial</strong> para criar a peça institucional híbrida via IA (FLUX.1) e moldura programática GOV.MT.</p>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- ABA 5: AUDITORIA, LGPD E RASTREABILIDADE (RF11, RF12, RF13) -->
+    <section id="tab-auditoria" class="tab-pane">
+      <div class="pane-grid">
+        <div class="card">
+          <div class="card-header">
+            <h3>Relatorio de Conformidade LGPD (RF12)</h3>
+          </div>
+          <div class="card-body" id="lgpd-report-container">
+            Carregando conformidade LGPD...
+          </div>
+        </div>
+
+        <div class="card">
+          <div class="card-header">
+            <h3>Trilha de Auditoria e Decisoes Humanas (RF11, RF13)</h3>
+            <button id="btn-atualizar-logs" class="btn btn-secondary btn-sm">Atualizar</button>
+          </div>
+          <div class="card-body">
+            <div id="audit-logs-container" class="log-list">
+              Carregando registros de auditoria...
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+  </main>
+
+  <!-- Rodape Institucional -->
+  <footer class="gov-footer">
+    <div class="footer-container">
+      <p>Governo do Estado de Mato Grosso — Secretaria de Estado de Ciência, Tecnologia e Inovação (SECITECI/MT)</p>
+      <p>Escola Técnica Estadual de Cuiabá — Central de Atendimento e Comunicação Institucional</p>
+    </div>
+  </footer>
+
+  <!-- Tela de Loading Global Institucional GOV.MT -->
+  <div id="gov-loading-overlay" class="gov-loading-overlay" style="display: none;" aria-hidden="true" role="dialog" aria-modal="true">
+    <div class="gov-loading-card">
+      <div class="gov-loading-spinner-wrapper">
+        <div class="gov-spinner"></div>
+        <div class="gov-spinner-inner"></div>
+      </div>
+      <div class="gov-loading-text-group">
+        <h3 id="gov-loading-title">Processando...</h3>
+        <p id="gov-loading-message">Processando requisição, por favor aguarde.</p>
+      </div>
+      <div class="gov-loading-progress-bar">
+        <div class="gov-loading-progress-indeterminate"></div>
+      </div>
+    </div>
+  </div>
+
+  <script src="/static/app.js"></script>
+</body>
+</html>
+

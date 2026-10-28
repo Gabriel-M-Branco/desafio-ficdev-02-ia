@@ -1,0 +1,34 @@
+{
+  "extracao": {
+    "protocolo": "2026-000142",
+    "data": "14/10/2026",
+    "solicitante": "Marcos Vinícius de Almeida Santos",
+    "cpf": "123.456.789-00",
+    "rg": "1234567-8",
+    "orgao_expedidor": "não localizado",
+    "uf": "não localizado",
+    "data_nascimento": "12/08/2008",
+    "naturalidade": "Cuiabá",
+    "nome_mae": "Lúcia Helena de Almeida Santos",
+    "nome_pai": "não localizado",
+    "curso": "Técnico em Enfermagem",
+    "eixo_tecnologico": "Saúde",
+    "carga_horaria": "1200 horas",
+    "turno": "noturno",
+    "inicio_curso": "01/02/2027",
+    "email": "marcos.almeida.teste@examplo.com",
+    "telefone": "não localizado",
+    "assunto": "Efetivação de matrícula e verificação de pendências documentais",
+    "pedido": "Efetivação da matrícula no curso Técnico em Enfermagem e orientações sobre quais documentos pendentes devem ser apresentados.",
+    "categoria": "Matrícula e Ingresso",
+    "campos_ausentes": [
+      "orgao_expedidor",
+      "uf",
+      "nome_pai",
+      "telefone"
+    ],
+    "nivel_confianca": "alta",
+    "necessidade_revisao": false
+  },
+  "minuta_institucional": "Prezado(a) Senhor(a), referente ao Protocolo nº 2026-000142,\n\nInformamos que recebemos a solicitação do estudante Marcos Vinícius de Almeida Santos, Protocolo nº 2026-000142, referente à efetivação de sua matrícula no curso Técnico em Enfermagem.\n\nDOCUMENTOS E DADOS PENDENTES:\n- Cópia de documento oficial de identificação legível contendo Órgão Expedidor e UF;\n- Telefone de contato atualizado;\n- Documentação regulamentar de conclusão de escolaridade;\n- Comprovação complementar de filiação.\n\nReiteramos a ciência manifestada quanto às normas de frequência, segundo as quais a matrícula será automaticamente cancelada caso haja ausência injustificada nos dois primeiros dias de aula consecutivos ou em três dias intercalados dentro dos dez primeiros dias letivos, previstos para iniciar em 01/02/2027. Orientamos acompanhar as publicações oficiais nos canais do Governo do Estado de Mato Grosso e da SECITECI.\n\nAtenciosamente,\nCoordenação de Atendimento e Registros Escolares"
+}

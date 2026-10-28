@@ -1,0 +1,46 @@
+{
+  "project_name": "Central Inteligente de Atendimento e Comunicação Institucional - GOV.MT",
+  "version": "1.0.0",
+  "paths": {
+    "dados_originais": "dados/originais",
+    "dados_gabaritos": "dados/gabaritos",
+    "dados_processados": "dados/processados",
+    "resultados_minutas": "resultados/minutas",
+    "resultados_audios": "resultados/audios",
+    "resultados_imagens": "resultados/imagens",
+    "resultados_logs": "resultados/logs",
+    "prompts_dir": "prompts",
+    "logo_institucional": "dados/originais/brasao.png"
+  },
+  "models": {
+    "llm_primary": "Qwen/Qwen2.5-72B-Instruct",
+    "llm_fallback": "meta-llama/Llama-3.3-70B-Instruct",
+    "vision": "Qwen/Qwen2.5-VL-7B-Instruct",
+    "stt": "openai/whisper-large-v3-turbo",
+    "image": "black-forest-labs/FLUX.1-schnell",
+    "tts_voice": "pt-BR-AntonioNeural"
+  },
+  "generation_params": {
+    "temperature": 0.1,
+    "max_tokens": 2500,
+    "timeout_seconds": 60
+  },
+  "categories": [
+    "Matrícula e Ingresso",
+    "Documentação e Certidões",
+    "Assistência Estudantil",
+    "Cursos e Horários",
+    "Outros / Informações Gerais"
+  ],
+  "gov_mt": {
+    "orgao": "GOVERNO DO ESTADO DE MATO GROSSO",
+    "secretaria": "SECRETARIA DE ESTADO DE CIÊNCIA, TECNOLOGIA E INOVAÇÃO - SECITECI/MT",
+    "escola": "ESCOLA TÉCNICA ESTADUAL DE CUIABÁ",
+    "cores": {
+      "azul": "#004A8F",
+      "verde": "#008B47",
+      "amarelo": "#F7B500"
+    },
+    "tarja_proveniencia": "CONTEÚDO SINTÉTICO GERADO POR IA - Validado por Servidor Responsável"
+  }
+}

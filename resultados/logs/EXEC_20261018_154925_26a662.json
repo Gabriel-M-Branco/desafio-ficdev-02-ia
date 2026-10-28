@@ -1,0 +1,83 @@
+{
+  "id_execucao": "EXEC_20261018_154925_26a662",
+  "timestamp": "2026-10-18T15:49:25.577340",
+  "modalidade": "audio",
+  "arquivo_origem": "dados/originais/entrada_audio.mp3",
+  "provedor": "OpenRouter",
+  "modelo": "google/gemini-3.8-flash",
+  "versao_prompt": "N/A (STT Direto)",
+  "parametros": {},
+  "duracao_segundos": 10.412826600000699,
+  "erros": [],
+  "resultado_resumo": {
+    "sucesso": true,
+    "campos_extraidos": 0
+  },
+  "decisao_humana": {
+    "status": "pendente_revisao",
+    "operador": "aguardando_validacao",
+    "justificativa": "Aguardando deliberação de servidor responsável no painel web."
+  },
+  "detalhes_completos": {
+    "sucesso": true,
+    "arquivo_audio": "dados/originais/entrada_audio.mp3",
+    "metadados": {
+      "arquivo": "entrada_audio.mp3",
+      "duracao_segundos": 89.16,
+      "tamanho_bytes": 2853120,
+      "modelo_stt": "google/gemini-3.8-flash",
+      "idioma_detectado": "pt",
+      "provedor": "OpenRouter"
+    },
+    "transcricao_bruta": "Bom dia. Meu protocolo é 2026-000142, de 14 de outubro de 2026. Meu nome é Marcos Vinícius de Almeida Santos, nasci em 12 de agosto de 2008, em Cuiabá, e quero pedir a efetivação da minha matrícula no curso Técnico em Enfermagem, do eixo tecnológico de Saúde, com carga horária de 1.200 horas, noturno, noturno. Meu CPF é 123456789-00, meu RG é 1234567-8, o nome da minha mãe é Lúcia Helena de Almeida Santos e o meu e-mail é marcos.almeida.teste@exemplo.com. Declaro estar ciente de que a matrícula será cancelada automaticamente se eu faltar, sem justificativa comprovada, nos dois primeiros dias de aula consecutivos ou em três dias de aula, consecutivos ou não, nos 10 primeiros dias de aula. Peço que informem quais os documentos ainda preciso apresentar. Muito obrigado.",
+    "transcricao_revisada": "Bom dia. Meu protocolo é 2026-000142, de 14 de outubro de 2026. Meu nome é Marcos Vinícius de Almeida Santos, nasci em 12 de agosto de 2008, em Cuiabá, e quero pedir a efetivação da minha matrícula no curso Técnico em Enfermagem, do eixo tecnológico de Saúde, com carga horária de 1.200 horas, noturno, noturno. Meu CPF é 123456789-00, meu RG é 1234567-8, o nome da minha mãe é Lúcia Helena de Almeida Santos e o meu e-mail é marcos.almeida.teste@exemplo.com. Declaro estar ciente de que a matrícula será cancelada automaticamente se eu faltar, sem justificativa comprovada, nos dois primeiros dias de aula consecutivos ou em três dias de aula, consecutivos ou não, nos 10 primeiros dias de aula. Peço que informem quais os documentos ainda preciso apresentar. Muito obrigado.",
+    "revisao_aplicada": "Normalização de espaços; conteúdo pendente de revisão humana.",
+    "origem_processamento": "api_remota",
+    "provedor": "OpenRouter",
+    "tempo_processamento_segundos": 10.386,
+    "exige_confirmacao_humana": true,
+    "comparacao_gabarito": {
+      "todos_campos_criticos_conferidos": true,
+      "detalhes": {
+        "solicitante": {
+          "valor_esperado": "Marcos Vinícius de Almeida Santos",
+          "localizado_na_transcricao": true
+        },
+        "protocolo": {
+          "valor_esperado": "2026-000142",
+          "localizado_na_transcricao": true
+        },
+        "curso": {
+          "valor_esperado": "Técnico em Enfermagem",
+          "localizado_na_transcricao": true
+        },
+        "carga_horaria": {
+          "valor_esperado": "1200 horas",
+          "localizado_na_transcricao": true
+        },
+        "turno": {
+          "valor_esperado": "noturno",
+          "localizado_na_transcricao": true
+        },
+        "data": {
+          "valor_esperado": "14/10/2026",
+          "localizado_na_transcricao": true
+        }
+      },
+      "campos_divergentes_ou_ausentes": [],
+      "acuracia_entidades": "6/6",
+      "comparacao_texto_referencia": {
+        "status": "comparado",
+        "palavras_referencia": 134,
+        "palavras_transcricao": 133,
+        "substituicoes": 2,
+        "exclusoes": 1,
+        "insercoes": 0,
+        "wer_percentual": 2.24,
+        "criterio": "Comparação lexical normalizada (Word Error Rate - WER); fidelidade institucional."
+      },
+      "confirmacao_humana_pendente": true
+    },
+    "arquivo_transcricao": "dados/processados/transcricao_entrada_audio.json"
+  }
+}

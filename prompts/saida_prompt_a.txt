@@ -1,0 +1,51 @@
+Abaixo apresento a extração dos dados contidos na solicitação e, em seguida, a minuta de resposta oficial da Secretaria.
+
+---
+
+### 1. Extração de Informações
+
+* **Protocolo:** 2026-000142
+* **Data da Solicitação/Matrícula:** 14/10/2026
+* **Canal:** E-mail
+* **Nome do Requerente:** Marcos Vinícius de Almeida Santos
+* **Data de Nascimento:** 12/08/2008 (Naturalidade: Cuiabá)
+* **Filiação:** Lúcia Helena de Almeida Santos
+* **Documentos:** CPF: 123.456.789-00 | RG: 1234567-8
+* **E-mail de Contato:** marcos.almeida.teste@examplo.com
+* **Curso Solicitado:** Técnico em Enfermagem
+* **Eixo Tecnológico:** Saúde
+* **Carga Horária:** 1.200 horas
+* **Turno:** Noturno
+* **Início das Aulas:** 01/02/2027
+* **Declaração de Ciência:** Ciente da regra de cancelamento automático da matrícula em caso de ausência injustificada nos primeiros dias (2 dias consecutivos ou 3 intercalados nos primeiros 10 dias).
+* **Demanda:** Confirmação da matrícula e relação de documentos pendentes a apresentar.
+
+---
+
+### 2. Resposta Oficial da Secretaria
+
+**Assunto:** Resposta ao Protocolo nº 2026-000142 – Solicitação de Efetivação de Matrícula  
+**Para:** marcos.almeida.teste@examplo.com  
+
+Prezado Marcos Vinícius de Almeida Santos,
+
+Acusamos o recebimento de sua solicitação referente ao **Protocolo nº 2026-000142**, registrada em 14 de outubro de 2026, para o curso **Técnico em Enfermagem** (Eixo Tecnológico: Saúde, Carga Horária: 1.200h, Turno: Noturno), com previsão de início para **01/02/2027**.
+
+Confirmamos o recebimento dos seus dados cadastrais e registramos sua ciência formal quanto às normas de frequência no início do período letivo (cancelamento automático em caso de falta sem justificativa nos dois primeiros dias consecutivos ou em três dias nos primeiros dez dias de aula).
+
+Em atenção ao seu questionamento sobre a documentação necessária para a efetivação definitiva da matrícula, solicitamos o envio (ou apresentação na Secretaria Acadêmica) dos seguintes documentos originais acompanhados de cópia simples:
+
+1. **Documento de Identidade (RG)** e **CPF**;
+2. **Certidão de Nascimento** ou Casamento;
+3. **Histórico Escolar e Certificado de Conclusão do Ensino Médio** (ou declaração original de matrícula no último ano do Ensino Médio, conforme o edital);
+4. **Comprovante de residência atualizado** (com CEP, emitido nos últimos 90 dias);
+5. **Título de Eleitor** e comprovante de quitação eleitoral (para maiores de 18 anos);
+6. **Certificado de Alistamento Militar / Quitação com o Serviço Militar** (para requerentes do sexo masculino maiores de 18 anos);
+7. **1 (uma) foto 3x4 recente**.
+
+O prazo para a entrega da documentação e validação da matrícula encerra-se no prazo regulamentar do calendário acadêmico. Em caso de dúvidas, favor responder a este e-mail mantendo o histórico da conversa e o número de protocolo.
+
+Atenciosamente,
+
+**Secretaria Acadêmica**  
+*Setor de Atendimento ao Aluno*

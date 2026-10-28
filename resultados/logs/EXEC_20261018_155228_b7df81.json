@@ -1,0 +1,102 @@
+{
+  "id_execucao": "EXEC_20261018_155228_b7df81",
+  "timestamp": "2026-10-18T15:52:28.040251",
+  "modalidade": "imagem",
+  "arquivo_origem": "dados/originais/brasao.png",
+  "provedor": "openrouter",
+  "modelo": "google/gemini-3.1-flash-image",
+  "versao_prompt": "Prompt Estruturado Institucional GOV.MT",
+  "parametros": {
+    "geracao": {
+      "width": 1024,
+      "height": 1024,
+      "num_inference_steps": 4,
+      "guidance_scale": 0.0,
+      "seed": 42
+    },
+    "prompt": {
+      "contexto": "Illustration-only asset about technical education and student enrollment. All titles, subjects, institutional marks and captions will be added separately by software after generation",
+      "sujeito": "A diverse group of fictional young adult students walking together in a welcoming technical school courtyard, carrying plain backpacks and closed notebooks with solid unmarked covers",
+      "composicao": "Central students surrounded by simple geometric trees and plain campus architecture with unmarked facades. Open welcoming educational setting, abstract technology shapes, generous clean space, no reception counter or display surfaces",
+      "estilo": "High-quality modern flat vector illustration for an official Brazilian public technical school enrollment announcement, harmonious palette of royal blue (#004A8F), emerald green (#008B47) and golden yellow (#F7B500)",
+      "iluminacao": "Crisp vector shapes, balanced composition, soft lighting, professional and welcoming atmosphere",
+      "proporcao": "Square 1:1 composition",
+      "restricoes": "No text, no letters, no typography, no logos, no watermarks. No words, numbers, pseudo-writing, glyphs, labels, signs, signboards, plaques, banners, posters, billboards, school name signs, emblems or coats of arms anywhere. No writing on buildings, clothing, backpacks or notebooks. Do not draw a blank sign or any lettering surface. No medical coats, no stethoscopes, no clinical or hospital environment. Fictional people only",
+      "prompt_completo_en": "Illustration-only asset about technical education and student enrollment. All titles, subjects, institutional marks and captions will be added separately by software after generation. A diverse group of fictional young adult students walking together in a welcoming technical school courtyard, carrying plain backpacks and closed notebooks with solid unmarked covers. Central students surrounded by simple geometric trees and plain campus architecture with unmarked facades. Open welcoming educational setting, abstract technology shapes, generous clean space, no reception counter or display surfaces. High-quality modern flat vector illustration for an official Brazilian public technical school enrollment announcement, harmonious palette of royal blue (#004A8F), emerald green (#008B47) and golden yellow (#F7B500). Crisp vector shapes, balanced composition, soft lighting, professional and welcoming atmosphere. Square 1:1 composition. No text, no letters, no typography, no logos, no watermarks. No words, numbers, pseudo-writing, glyphs, labels, signs, signboards, plaques, banners, posters, billboards, school name signs, emblems or coats of arms anywhere. No writing on buildings, clothing, backpacks or notebooks. Do not draw a blank sign or any lettering surface. No medical coats, no stethoscopes, no clinical or hospital environment. Fictional people only"
+    }
+  },
+  "duracao_segundos": 9.221072600001207,
+  "erros": [],
+  "resultado_resumo": {
+    "sucesso": true,
+    "campos_extraidos": 0
+  },
+  "decisao_humana": {
+    "status": "pendente_revisao",
+    "operador": "aguardando_validacao",
+    "justificativa": "Aguardando deliberação de servidor responsável no painel web."
+  },
+  "detalhes_completos": {
+    "identificador": "e29dc0a289924b9d980995bf26991366",
+    "titulo": "COMUNICADO OFICIAL: MATRÍCULAS E INGRESSO ETEC 2026",
+    "sucesso": true,
+    "data_geracao": "2026-10-18T15:52:18.815553-04:00",
+    "modelo_ia_utilizado": "google/gemini-3.1-flash-image",
+    "provedor_solicitado": "openrouter",
+    "provedor_efetivo": "openrouter",
+    "ia_gerada": true,
+    "estado_imagem": "pendente_revisao",
+    "endpoint": null,
+    "parametros_geracao": {
+      "width": 1024,
+      "height": 1024,
+      "num_inference_steps": 4,
+      "guidance_scale": 0.0,
+      "seed": 42
+    },
+    "timeout_seconds": 60,
+    "prompt_estruturado": {
+      "contexto": "Illustration-only asset about technical education and student enrollment. All titles, subjects, institutional marks and captions will be added separately by software after generation",
+      "sujeito": "A diverse group of fictional young adult students walking together in a welcoming technical school courtyard, carrying plain backpacks and closed notebooks with solid unmarked covers",
+      "composicao": "Central students surrounded by simple geometric trees and plain campus architecture with unmarked facades. Open welcoming educational setting, abstract technology shapes, generous clean space, no reception counter or display surfaces",
+      "estilo": "High-quality modern flat vector illustration for an official Brazilian public technical school enrollment announcement, harmonious palette of royal blue (#004A8F), emerald green (#008B47) and golden yellow (#F7B500)",
+      "iluminacao": "Crisp vector shapes, balanced composition, soft lighting, professional and welcoming atmosphere",
+      "proporcao": "Square 1:1 composition",
+      "restricoes": "No text, no letters, no typography, no logos, no watermarks. No words, numbers, pseudo-writing, glyphs, labels, signs, signboards, plaques, banners, posters, billboards, school name signs, emblems or coats of arms anywhere. No writing on buildings, clothing, backpacks or notebooks. Do not draw a blank sign or any lettering surface. No medical coats, no stethoscopes, no clinical or hospital environment. Fictional people only",
+      "prompt_completo_en": "Illustration-only asset about technical education and student enrollment. All titles, subjects, institutional marks and captions will be added separately by software after generation. A diverse group of fictional young adult students walking together in a welcoming technical school courtyard, carrying plain backpacks and closed notebooks with solid unmarked covers. Central students surrounded by simple geometric trees and plain campus architecture with unmarked facades. Open welcoming educational setting, abstract technology shapes, generous clean space, no reception counter or display surfaces. High-quality modern flat vector illustration for an official Brazilian public technical school enrollment announcement, harmonious palette of royal blue (#004A8F), emerald green (#008B47) and golden yellow (#F7B500). Crisp vector shapes, balanced composition, soft lighting, professional and welcoming atmosphere. Square 1:1 composition. No text, no letters, no typography, no logos, no watermarks. No words, numbers, pseudo-writing, glyphs, labels, signs, signboards, plaques, banners, posters, billboards, school name signs, emblems or coats of arms anywhere. No writing on buildings, clothing, backpacks or notebooks. Do not draw a blank sign or any lettering surface. No medical coats, no stethoscopes, no clinical or hospital environment. Fictional people only"
+    },
+    "restricoes_aplicadas": "No text, no letters, no typography, no logos, no watermarks. No words, numbers, pseudo-writing, glyphs, labels, signs, signboards, plaques, banners, posters, billboards, school name signs, emblems or coats of arms anywhere. No writing on buildings, clothing, backpacks or notebooks. Do not draw a blank sign or any lettering surface. No medical coats, no stethoscopes, no clinical or hospital environment. Fictional people only",
+    "declaracao_proveniencia": "CONTEÚDO SINTÉTICO GERADO POR IA - Consulte o status de revisão",
+    "status_revisao": "pendente_revisao",
+    "custo_usd": null,
+    "custo_status": "não informado pelo provedor",
+    "template_institucional": "GOV.MT Oficial Padrão SECITECI",
+    "conformidade_seguranca": {
+      "sem_pessoas_reais": null,
+      "sem_direitos_autorais_terceiros": null,
+      "ilustracao_sem_texto_placas_logos": null,
+      "tarja_visivel_aplicada": true,
+      "revisao_humana_obrigatoria": true
+    },
+    "arquivo_arte_ia": "resultados/imagens/comunicado_institucional_govmt_arte_ia.png",
+    "dimensoes_arte": "1024x1024",
+    "sha256_arte_ia": "f970552435ee091826a99f62dc229bdfb9278272a276ef0632a67385437b5fb0",
+    "composicao": {
+      "origem_textos": "Pillow / fonte TrueType Unicode; nunca renderizados pela IA",
+      "titulo": "COMUNICADO OFICIAL: MATRÍCULAS E INGRESSO ETEC 2026",
+      "assunto": "MATRÍCULAS E INGRESSO ETEC 2026",
+      "aviso_conteudo_sintetico": "CONTEÚDO SINTÉTICO GERADO POR IA - Consulte o status de revisão",
+      "fonte": "arial.ttf",
+      "sha256_fonte": "b3658eadae55e682b5f69eb64c439c1ecc8f196c0bb8d4756d145d13bc86476a",
+      "brasao_origem": "dados/originais/brasao.png",
+      "sha256_brasao": "ccb82e8c921b2999b4c52b0466b09f6dbdeff24f7425c23d7b9371d3a13ed50a",
+      "adequacao_visual": "pendente_revisao_humana"
+    },
+    "arquivo_imagem": "resultados/imagens/comunicado_institucional_govmt.png",
+    "formato": "PNG",
+    "dimensoes": "1080x1350",
+    "sha256_imagem": "848a0f8cc30868c1d814b5f5b6cfcd1505b7d1940dd08683f532e5fc07b842f7",
+    "tempo_processamento_segundos": 9.221072600001207,
+    "arquivo_metadados": "resultados/imagens/comunicado_institucional_govmt.json"
+  }
+}

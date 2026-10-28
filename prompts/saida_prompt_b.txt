@@ -1,0 +1,26 @@
+{
+  "extracao": {
+    "protocolo": "2026-000142",
+    "data": "14/10/2026",
+    "solicitante": "Marcos Vinícius de Almeida Santos",
+    "cpf": "123.456.789-00",
+    "rg": "1234567-8",
+    "orgao_expedidor": "não localizado",
+    "uf": "não localizado",
+    "data_nascimento": "12/08/2008",
+    "naturalidade": "Cuiabá",
+    "nome_mae": "Lúcia Helena de Almeida Santos",
+    "nome_pai": "não localizado",
+    "curso": "Técnico em Enfermagem",
+    "eixo_tecnologico": "Saúde",
+    "carga_horaria": "1200 horas",
+    "turno": "noturno",
+    "inicio_curso": "01/02/2027",
+    "email": "marcos.almeida.teste@examplo.com",
+    "telefone": "não localizado",
+    "assunto": "Efetivação de matrícula e verificação de pendências documentais",
+    "pedido": "Solicita a efetivação da matrícula no curso Técnico em Enfermagem e requer informações sobre quais documentos ainda precisam ser apresentados para a conclusão do processo.",
+    "categoria": "Matrícula e Ingresso"
+  },
+  "minuta_institucional": "GOVERNO DO ESTADO DE MATO GROSSO\nSECRETARIA DE ESTADO DE CIÊNCIA, TECNOLOGIA E INOVAÇÃO (SECITECI/MT)\nESCOLA TÉCNICA ESTADUAL DE CUIABÁ\n\nComunicação Oficial nº 2026-000142\nCuiabá-MT, 14 de outubro de 2026.\n\nPrezado(a) Senhor(a) Marcos Vinícius de Almeida Santos,\n\nAcusamos o recebimento de sua manifestação, registrada sob o Protocolo nº 2026-000142, referente à solicitação de efetivação de matrícula no curso Técnico em Enfermagem ofertado por esta instituição de ensino.\n\nEm atenção ao seu pedido de esclarecimentos acerca das pendências para a conclusão do registro acadêmico, informamos que a confirmação da matrícula requer a apresentação e complementação dos itens descritos a seguir, em estrita observância às normas de integridade cadastral e regulamentares da instituição.\n\nDOCUMENTOS E DADOS PENDENTES\n\n• Órgão Expedidor e Unidade Federativa (UF) do Documento de Identidade (RG): informação não constante no cadastro inicial;\n• Filiação paterna: dado não informado (caso conste em registro civil, deverá ser apresentado para regularização cadastral);\n• Telefone para contato institucional: registro de contato telefônico não fornecido no requerimento;\n• Documentação comprobatória oficial: apresentação dos documentos originais com cópias (documento oficial de identidade, CPF, certidão de nascimento/casamento e comprovante de escolaridade) junto à Secretaria Escolar para conferência e validação da matrícula conforme as diretrizes do curso.\n\nRegistramos, ainda, a ciência manifestada quanto à regra institucional de cancelamento automático da matrícula em caso de ausência injustificada nos dois primeiros dias letivos consecutivos ou em três dias intercalados no período dos dez primeiros dias de aula do semestre letivo previsto para 01/02/2027.\n\nColocamo-nos à disposição para prestar esclarecimentos adicionais por meio de nossos canais oficiais de atendimento.\n\nAtenciosamente,\n\nSecretaria Escolar / Atendimento ao Cidadão\nEscola Técnica Estadual de Cuiabá\nSecretaria de Estado de Ciência, Tecnologia e Inovação (SECITECI/MT)\nGoverno do Estado de Mato Grosso"
+}

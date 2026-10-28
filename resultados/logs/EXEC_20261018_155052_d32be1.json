@@ -1,0 +1,69 @@
+{
+  "id_execucao": "EXEC_20261018_155052_d32be1",
+  "timestamp": "2026-10-18T15:50:52.780206",
+  "modalidade": "texto",
+  "arquivo_origem": "dados/originais/audio_transcricao.txt",
+  "provedor": "OpenRouter",
+  "modelo": "google/gemini-3.8-flash",
+  "versao_prompt": "PRODUCAO",
+  "parametros": {
+    "temperatura": 0.1,
+    "max_tokens": "[REDACTED]",
+    "response_format": "json_schema",
+    "tentativas_formato": [
+      {
+        "tentativa": 1,
+        "status": "contrato_valido",
+        "finish_reason": "stop",
+        "id_resposta_provedor": "gen-1792353045-zCkn9VpJbYrnblM3xKtD"
+      }
+    ]
+  },
+  "duracao_segundos": 10.289650700000493,
+  "erros": [],
+  "resultado_resumo": {
+    "sucesso": true,
+    "campos_extraidos": 24
+  },
+  "decisao_humana": {
+    "status": "pendente_revisao",
+    "operador": "aguardando_validacao",
+    "justificativa": "Aguardando deliberação de servidor responsável no painel web."
+  },
+  "detalhes_completos": {
+    "extracao": {
+      "protocolo": "2026-000142",
+      "data": "14 de outubro de 2026",
+      "solicitante": "Marcos Vinícius de Almeida Santos",
+      "cpf": "123456789-00",
+      "rg": "1234567-8",
+      "orgao_expedidor": "não localizado",
+      "data_nascimento": "12 de agosto de 2008",
+      "naturalidade": "Cuiabá",
+      "uf": "não localizado",
+      "nome_mae": "Lúcia Helena de Almeida Santos",
+      "nome_pai": "não localizado",
+      "curso": "Técnico em Enfermagem",
+      "eixo_tecnologico": "Saúde",
+      "carga_horaria": "1.200 horas",
+      "turno": "noturno",
+      "inicio_curso": "não localizado",
+      "email": "marcos.almeida.teste@exemplo.com",
+      "telefone": "não localizado",
+      "assunto": "Efetivação de matrícula e verificação de documentos pendentes",
+      "pedido": "Efetivação da matrícula no curso Técnico em Enfermagem e esclarecimento sobre quais documentos ainda precisam ser apresentados",
+      "categoria": "Matrícula e Ingresso",
+      "nivel_confianca": "alta",
+      "campos_ausentes": [
+        "orgao_expedidor",
+        "uf",
+        "nome_pai",
+        "inicio_curso",
+        "telefone"
+      ],
+      "necessidade_revisao": true
+    },
+    "minuta": "Prezado(a) Senhor(a), referente ao Protocolo nº 2026-000142.\n\nAcusamos o recebimento da solicitação de Marcos Vinícius de Almeida Santos, registrada sob o Protocolo nº 2026-000142, com pedido de efetivação de matrícula no curso Técnico em Enfermagem.\n\nDOCUMENTOS E DADOS PENDENTES:\n- Cópia do documento oficial de identificação com indicação clara do Órgão Expedidor e UF;\n- Telefone de contato atualizado para comunicações institucionais;\n- Informação ou comprovação relativa à filiação paterna, se houver;\n- Documentação regulamentar de conclusão e escolaridade exigida para o ingresso no curso.\n\nReiteramos a regra institucional comunicada pelo próprio requerente, no sentido de que a matrícula será cancelada automaticamente em caso de falta, sem justificativa comprovada, nos dois primeiros dias letivos consecutivos ou em três dias letivos, consecutivos ou alternados, no período inicial de dez dias letivos.\n\nAtenciosamente,\nCoordenação de Atendimento e Registros Escolares",
+    "arquivo_pdf": "resultados/minutas/minuta_audio_transcricao_da7e57ee25ac40f1a512e7a4bd8d83d6.pdf"
+  }
+}

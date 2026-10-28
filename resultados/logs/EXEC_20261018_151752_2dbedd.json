@@ -1,0 +1,72 @@
+{
+  "id_execucao": "EXEC_20261018_151752_2dbedd",
+  "timestamp": "2026-10-18T15:17:52.230218",
+  "modalidade": "texto",
+  "arquivo_origem": "dados/originais/texto_original.txt",
+  "provedor": "OpenRouter",
+  "modelo": "google/gemini-3.8-flash",
+  "versao_prompt": "PRODUCAO",
+  "parametros": {
+    "temperatura": 0.1,
+    "max_tokens": "[REDACTED]",
+    "response_format": "json_schema",
+    "tentativas_formato": [
+      {
+        "tentativa": 1,
+        "status": "contrato_valido",
+        "finish_reason": "stop",
+        "id_resposta_provedor": "gen-1792351060-f336PUTubArOuq0U10Lw"
+      }
+    ]
+  },
+  "duracao_segundos": 14.481377399999474,
+  "erros": [],
+  "resultado_resumo": {
+    "sucesso": true,
+    "campos_extraidos": 24
+  },
+  "decisao_humana": {
+    "status": "APROVADO",
+    "operador": "Servidor Responsavel ETEC/SECITECI",
+    "justificativa": "tes teste asjdnas ap",
+    "data_decisao": "2026-10-18T15:20:28.745900",
+    "id_aprovacao": "9090632daa3d429c80a49f67a6ff0e3d",
+    "hash_texto_aprovado": "7f62d6e1f602aac856cc1678acd6bbe3e670c4f3d23dfcce79c96bf16fc3e78a"
+  },
+  "detalhes_completos": {
+    "extracao": {
+      "protocolo": "2026-000142",
+      "data": "14/10/2026",
+      "solicitante": "Marcos Vinícius de Almeida Santos",
+      "cpf": "123.456.789-00",
+      "rg": "1234567-8",
+      "orgao_expedidor": "não localizado",
+      "data_nascimento": "12/08/2008",
+      "naturalidade": "Cuiabá",
+      "uf": "não localizado",
+      "nome_mae": "Lúcia Helena de Almeida Santos",
+      "nome_pai": "não localizado",
+      "curso": "Técnico em Enfermagem",
+      "eixo_tecnologico": "Saúde",
+      "carga_horaria": "1200 horas",
+      "turno": "noturno",
+      "inicio_curso": "01/02/2027",
+      "email": "marcos.almeida.teste@examplo.com",
+      "telefone": "não localizado",
+      "assunto": "Efetivação de matrícula e verificação de documentos pendentes",
+      "pedido": "Efetivação de matrícula no curso Técnico em Enfermagem e orientação sobre documentos pendentes a apresentar",
+      "categoria": "Matrícula e Ingresso",
+      "nivel_confianca": "alta",
+      "campos_ausentes": [
+        "orgao_expedidor",
+        "uf",
+        "nome_pai",
+        "telefone"
+      ],
+      "necessidade_revisao": true
+    },
+    "minuta": "Prezado(a) Senhor(a), referente ao Protocolo nº 2026-000142.\n\nRegistramos o acolhimento da solicitação de Marcos Vinícius de Almeida Santos, referente ao Protocolo nº 2026-000142, concernente à efetivação de matrícula no curso Técnico em Enfermagem da Escola Técnica Estadual.\n\nDOCUMENTOS E DADOS PENDENTES:\n- Cópia do documento de identificação oficial com indicação de Órgão Expedidor e UF;\n- Telefone atualizado para contato cadastral;\n- Informação ou comprovação documental de filiação completa;\n- Documentação regulamentar de conclusão de escolaridade exigida para o ingresso no curso.\n\nAdverte-se que a regularização documental deve ser providenciada perante a Secretaria Escolar e que, conforme a regulamentação vigente, a matrícula será cancelada caso haja ausência injustificada nos dois primeiros dias letivos consecutivos ou em três dias, consecutivos ou alternados, nos dez primeiros dias de aula.\n\nAtenciosamente,\nCoordenação de Atendimento e Registros Escolares",
+    "arquivo_pdf": "resultados/minutas/minuta_texto_original_698a646b5eb74c76a0deaaa9c41f8563.pdf"
+  },
+  "texto_final": "Prezado(a) Senhor(a), referente ao Protocolo nº 2026-000142.\n\nRegistramos o acolhimento da solicitação de Marcos Vinícius de Almeida Santos, referente ao Protocolo nº 2026-000142, concernente à efetivação de matrícula no curso Técnico em Enfermagem da Escola Técnica Estadual.\n\nDOCUMENTOS E DADOS PENDENTES:\n- Cópia do documento de identificação oficial com indicação de Órgão Expedidor e UF;\n- Telefone atualizado para contato cadastral;\n- Informação ou comprovação documental de filiação completa;\n- Documentação regulamentar de conclusão de escolaridade exigida para o ingresso no curso.\n\nAdverte-se que a regularização documental deve ser providenciada perante a Secretaria Escolar e que, conforme a regulamentação vigente, a matrícula será cancelada caso haja ausência injustificada nos dois primeiros dias letivos consecutivos ou em três dias, consecutivos ou alternados, nos dez primeiros dias de aula.\n\nAtenciosamente,\nCoordenação de Atendimento e Registros Escolares"
+}

@@ -1,0 +1,45 @@
+{
+  "id_execucao": "EXEC_20261018_154223_1188db",
+  "timestamp": "2026-10-18T15:42:23.399417",
+  "modalidade": "tts",
+  "arquivo_origem": "resultados/logs/EXEC_20261018_154113_8ce458.json",
+  "provedor": "openrouter",
+  "modelo": "OpenRouter Gemini (google/gemini-3.8-flash-tts / Zephyr)",
+  "versao_prompt": "N/A (síntese de acessibilidade)",
+  "parametros": {
+    "id_execucao_aprovacao": "EXEC_20261018_154113_8ce458",
+    "hash_texto_aprovado": null,
+    "status_aprovacao": "previa_acessibilidade"
+  },
+  "duracao_segundos": 22.631783200002246,
+  "erros": [],
+  "resultado_resumo": {
+    "sucesso": true,
+    "campos_extraidos": 0
+  },
+  "decisao_humana": {
+    "status": "pendente_revisao",
+    "operador": "aguardando_validacao",
+    "justificativa": "Aguardando deliberação de servidor responsável no painel web."
+  },
+  "detalhes_completos": {
+    "sucesso": true,
+    "provedor": "openrouter",
+    "metodo": "openrouter",
+    "id_execucao_aprovacao": "EXEC_20261018_154113_8ce458",
+    "status_aprovacao": "previa_acessibilidade",
+    "hash_texto_aprovado": null,
+    "caminho_arquivo": "resultados/audios/minuta_acessivel_b29983b611064087bab7249c05720c73.mp3",
+    "voz_utilizada": "OpenRouter Gemini (google/gemini-3.8-flash-tts / Zephyr)",
+    "formato": "mp3",
+    "tamanho_bytes": 1073664,
+    "duracao_segundos": 67.104,
+    "id_aprovacao": null,
+    "texto_sintetizado": "Prezado(a) Senhor(a), referente ao Protocolo nº 2026-000999.\n\nAcusamos o recebimento da manifestação registrada por Carlos Alberto da Silva, sob o Protocolo nº 2026-000999, referente ao interesse de ingresso no curso de Informática.\n\nORIENTAÇÕES AO CANDIDATO:\n- O ingresso na Rede de Educação Profissional e Tecnológica ocorre por meio de processos seletivos públicos regidos por editais próprios;\n- As orientações, cronogramas, editais e períodos de inscrição devem ser acompanhados diretamente pelo portal oficial da SECITECI e pelas publicações no Diário Oficial do Estado de Mato Grosso (DOE-MT);\n- A documentação comprobatória de escolaridade e identificação pessoal não é exigida na fase de consulta prévia, sendo solicitada estritamente no ato da matrícula dos candidatos classificados e convocados.\n\nRecomenda-se a verificação contínua das publicações institucionais nos canais oficiais do GOV.MT para não perder os prazos de lançamento de novos editais.\n\nAtenciosamente,\nCoordenação de Atendimento e Registros Escolares",
+    "hash_texto_sintetizado": "99b0b622e4cafcd493043921803fa6eff3ae07809a74e3a02ec018c2396cbcd8",
+    "sha256_audio": "3b1d69423edef34d7788b3d9da72092760552a05400c1117bbff886e0d5238c9",
+    "aviso_acessibilidade_aplicado": false,
+    "impacto_acessibilidade": "Leitura da minuta acessível com aviso explícito sobre informações pendentes.",
+    "tempo_processamento_segundos": 22.631783200002246
+  }
+}
