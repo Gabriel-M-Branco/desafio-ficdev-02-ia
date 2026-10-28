@@ -1,0 +1,71 @@
+{
+  "titulo": "Relatório de Conformidade com a LGPD (Lei nº 13.709/2018)",
+  "orgao": "Governo do Estado de Mato Grosso - SECITECI/MT",
+  "principios_atendidos": [
+    {
+      "principio": "Finalidade",
+      "status": "Atendido",
+      "evidencia": "Dados processados estritamente para o ato de matrícula e resposta oficial."
+    },
+    {
+      "principio": "Necessidade/Minimização",
+      "status": "Atendido",
+      "evidencia": "Campos não essenciais são descartados e prompts usam apenas o estritamente necessário."
+    },
+    {
+      "principio": "Segurança",
+      "status": "Atendido",
+      "evidencia": "Chaves de API jamais gravadas em log; opção de processamento local para documentos sensíveis."
+    },
+    {
+      "principio": "Transparência",
+      "status": "Atendido",
+      "evidencia": "Trilha de auditoria integral e identificação clara de conteúdo gerado por IA."
+    }
+  ],
+  "matriz_de_dados": {
+    "solicitante": {
+      "natureza": "Dado Pessoal",
+      "finalidade": "Identificação do requerente no processo escolar de matrícula.",
+      "necessidade": "Essencial para emissão de certidões e histórico acadêmico.",
+      "risco": "Médio (identificação individual direta).",
+      "minimizar_no_prompt": false
+    },
+    "cpf": {
+      "natureza": "Dado Pessoal Sensível/Crítico",
+      "finalidade": "Unicidade cadastral junto ao MEC e órgãos estaduais de educação.",
+      "necessidade": "Obrigatório para registro educacional oficial.",
+      "risco": "Alto (risco de fraude em caso de vazamento externo).",
+      "minimizar_no_prompt": true
+    },
+    "rg": {
+      "natureza": "Dado Pessoal",
+      "finalidade": "Validação de documento físico na secretaria da escola.",
+      "necessidade": "Complementar à verificação do CPF.",
+      "risco": "Médio.",
+      "minimizar_no_prompt": true
+    },
+    "data_nascimento": {
+      "natureza": "Dado Pessoal (Menor de Idade se < 18 anos)",
+      "finalidade": "Verificação de idade mínima legal e necessidade de assistência parental.",
+      "necessidade": "Essencial para cumprimento das diretrizes educacionais.",
+      "risco": "Alto (Artigo 14 da LGPD - Proteção especial a crianças e adolescentes).",
+      "minimizar_no_prompt": false
+    },
+    "nome_mae": {
+      "natureza": "Dado Pessoal / Filiação",
+      "finalidade": "Diferenciação de homônimos e representação legal de menor.",
+      "necessidade": "Essencial para documentação escolar oficial.",
+      "risco": "Médio.",
+      "minimizar_no_prompt": false
+    },
+    "email": {
+      "natureza": "Dado de Contato",
+      "finalidade": "Envio do comprovante oficial de matrícula e orientações da secretaria.",
+      "necessidade": "Canal oficial direto de comunicação com o estudante.",
+      "risco": "Baixo/Médio.",
+      "minimizar_no_prompt": false
+    }
+  },
+  "declaracao_dados_ficticios": "Todos os dados manipulados neste protótipo são integralmente FICTÍCIOS, sem correspondência com pessoas reais."
+}
