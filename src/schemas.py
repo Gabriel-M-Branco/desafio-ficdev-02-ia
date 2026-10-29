@@ -284,7 +284,7 @@ class SolicitacaoEntrada(BaseModel):
 
 
 class TrechoRecuperado(BaseModel):
-    model_config = ConfigDict(extra="forbid")
+    model_config = ConfigDict(extra="ignore")
 
     documento_id: str
     titulo: Optional[str] = None
@@ -295,10 +295,13 @@ class TrechoRecuperado(BaseModel):
     conteudo: str
     score_similaridade: float = 0.0
     score_distancia: float = 0.0
+    hash_arquivo: Optional[str] = None
+    configuracao: Optional[str] = None
+    chunk_hash: Optional[str] = None
 
 
 class RespostaRAG(BaseModel):
-    model_config = ConfigDict(extra="forbid")
+    model_config = ConfigDict(extra="ignore")
 
     pergunta: str
     resposta: str
@@ -313,9 +316,33 @@ class RespostaRAG(BaseModel):
     @field_validator("fontes", mode="before")
     @classmethod
     def _converter_fontes(cls, v):
-        if isinstance(v, list):
-            return [x.model_dump() if hasattr(x, "model_dump") else x for x in v]
-        return v
+        if not isinstance(v, list):
+            return v
+        res = []
+        for x in v:
+            if isinstance(x, TrechoRecuperado):
+                res.append(x)
+            elif isinstance(x, dict):
+                res.append(TrechoRecuperado.model_validate(x))
+            elif hasattr(x, "documento_id"):
+                data = {
+                    "documento_id": getattr(x, "documento_id", ""),
+                    "titulo": getattr(x, "titulo", "Documento Institucional"),
+                    "versao": getattr(x, "versao", "1.0"),
+                    "trecho_id": getattr(x, "trecho_id", ""),
+                    "pagina": getattr(x, "pagina", 1),
+                    "secao": getattr(x, "secao", None),
+                    "conteudo": getattr(x, "conteudo", ""),
+                    "score_similaridade": getattr(x, "score_similaridade", 0.0),
+                    "score_distancia": getattr(x, "score_distancia", 0.0),
+                    "hash_arquivo": getattr(x, "hash_arquivo", None),
+                    "configuracao": getattr(x, "configuracao", None),
+                    "chunk_hash": getattr(x, "chunk_hash", None),
+                }
+                res.append(TrechoRecuperado(**data))
+            else:
+                res.append(x)
+        return res
 
 
 class ClassificacaoSentimento(BaseModel):
