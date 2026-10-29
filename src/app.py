@@ -866,58 +866,139 @@ elif menu.startswith("4."):
     st.subheader("4. Comunicação Visual Institucional Padronizada (RF10)")
     st.markdown("Abordagem híbrida: geração de ilustração sem texto por IA combinada com moldura timbrada oficial em Pillow (Brasão do Estado e tarja de proveniência de conteúdo sintético).")
 
-    if st.button("Gerar Comunicado Visual Oficial", type="primary"):
-        with st.spinner("Compondo arte institucional e aplicando moldura com Brasão..."):
-            res_img = image_generator.gerar_comunicado_oficial(audit_logger=audit_logger)
-            st.session_state.imagem_resultado = res_img
-            st.session_state.imagem_aprovada = False
+    def _obter_ultima_imagem_existente():
+        diretorio = Path("resultados/imagens")
+        if not diretorio.exists():
+            return None
+        jsons = sorted(diretorio.glob("comunicado_institucional_govmt*.json"), key=os.path.getmtime, reverse=True)
+        for j in jsons:
+            try:
+                with open(j, "r", encoding="utf-8") as f:
+                    m = json.load(f)
+                if m.get("sucesso") and m.get("arquivo_imagem") and os.path.exists(m.get("arquivo_imagem")):
+                    log_dir = Path("resultados/logs")
+                    sha = m.get("sha256_imagem")
+                    found_exec = None
+                    if log_dir.exists():
+                        for l in sorted(log_dir.glob("EXEC_*.json"), key=os.path.getmtime, reverse=True):
+                            try:
+                                with open(l, "r", encoding="utf-8") as fl:
+                                    ld = json.load(fl)
+                                if ld.get("modalidade") == "imagem" and ld.get("detalhes_completos", {}).get("sha256_imagem") == sha:
+                                    found_exec = ld.get("id_execucao")
+                                    break
+                            except Exception:
+                                pass
+                    return {
+                        "sucesso": True,
+                        "caminho_imagem": m.get("arquivo_imagem"),
+                        "caminho_metadados": str(j),
+                        "metadados": m,
+                        "id_execucao": found_exec or m.get("identificador"),
+                    }
+            except Exception:
+                continue
+        return None
 
-    img_dado = st.session_state.imagem_resultado
+    if st.session_state.get("imagem_resultado") is None:
+        st.session_state.imagem_resultado = _obter_ultima_imagem_existente()
+
+    c_btn1, c_btn2 = st.columns([1.2, 2])
+    with c_btn1:
+        if st.button("Gerar Comunicado Visual Oficial", type="primary", use_container_width=True):
+            with st.spinner("Gerando ilustração sem texto por IA e aplicando moldura GOV.MT com Brasão..."):
+                res_img = image_generator.gerar_comunicado_oficial(audit_logger=audit_logger)
+                st.session_state.imagem_resultado = res_img
+                st.session_state.imagem_aprovada = False
+                if res_img.get("sucesso"):
+                    st.success("Nova peça institucional gerada com sucesso!")
+                else:
+                    st.error(f"Erro na geração da imagem: {res_img.get('erro', 'Falha no provedor de imagens.')}")
+
+    img_dado = st.session_state.get("imagem_resultado")
     if img_dado and img_dado.get("sucesso"):
         c_v1, c_v2 = st.columns([1.2, 1], gap="large")
         with c_v1:
-            st.image(img_dado["caminho_imagem"], caption="Peça Institucional Padronizada GOV.MT", width='stretch')
+            st.image(img_dado["caminho_imagem"], caption="Peça Institucional Padronizada GOV.MT (RF10)", use_container_width=True)
+            if os.path.exists(img_dado["caminho_imagem"]):
+                with open(img_dado["caminho_imagem"], "rb") as f_img:
+                    st.download_button(
+                        label="Baixar Peça Gráfica PNG",
+                        data=f_img.read(),
+                        file_name=Path(img_dado["caminho_imagem"]).name,
+                        mime="image/png",
+                        use_container_width=True
+                    )
         with c_v2:
             meta = img_dado.get("metadados", {})
             st.markdown("##### Metadados da Peça (RF10)")
             st.write(f"- **Título:** {meta.get('titulo')}")
-            st.write(f"- **Dimensões:** {meta.get('dimensoes')}")
+            st.write(f"- **Dimensões:** {meta.get('dimensoes', '1080x1350')}")
             st.write(f"- **Modelo IA:** `{meta.get('modelo_ia_utilizado')}`")
+            st.write(f"- **Provedor:** `{meta.get('provedor_efetivo') or meta.get('provedor_solicitado')}`")
             st.write(f"- **Tarja:** `{meta.get('declaracao_proveniencia')}`")
             st.write(f"- **SHA-256:** `{meta.get('sha256_imagem', '')[:20]}...`")
 
+            status_rev = meta.get("status_revisao", "pendente_revisao")
+            if status_rev in ("aprovada", "APROVADO"):
+                st.success("**Status de Homologação:** APROVADA PARA PUBLICAÇÃO")
+            elif status_rev in ("rejeitada", "REJEITADO"):
+                st.error("**Status de Homologação:** REJEITADA PELO OPERADOR")
+            else:
+                st.warning("**Status de Homologação:** PENDENTE DE REVISÃO HUMANA")
+
             st.divider()
-            st.markdown("##### Deliberação Humana")
-            chk_v = st.checkbox("Conferi textos, símbolos, mãos, objetos e coerência visual (RF13).")
-            just_v = st.text_input("Justificativa:", value="Conferência visual aprovada conforme padrão institucional GOV.MT.")
+            st.markdown("##### Deliberação Humana (Human-in-the-Loop - RF13 / RF20)")
+            chk_v = st.checkbox(
+                "Conferi textos, símbolos, mãos, objetos e coerência visual institucional (RF13).",
+                key="chk_conferencia_visual"
+            )
+            just_v = st.text_input(
+                "Justificativa da Decisão:",
+                value="Conferência visual realizada conforme os padrões normativos e visuais do GOV.MT.",
+                key="just_conferencia_visual"
+            )
 
             b_ap, b_rej = st.columns(2)
             with b_ap:
-                if st.button("Aprovar Imagem", type="primary", width='stretch'):
+                if st.button("Aprovar Imagem", type="primary", use_container_width=True):
                     if not chk_v:
-                        st.warning("Confirme o checkbox de conferência visual.")
+                        st.warning("Confirme o checkbox de conferência visual antes de registrar a aprovação.")
                     else:
-                        image_generator.revisar_imagem(
-                            id_execucao=img_dado["id_execucao"],
+                        res_rev = image_generator.revisar_imagem(
+                            id_execucao=img_dado.get("id_execucao") or meta.get("identificador"),
                             hash_imagem=meta.get("sha256_imagem"),
                             decisao="APROVADO",
                             justificativa=just_v,
                             operador="Servidor SECITECI/MT",
                             audit_logger=audit_logger
                         )
-                        st.session_state.imagem_aprovada = True
-                        st.success("Imagem homologada e aprovada para publicação!")
+                        if res_rev.get("sucesso"):
+                            st.session_state.imagem_aprovada = True
+                            img_dado["metadados"]["status_revisao"] = "aprovada"
+                            st.session_state.imagem_resultado = img_dado
+                            st.success("Imagem homologada e aprovada com sucesso na trilha de auditoria!")
+                        else:
+                            st.error(f"Não foi possível homologar a imagem: {res_rev.get('erro', 'Erro desconhecido.')}")
             with b_rej:
-                if st.button("Rejeitar Imagem", width='stretch'):
-                    image_generator.revisar_imagem(
-                        id_execucao=img_dado["id_execucao"],
+                if st.button("Rejeitar Imagem", use_container_width=True):
+                    res_rev = image_generator.revisar_imagem(
+                        id_execucao=img_dado.get("id_execucao") or meta.get("identificador"),
                         hash_imagem=meta.get("sha256_imagem"),
                         decisao="REJEITADO",
                         justificativa=just_v,
                         operador="Servidor SECITECI/MT",
                         audit_logger=audit_logger
                     )
-                    st.error("Imagem rejeitada.")
+                    if res_rev.get("sucesso"):
+                        st.session_state.imagem_aprovada = False
+                        img_dado["metadados"]["status_revisao"] = "rejeitada"
+                        st.session_state.imagem_resultado = img_dado
+                        st.warning("Imagem rejeitada e registrada na trilha de auditoria.")
+                    else:
+                        st.error(f"Erro ao rejeitar: {res_rev.get('erro', 'Erro desconhecido.')}")
+    elif img_dado and not img_dado.get("sucesso"):
+        st.error(f"Falha na geração da imagem: {img_dado.get('erro', 'Erro desconhecido.')}")
     else:
         st.info("Clique em **Gerar Comunicado Visual Oficial** para criar a peça gráfica institucional.")
 

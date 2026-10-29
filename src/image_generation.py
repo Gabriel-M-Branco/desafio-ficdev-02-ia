@@ -49,7 +49,7 @@ class ImageGenerator:
             self.image_provider = image_config.get("provider", "fal-ai")
 
         if self.image_provider == "openai":
-            self.image_model = os.getenv("OPENAI_IMAGE_MODEL") or "dall-e-3"
+            self.image_model = os.getenv("OPENAI_IMAGE_MODEL") or "gpt-image-1-mini"
         elif self.image_provider == "cloudflare":
             self.image_model = os.getenv("CLOUDFLARE_IMAGE_MODEL") or "@cf/black-forest-labs/flux-1-schnell"
         elif self.image_provider == "openrouter":
@@ -275,28 +275,57 @@ class ImageGenerator:
         return img.convert("RGB")
 
     def _gerar_openai(self, prompt_en: str) -> Image.Image:
-        """Geração da ilustração central via OpenAI DALL-E 3."""
+        """Geração da ilustração central via OpenAI."""
         import requests
         key = os.getenv("OPENAI_API_KEY", "").strip()
         if not key:
-            raise RuntimeError("OPENAI_API_KEY ausente para DALL-E 3.")
+            raise RuntimeError("OPENAI_API_KEY ausente para geração de imagem via OpenAI.")
         url = "https://api.openai.com/v1/images/generations"
-        model = os.getenv("OPENAI_IMAGE_MODEL", "dall-e-3").strip()
+        modelo_config = (os.getenv("OPENAI_IMAGE_MODEL") or self.image_model or "gpt-image-1-mini").strip()
         headers = {"Authorization": f"Bearer {key}", "Content-Type": "application/json"}
-        payload = {
-            "model": model,
-            "prompt": prompt_en,
-            "n": 1,
-            "size": "1024x1024",
-            "quality": "standard",
-            "response_format": "b64_json"
-        }
-        resp = requests.post(url, headers=headers, json=payload, timeout=self.image_timeout)
-        if resp.status_code != 200:
-            err = resp.json().get("error", {}).get("message", resp.text) if resp.headers.get("content-type", "").startswith("application/json") else resp.text
-            raise RuntimeError(f"OpenAI DALL-E retornou status {resp.status_code}: {err}")
-        b64 = resp.json()["data"][0]["b64_json"]
-        return Image.open(io.BytesIO(base64.b64decode(b64))).convert("RGB")
+
+        candidatos = [modelo_config]
+        for fallback_m in ["gpt-image-1-mini", "gpt-image-2", "dall-e-3"]:
+            if fallback_m not in candidatos:
+                candidatos.append(fallback_m)
+
+        ultimo_erro = None
+        for m in candidatos:
+            payload = {
+                "model": m,
+                "prompt": prompt_en,
+                "n": 1,
+            }
+            if m.startswith("dall-e"):
+                payload["response_format"] = "b64_json"
+                payload["size"] = "1024x1024"
+
+            try:
+                resp = requests.post(url, headers=headers, json=payload, timeout=self.image_timeout)
+                if resp.status_code == 200:
+                    data = resp.json().get("data", [])
+                    if data:
+                        b64 = data[0].get("b64_json")
+                        if b64:
+                            img = Image.open(io.BytesIO(base64.b64decode(b64))).convert("RGB")
+                            self.image_model = m
+                            return img
+                        url_img = data[0].get("url")
+                        if url_img:
+                            r_img = requests.get(url_img, timeout=self.image_timeout)
+                            img = Image.open(io.BytesIO(r_img.content)).convert("RGB")
+                            self.image_model = m
+                            return img
+                err_text = resp.json().get("error", {}).get("message", resp.text) if resp.headers.get("content-type", "").startswith("application/json") else resp.text
+                ultimo_erro = f"OpenAI ({m}) HTTP {resp.status_code}: {err_text}"
+                if resp.status_code in (401, 403):
+                    raise RuntimeError(ultimo_erro)
+            except Exception as exc:
+                if isinstance(exc, RuntimeError) and "401" in str(exc):
+                    raise
+                ultimo_erro = str(exc)
+
+        raise RuntimeError(ultimo_erro or "Falha ao gerar imagem via OpenAI.")
 
     def _gerar_cloudflare(self, prompt):
         import requests
