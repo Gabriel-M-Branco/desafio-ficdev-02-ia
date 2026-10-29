@@ -1,7 +1,8 @@
 {
-  "timestamp": "2026-10-29T11:09:24.211225",
+  "timestamp": "2026-10-29T16:37:29.541006",
   "total_testes": 15,
   "aprovados": 15,
+  "duracao_total_ms": 175.19,
   "resumo_metricas": {
     "nlp_solicitacoes": {
       "acuracia_categoria": 1.0,
@@ -244,6 +245,7 @@
       "requisito": "RF14",
       "cenario": "Saída válida, tipo incorreto, campo obrigatório ausente e chave extra",
       "status": "APROVADO",
+      "duracao_ms": 0.16,
       "evidencia": {
         "chaves_extras_detectadas": [
           "chave_intrusa_nao_prevista"
@@ -262,6 +264,7 @@
       "requisito": "RF14",
       "cenario": "Data inválida, categoria fora da lista e dado não presente no original",
       "status": "APROVADO",
+      "duracao_ms": 0.11,
       "evidencia": "Bloqueados com sucesso: ['data_invalida', 'categoria_invalida', 'dado_ausente_no_original']"
     },
     {
@@ -269,6 +272,7 @@
       "requisito": "RF15",
       "cenario": "Seis solicitações (4 completas, 1 incompleta, 1 ambígua) contra gabarito",
       "status": "APROVADO",
+      "duracao_ms": 20.32,
       "evidencia": "Acurácia categoria: 100.0% (6/6), Omissões: 0, Fatos sem suporte: 0"
     },
     {
@@ -276,6 +280,7 @@
       "requisito": "RF16",
       "cenario": "Três entradas adversariais (solicitação, documento do corpus e extração de segredo)",
       "status": "APROVADO",
+      "duracao_ms": 2.49,
       "evidencia": {
         "adv1_solicitacao": "bloquear",
         "adv2_corpus_alerta": "Instrução maliciosa indireta neutralizada no documento DOC-ADV-02 (ADV-02).",
@@ -287,6 +292,7 @@
       "requisito": "RF16",
       "cenario": "Entrada fora de escopo, arquivo/texto excessivo e limite máximo de chamadas",
       "status": "APROVADO",
+      "duracao_ms": 0.06,
       "evidencia": {
         "fora_de_escopo": "revisar",
         "arquivo_invalido_bloqueado": true,
@@ -299,6 +305,7 @@
       "requisito": "RF17",
       "cenario": "Indexação dos 6 documentos, recarga em disco e reindexação do mesmo acervo sem duplicação",
       "status": "APROVADO",
+      "duracao_ms": 12.78,
       "evidencia": "Docs: 6, Chunks: 49, Duplicados adicionados: 0"
     },
     {
@@ -306,6 +313,7 @@
       "requisito": "RF18",
       "cenario": "Cinco perguntas respondíveis comparadas em duas configurações de chunking (A: 400/80 vs B: 800/150)",
       "status": "APROVADO",
+      "duracao_ms": 21.24,
       "evidencia": {
         "config_a_hit_rate": "100.0%",
         "config_a_chunks": 49,
@@ -318,6 +326,7 @@
       "requisito": "RF19",
       "cenario": "Cinco perguntas respondíveis pelo corpus (P1 a P5) com resposta fundamentada e citação",
       "status": "APROVADO",
+      "duracao_ms": 10.41,
       "evidencia": [
         "P1: ['DOC-SECITECI-002', 'DOC-SECITECI-001', 'DOC-SECITECI-002']",
         "P2: ['DOC-SECITECI-005', 'DOC-SECITECI-004', 'DOC-SECITECI-004']",
@@ -331,6 +340,7 @@
       "requisito": "RF19",
       "cenario": "Duas perguntas sem resposta no corpus (P6 e P7) com abstenção explícita",
       "status": "APROVADO",
+      "duracao_ms": 9.0,
       "evidencia": [
         "P6: sem_evidencia_suficiente",
         "P7: sem_evidencia_suficiente"
@@ -341,6 +351,7 @@
       "requisito": "RF19",
       "cenario": "Pergunta com fontes contraditórias (P8) sinalizando conflito entre DOC-004 e DOC-006",
       "status": "APROVADO",
+      "duracao_ms": 8.6,
       "evidencia": [
         "DOC-SECITECI-006",
         "DOC-SECITECI-004",
@@ -352,6 +363,7 @@
       "requisito": "RF20",
       "cenario": "Fluxo completo do assistente (solicitação, fontes, minuta fundamentada e revisão humana)",
       "status": "APROVADO",
+      "duracao_ms": 29.0,
       "evidencia": "Minuta gerada (2929 chars) | Decisões: ['pendente', 'aprovada', 'rejeitada', 'revisar']"
     },
     {
@@ -359,6 +371,7 @@
       "requisito": "RF21",
       "cenario": "Segunda configuração de geração compatível e falha controlada sem reconstruir o índice",
       "status": "APROVADO",
+      "duracao_ms": 29.75,
       "evidencia": {
         "modo_geracao_2": "Adaptador_Simulado_Identificado:simulador-institucional-govmt-v2",
         "versao_indice_preservada": "v2.0-49c-5167d33347",
@@ -370,6 +383,7 @@
       "requisito": "RF22/RF23",
       "cenario": "12 avaliações, filtro por categoria, deduplicação por ID e conjunto vazio sem divisão por zero",
       "status": "APROVADO",
+      "duracao_ms": 0.9,
       "evidencia": {
         "taxa_acerto_12_casos": "100.0%",
         "duplicatas_removidas": 2,
@@ -382,6 +396,7 @@
       "requisito": "RF17/RF21",
       "cenario": "Indexar documento, consultar, excluir por id_documento e confirmar ausência na busca",
       "status": "APROVADO",
+      "duracao_ms": 25.21,
       "evidencia": "Recuperado antes: True, Chunks removidos: 1, Ausente após exclusão: True"
     },
     {
@@ -389,6 +404,7 @@
       "requisito": "RF23",
       "cenario": "Regressão dos fluxos herdados do Desafio 01 (caso textual + acessibilidade de áudio/OCR)",
       "status": "APROVADO",
+      "duracao_ms": 5.16,
       "evidencia": {
         "protocolo_d01": "2026-000142",
         "fidelidade_d01_percentual": 100.0,

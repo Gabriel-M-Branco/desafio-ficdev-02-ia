@@ -5,16 +5,20 @@ Interface oficial consolidada para os Desafios Práticos 01 (RF01 a RF13) e 02 (
 
 import os
 import sys
+import subprocess
+import time
 from dotenv import load_dotenv
 
 load_dotenv()
 import json
 import uuid
 import re
-from datetime import datetime
+from datetime import datetime, date
 from pathlib import Path
 from typing import Dict, Any, List, Optional
 import streamlit as st
+import pandas as pd
+import altair as alt
 
 # Garante que a raiz do projeto esteja no sys.path mesmo ao executar 'streamlit run src/app.py'
 ROOT_DIR = Path(__file__).resolve().parent.parent
@@ -133,6 +137,100 @@ if "rag_atendimento_resultado" not in st.session_state:
     st.session_state.rag_atendimento_resultado = None
 if "rag_consulta_resultado" not in st.session_state:
     st.session_state.rag_consulta_resultado = None
+if "testes_ao_vivo" not in st.session_state:
+    st.session_state.testes_ao_vivo = None
+if "teste_individual_resultado" not in st.session_state:
+    st.session_state.teste_individual_resultado = None
+if "pytest_resultado" not in st.session_state:
+    st.session_state.pytest_resultado = None
+
+# ==============================================================================
+# Ajuste Dinâmico de Altura e CSS para Exibição Integral
+# ==============================================================================
+st.markdown(
+    """
+    <style>
+    /* Força o Streamlit a libertar a altura fixa injetada por JavaScript */
+    div[data-baseweb="textarea"] > div {
+        height: auto !important;
+        min-height: fit-content !important;
+    }
+    textarea {
+        field-sizing: content !important;
+        height: auto !important;
+        padding-top: 12px !important;
+        padding-bottom: 12px !important;
+        line-height: 1.45 !important;
+        resize: none !important; /* Desativa a pega de redimensionamento manual */
+    }
+
+    /* Campos de visualização (disabled) 100% opacos, com contraste nítido e fundo sólido */
+    textarea:disabled,
+    textarea[disabled] {
+        opacity: 1 !important;
+        -webkit-text-fill-color: #1e293b !important;
+        color: #1e293b !important;
+        background-color: #f1f5f9 !important;
+        cursor: default !important;
+    }
+    div[data-baseweb="textarea"]:has(textarea:disabled) {
+        opacity: 1 !important;
+        background-color: #f1f5f9 !important;
+        border-color: #cbd5e1 !important;
+    }
+
+    /* Reduz o espaco vazio no topo da tela principal sem cortar a borda superior */
+    .block-container,
+    [data-testid="stMainBlockContainer"] {
+        padding-top: 3.2rem !important;
+        padding-bottom: 2rem !important;
+    }
+
+    /* Reduz espacamento e bordas no brasao e cabecalho da barra lateral */
+    [data-testid="stSidebar"] [data-testid="stImage"] {
+        margin-top: -12px !important;
+        margin-bottom: 2px !important;
+        padding: 0 !important;
+    }
+    [data-testid="stSidebar"] hr {
+        margin-top: 0.45rem !important;
+        margin-bottom: 0.45rem !important;
+    }
+    </style>
+    """,
+    unsafe_allow_html=True
+)
+
+
+def calcular_altura_dinamica(
+    texto: Any,
+    min_height: int = 80,
+    max_height: int = 1800,
+    chars_per_line: int = 85,  # Ponto de quebra conservador para evitar cortes
+    line_height: int = 24      # Espaçamento vertical real da fonte
+) -> int:
+    """Calcula dinamicamente a altura ideal em píxeis com precisão,
+    evitando cortes na base e margens vazias exageradas."""
+    if not texto:
+        return min_height
+    texto_str = str(texto).strip()
+    if not texto_str:
+        return min_height
+        
+    linhas = texto_str.splitlines()
+    total_linhas = 0
+    for linha in linhas:
+        if not linha:
+            total_linhas += 1
+        else:
+            # Calcula quebras visuais assumindo um ecrã mais apertado
+            quebras = max(1, (len(linha) + chars_per_line - 1) // chars_per_line)
+            total_linhas += quebras
+            
+    # 30px exatos para cobrir o padding superior (12px) e inferior (12px) + bordas
+    altura = (total_linhas * line_height) + 30
+    return max(min_height, min(altura, max_height))
+
 
 def formatar_identificador(campo: str, valor: Any, formato: str) -> str:
     texto = str(valor or "")
@@ -288,10 +386,17 @@ def obter_status_todos_motores() -> Dict[str, Any]:
 # ==============================================================================
 p_brasao = resolver_caminho("dados/originais/brasao.png")
 if p_brasao.exists():
-    st.sidebar.image(str(p_brasao), width=100)
+    st.sidebar.image(str(p_brasao), width=75)
 
-st.sidebar.subheader("Central GOV.MT")
-st.sidebar.markdown("**SECITECI/MT** • ETEC Cuiabá")
+st.sidebar.markdown(
+    """
+    <div style='margin-top: -6px; margin-bottom: 2px;'>
+        <div style='font-size: 1.15rem; font-weight: 700; color: #0f172a; line-height: 1.2;'>Central GOV.MT</div>
+        <div style='font-size: 0.82rem; color: #475569; margin-top: 2px;'><strong>SECITECI/MT</strong> • ETEC Cuiabá</div>
+    </div>
+    """,
+    unsafe_allow_html=True
+)
 st.sidebar.divider()
 
 menu = st.sidebar.radio(
@@ -316,7 +421,7 @@ st.sidebar.markdown("##### Status Real dos Motores de IA")
 
 status_motores = obter_status_todos_motores()
 
-with st.sidebar.expander("Texto / LLM", expanded=True):
+with st.sidebar.expander("Texto / LLM", expanded=False):
     st.caption(status_motores["texto"]["status"])
     if status_motores["texto"]["em_uso"]:
         st.write(f"• **Provedor:** `{status_motores['texto']['provedor']}`")
@@ -425,7 +530,7 @@ if menu.startswith("1."):
         texto_digitado = st.text_area(
             "Texto da Manifestação:",
             value=st.session_state.solicitacao_texto,
-            height=280,
+            height=calcular_altura_dinamica(st.session_state.solicitacao_texto, min_height=100),
             placeholder="Digite ou cole aqui a solicitação do cidadão..."
         )
         st.session_state.solicitacao_texto = texto_digitado
@@ -576,7 +681,7 @@ if menu.startswith("1."):
                 texto_editado = st.text_area(
                     "Minuta de Despacho (Editável pelo Operador):",
                     value=st.session_state.minuta_editavel,
-                    height=250,
+                    height=calcular_altura_dinamica(st.session_state.minuta_editavel, min_height=140),
                     key="minuta_textarea_key"
                 )
                 st.session_state.minuta_editavel = texto_editado
@@ -778,11 +883,11 @@ elif menu.startswith("2."):
 
     t1, t2, t3 = st.tabs(["Prompt A (Zero-Shot)", "Prompt B (Estruturado)", "Prompt C (Produção)"])
     with t1:
-        st.text_area("Saída A:", value=exp["prompt_a"]["texto"], height=260, disabled=True)
+        st.text_area("Saída A:", value=exp["prompt_a"]["texto"], height=calcular_altura_dinamica(exp["prompt_a"]["texto"], min_height=100), disabled=True)
     with t2:
-        st.text_area("Saída B:", value=exp["prompt_b"]["texto"], height=260, disabled=True)
+        st.text_area("Saída B:", value=exp["prompt_b"]["texto"], height=calcular_altura_dinamica(exp["prompt_b"]["texto"], min_height=100), disabled=True)
     with t3:
-        st.text_area("Saída C:", value=exp["prompt_c"]["texto"], height=260, disabled=True)
+        st.text_area("Saída C:", value=exp["prompt_c"]["texto"], height=calcular_altura_dinamica(exp["prompt_c"]["texto"], min_height=100), disabled=True)
 
 
 # ==============================================================================
@@ -810,7 +915,7 @@ elif menu.startswith("3."):
             if res_a.get("sucesso"):
                 comp = res_a.get("comparacao_gabarito", {})
                 st.metric("Acurácia de Entidades", comp.get("acuracia_entidades", "4/6"))
-                st.text_area("Transcrição Revisada:", value=res_a.get("transcricao_revisada", ""), height=140, disabled=True)
+                st.text_area("Transcrição Revisada:", value=res_a.get("transcricao_revisada", ""), height=calcular_altura_dinamica(res_a.get("transcricao_revisada", ""), min_height=50), disabled=True)
 
                 st.markdown("**Validação de Entidades Críticas:**")
                 for c_nome, c_item in comp.get("detalhes", {}).items():
@@ -847,7 +952,7 @@ elif menu.startswith("3."):
                     st.warning(res_v["aviso_fallback"])
                 st.metric("Acurácia contra Gabarito", res_v.get("comparacao_gabarito", {}).get("taxa_acuracia_percentual", "N/A"))
                 txt_ocr = res_v.get("texto_corrigido") or res_v.get("texto_bruto") or ""
-                st.text_area("Texto Extraído pelo OCR:", value=txt_ocr, height=140, disabled=True)
+                st.text_area("Texto Extraído pelo OCR:", value=txt_ocr, height=calcular_altura_dinamica(txt_ocr, min_height=50), disabled=True)
 
                 if res_v.get("trechos_incertos_ou_ilegiveis"):
                     st.markdown("**Trechos Incertos / Manuscritos:**")
@@ -1107,10 +1212,6 @@ elif menu.startswith("5."):
             </style>""",
             unsafe_allow_html=True
         )
-        c_topo1, c_topo2 = st.columns([1.2, 3])
-        with c_topo1:
-            if st.button("Atualizar Trilha de Auditoria", width='stretch'):
-                st.rerun()
 
         logs_brutos = audit_logger.listar_execucoes()
         if not logs_brutos:
@@ -1431,7 +1532,7 @@ elif menu.startswith("6."):
                 for idx, t in enumerate(resp.fontes, start=1):
                     with st.expander(f"Trecho {idx}: {t.documento_id} v{t.versao} (Pág. {t.pagina or '1'}) — Similaridade: {t.score_similaridade:.4f}"):
                         st.caption(f"ID: {t.trecho_id} | Seção: {t.secao or 'Geral'} | Distância: {t.score_distancia:.4f}")
-                        st.text_area("Fragmento:", value=t.conteudo, height=90, disabled=True, key=f"rag_{t.trecho_id}")
+                        st.text_area("Fragmento:", value=t.conteudo, height=calcular_altura_dinamica(t.conteudo, min_height=40), disabled=True, key=f"rag_{t.trecho_id}")
             else:
                 st.caption("Nenhum trecho documental recuperado ou aplicável para esta resposta.")
 
@@ -1479,7 +1580,7 @@ elif menu.startswith("6."):
 
         col_f1, col_f2 = st.columns([3, 1])
         with col_f1:
-            texto_int = st.text_area("Texto da Solicitação:", value=texto_int_padrao, height=130, key="txt_int_area")
+            texto_int = st.text_area("Texto da Solicitação:", value=texto_int_padrao, height=calcular_altura_dinamica(texto_int_padrao, min_height=70), key="txt_int_area")
         with col_f2:
             prot_int = st.text_input("Protocolo (se houver):", value=prot_int_padrao, key="prot_int_in")
             data_int = st.text_input("Data de Registro (se houver):", value=data_int_padrao, key="data_int_in")
@@ -1563,7 +1664,7 @@ elif menu.startswith("6."):
             minuta_int_editada = st.text_area(
                 "Minuta Institucional Fundamentada (Fatos do Solicitante + Regras do Acervo):",
                 value=pacote_i.minuta_institucional or "",
-                height=260,
+                height=calcular_altura_dinamica(pacote_i.minuta_institucional or "", min_height=140),
                 key="minuta_int_edit_area"
             )
 
@@ -1617,7 +1718,7 @@ elif menu.startswith("7."):
     else:
         caso_sol = None
 
-    texto_f = st.text_area("Texto da Manifestação:", value=caso_sol["texto_original"] if caso_sol else "", height=150)
+    texto_f = st.text_area("Texto da Manifestação:", value=caso_sol["texto_original"] if caso_sol else "", height=calcular_altura_dinamica(caso_sol["texto_original"] if caso_sol else "", min_height=70))
     prot_f = st.text_input("Protocolo Externo (opcional):", value=(caso_sol.get("protocolo") or "") if caso_sol else "")
 
     if st.button("Processar Ficha Pydantic", type="primary"):
@@ -1667,28 +1768,50 @@ elif menu.startswith("8."):
         with open(p_av, "r", encoding="utf-8") as fa:
             avaliacoes = json.load(fa)
 
-        categorias_disp = ["Todas"] + sorted(list({a.get("categoria_servico", "Geral") for a in avaliacoes}))
-        datas_disp = sorted([a.get("data", "2026-10-01") for a in avaliacoes])
+        categorias_disp = ["Todas"] + sorted(list({a.get("categoria_servico", "Geral") for a in avaliacoes if a.get("categoria_servico")}))
 
         cf1, cf2, cf3 = st.columns(3)
         with cf1:
             cat_filtro = st.selectbox("Filtrar por Categoria/Canal:", categorias_disp)
         with cf2:
-            dt_ini = st.text_input("Data Inicial (YYYY-MM-DD):", value=datas_disp[0] if datas_disp else "2026-10-01")
+            d_ini = st.date_input(
+                "Data Inicial:",
+                value=date(2026, 6, 1),
+                format="DD/MM/YYYY",
+                help="Data de início do recorte temporal (padrão amplo cobrindo todo o exercício de 2026)."
+            )
+            dt_ini = d_ini.strftime("%Y-%m-%d") if d_ini else None
         with cf3:
-            dt_fim = st.text_input("Data Final (YYYY-MM-DD):", value=datas_disp[-1] if datas_disp else "2026-10-31")
+            d_fim = st.date_input(
+                "Data Final:",
+                value=date(2026, 12, 31),
+                format="DD/MM/YYYY",
+                help="Data final do recorte temporal (padrão amplo cobrindo todo o exercício de 2026)."
+            )
+            dt_fim = d_fim.strftime("%Y-%m-%d") if d_fim else None
 
-        avaliacoes_filtradas = filtrar_e_deduplicar_avaliacoes(
-            avaliacoes,
-            categoria_servico=cat_filtro,
-            data_inicio=dt_ini,
-            data_fim=dt_fim,
-        )
+        if d_ini and d_fim and d_ini > d_fim:
+            st.error("A Data Inicial não pode ser posterior à Data Final. Por favor, ajuste o período.")
+            avaliacoes_filtradas = []
+        else:
+            avaliacoes_filtradas = filtrar_e_deduplicar_avaliacoes(
+                avaliacoes,
+                categoria_servico=cat_filtro,
+                data_inicio=dt_ini,
+                data_fim=dt_fim,
+            )
 
         classificacoes = [classificar_sentimento_avaliacao(a["id"], a["texto"]) for a in avaliacoes_filtradas]
         agregacao = agregar_sentimentos_determinístico(classificacoes)
 
-        st.caption(f"**Denominador Visível da Consulta Atual:** `{agregacao['denominador']}` avaliações únicas consideradas.")
+        periodo_txt = f"{d_ini.strftime('%d/%m/%Y')} até {d_fim.strftime('%d/%m/%Y')}" if (d_ini and d_fim) else "Período Completo"
+        st.markdown(
+            f"<div style='color: #334155; font-size: 0.9rem; margin-bottom: 0.6rem;'>"
+            f"<strong>Recorte Temporal Ativo:</strong> <code>{periodo_txt}</code> | "
+            f"<strong>Denominador Visível da Consulta Atual:</strong> <code>{agregacao['denominador']}</code> avaliações únicas consideradas."
+            f"</div>",
+            unsafe_allow_html=True
+        )
 
         if agregacao["denominador"] == 0:
             st.warning("Nenhuma avaliação encontrada para o filtro selecionado (tratamento seguro de conjunto vazio sem divisão por zero).")
@@ -1696,22 +1819,71 @@ elif menu.startswith("8."):
             col_s1, col_s2, col_s3, col_s4, col_s5 = st.columns(5)
             with col_s1:
                 with st.container(border=True):
-                    st.metric("Total Único", agregacao["denominador"], help="Denominador de avaliações únicas")
+                    st.metric("Total Único", agregacao["denominador"], help="Denominador de avaliações únicas no filtro ativo")
+                    st.markdown("<div style='color: #334155; font-size: 0.85rem; font-weight: 500;'>Avaliações no filtro</div>", unsafe_allow_html=True)
             with col_s2:
                 with st.container(border=True):
-                    st.metric("Positivas", agregacao["distribuicao"]["positiva"], delta=f"{agregacao['percentuais']['positiva']}%", delta_color="normal")
+                    st.metric("Positivas", agregacao["distribuicao"]["positiva"])
+                    st.markdown(f"<div style='color: #166534; font-size: 0.85rem; font-weight: 600;'>{agregacao['percentuais']['positiva']}% do total</div>", unsafe_allow_html=True)
             with col_s3:
                 with st.container(border=True):
-                    st.metric("Negativas", agregacao["distribuicao"]["negativa"], delta=f"-{agregacao['percentuais']['negativa']}%", delta_color="inverse")
+                    st.metric("Negativas", agregacao["distribuicao"]["negativa"])
+                    st.markdown(f"<div style='color: #991b1b; font-size: 0.85rem; font-weight: 600;'>{agregacao['percentuais']['negativa']}% do total</div>", unsafe_allow_html=True)
             with col_s4:
                 with st.container(border=True):
-                    st.metric("Neutras", agregacao["distribuicao"]["neutra"], delta=f"{agregacao['percentuais']['neutra']}%", delta_color="off")
+                    st.metric("Neutras", agregacao["distribuicao"]["neutra"])
+                    st.markdown(f"<div style='color: #334155; font-size: 0.85rem; font-weight: 600;'>{agregacao['percentuais']['neutra']}% do total</div>", unsafe_allow_html=True)
             with col_s5:
                 with st.container(border=True):
-                    st.metric("Indeterminadas", agregacao["distribuicao"]["indeterminada"], delta=f"{agregacao['percentuais']['indeterminada']}%", delta_color="inverse", help="Casos com necessidade de revisão")
+                    st.metric("Indeterminadas", agregacao["distribuicao"]["indeterminada"], help="Casos com necessidade de revisão")
+                    st.markdown(f"<div style='color: #9a3412; font-size: 0.85rem; font-weight: 600;'>{agregacao['percentuais']['indeterminada']}% do total</div>", unsafe_allow_html=True)
 
-            st.bar_chart(agregacao["distribuicao"])
-            st.caption(f"**Nota Metodológica:** {agregacao['nota_metodologica']}")
+            df_barras = pd.DataFrame([
+                {"Sentimento": "Positiva", "Quantidade": agregacao["distribuicao"]["positiva"]},
+                {"Sentimento": "Negativa", "Quantidade": agregacao["distribuicao"]["negativa"]},
+                {"Sentimento": "Neutra", "Quantidade": agregacao["distribuicao"]["neutra"]},
+                {"Sentimento": "Indeterminada", "Quantidade": agregacao["distribuicao"]["indeterminada"]},
+            ])
+
+            grafico_sentimento = (
+                alt.Chart(df_barras)
+                .mark_bar(cornerRadius=4)
+                .encode(
+                    x=alt.X(
+                        "Sentimento:N",
+                        title=None,
+                        sort=["Positiva", "Negativa", "Neutra", "Indeterminada"],
+                        axis=alt.Axis(
+                            labelAngle=0,
+                            labelColor="#334155",
+                            labelFontSize=13,
+                            labelFontWeight="bold",
+                        )
+                    ),
+                    y=alt.Y(
+                        "Quantidade:Q",
+                        title="Quantidade de Avaliações",
+                        axis=alt.Axis(
+                            labelColor="#334155",
+                            titleColor="#334155",
+                            labelFontSize=11,
+                            tickMinStep=1,
+                        )
+                    ),
+                    color=alt.Color(
+                        "Sentimento:N",
+                        scale=alt.Scale(
+                            domain=["Positiva", "Negativa", "Neutra", "Indeterminada"],
+                            range=["#15803d", "#b91c1c", "#475569", "#c2410c"]
+                        ),
+                        legend=None
+                    ),
+                    tooltip=["Sentimento", "Quantidade"]
+                )
+                .properties(height=280)
+            )
+            st.altair_chart(grafico_sentimento, width="stretch")
+            st.markdown(f"<div style='color: #475569; font-size: 0.82rem;'><strong>Nota Metodológica:</strong> {agregacao['nota_metodologica']}</div>", unsafe_allow_html=True)
 
             with st.expander("Inspecionar Prompt Dedicado e Isolado de Sentimento (RF22)"):
                 st.code(montar_prompt_sentimento_isolado(avaliacoes_filtradas[0]["texto"]), language="xml")
@@ -1737,12 +1909,20 @@ elif menu.startswith("9."):
     c_m2.metric("Total de Chunks Indexados", len(indice_vetorial.chunks))
     c_m3.metric("Versão Atual do Índice", indice_vetorial.versao_indice)
 
-    st.markdown("##### Documentos Atualmente Ativos no Acervo")
-    col_docs = st.columns(2)
-    for i, d in enumerate(docs_presentes):
-        qtd = sum(1 for c in indice_vetorial.chunks if c["documento_id"] == d)
-        with col_docs[i % 2]:
-            st.info(f"**Identificador:** `{d}`\n\n**Fragmentos Derivados:** `{qtd} trechos indexados`")
+    st.markdown("##### Documentos Ativos e Detalhamento dos Trechos Indexados")
+    for d in docs_presentes:
+        chunks_d = [c for c in indice_vetorial.chunks if c["documento_id"] == d]
+        titulo_doc = chunks_d[0].get("titulo", d) if chunks_d else d
+        qtd = len(chunks_d)
+
+        with st.expander(f"{d} — {titulo_doc} ({qtd} trechos indexados)"):
+            for c in chunks_d:
+                t_id = c.get("trecho_id", "")
+                p = c.get("pagina", 1)
+                sec = c.get("secao", "Geral")
+                conteudo = c.get("conteudo", "").strip()
+                st.markdown(f"**Trecho:** `{t_id}` | **Página:** `{p}` | **Seção:** `{sec}`")
+                st.text_area(f"Conteúdo do trecho {t_id}", value=conteudo, height=calcular_altura_dinamica(conteudo, min_height=40), disabled=True, label_visibility="collapsed")
 
     st.divider()
     st.markdown("##### Expurgo Definitivo de Documento (Direito ao Esquecimento / RF24)")
@@ -1759,41 +1939,157 @@ elif menu.startswith("9."):
 # MÓDULO 10: Matriz de Testes Automatizados T01 a T15 (RF23 / RF24)
 # ==============================================================================
 elif menu.startswith("10."):
-    st.subheader("10. Matriz de Avaliação e Testes Automatizados (T01 a T15 — RF23 / RF24)")
+    st.subheader("10. Central de Execução e Verificação de Testes (T01 a T15 — RF23 / RF24)")
     st.markdown(
-        "Painel centralizado de verificação da suíte automatizada de 15 testes contratuais (`T01` a `T15`), "
-        "validação estrita por esquemas Pydantic v2, defesas adversariais (guardrails), RAG fundamentado "
-        "com abstenção, análise de sentimento e regressão integral do Desafio 01."
+        "Ambiente interativo de execução de testes em tempo real: execute a matriz contratual de 15 cenários (`T01` a `T15`), "
+        "dispare asserções individuais sob demanda ou execute a suíte oficial do `pytest` com captura de terminal ao vivo."
     )
 
     caminho_rel_d02 = resolver_caminho("resultados/metricas/relatorio_avaliacao_d02.json")
 
-    col_btn1, col_btn2 = st.columns([2, 3])
-    with col_btn1:
-        executar_clicado = st.button("Executar Bateria Completa (T01 a T15)", type="primary")
-    with col_btn2:
-        if caminho_rel_d02.exists():
-            st.caption(f"Arquivo de evidências: `{caminho_rel_d02.name}`")
+    mapa_testes_desc = {
+        "T01": "T01 — RF14: Esquema Pydantic, Campos Ausentes e Chaves Extras",
+        "T02": "T02 — RF14: Bloqueio de Data Impossível e Alucinação Factual",
+        "T03": "T03 — RF15: Classificação e Omissões nas 6 Solicitações",
+        "T04": "T04 — RF16: Defesas Adversariais (ADV-01 Injeção Direta, ADV-02 Corpus, ADV-03 Segredo)",
+        "T05": "T05 — RF16: Bloqueio Fora de Escopo, Arquivo Excessivo e Limite de Chamadas",
+        "T06": "T06 — RF17: Indexação dos 6 Documentos, Recarga e Deduplicação",
+        "T07": "T07 — RF18: Recuperação Vetorial Top-3 e Chunking (A: 400/80 vs B: 800/150)",
+        "T08": "T08 — RF19: 5 Perguntas Respondíveis (P1 a P5) com Citação Documental",
+        "T09": "T09 — RF19: 2 Perguntas sem Resposta (P6 e P7) com Abstenção Explícita",
+        "T10": "T10 — RF19: Detecção de Fontes Contraditórias (P8: DOC-004 vs DOC-006)",
+        "T11": "T11 — RF20: Fluxo Assistente Completo (Solicitação, RAG, Minuta e Revisão Humana)",
+        "T12": "T12 — RF21: Segunda Configuração de Geração e Falha Simulada sem Reconstruir Índice",
+        "T13": "T13 — RF22: Classificação das 12 Avaliações, Deduplicação e Zero-Division",
+        "T14": "T14 — RF24: Expurgo Vetorial Definitivo e Direito ao Esquecimento",
+        "T15": "T15 — RF23: Regressão dos Fluxos D01 e Acessibilidade TTS para Ausências",
+    }
 
-    if executar_clicado:
-        with st.spinner("Executando bateria completa de testes T01 a T15 sem atalhos simulados..."):
+    # Painel de Disparo de Testes ao Vivo
+    with st.container(border=True):
+        st.markdown("##### Painel de Disparo de Testes ao Vivo")
+        col_ctrl1, col_ctrl2 = st.columns([1.2, 1.8], gap="medium")
+
+        with col_ctrl1:
+            st.markdown("**Execução da Matriz Contratual Completa:**")
+            executar_todos = st.button("Executar Todos os Testes (T01 a T15) ao Vivo", type="primary", use_container_width=True)
+
+        with col_ctrl2:
+            st.markdown("**Execução de Teste Específico sob Demanda:**")
+            col_sel, col_btn_ind = st.columns([2.5, 1.2])
+            with col_sel:
+                teste_escolhido = st.selectbox(
+                    "Selecione o cenário para testar na hora:",
+                    list(mapa_testes_desc.keys()),
+                    format_func=lambda k: mapa_testes_desc[k],
+                    label_visibility="collapsed"
+                )
+            with col_btn_ind:
+                executar_individual = st.button("Executar Teste", type="secondary", use_container_width=True)
+
+    # Execução de Teste Individual
+    if executar_individual:
+        with st.spinner(f"Executando asserções reais do teste {teste_escolhido}..."):
             avaliador = AvaliadorDesafio02(indice=indice_vetorial)
-            avaliador.executar_matriz_testes_completa()
-            st.success("Bateria de testes T01 a T15 concluída com sucesso! Relatório atualizado.")
-            st.rerun()
+            res_ind = avaliador.executar_teste_individual(teste_escolhido)
+            st.session_state.teste_individual_resultado = res_ind
 
-    if not caminho_rel_d02.exists():
-        st.warning("Nenhum relatório de avaliação encontrado. Clique no botão acima para executar a matriz T01 a T15.")
+    if st.session_state.teste_individual_resultado:
+        ind = st.session_state.teste_individual_resultado
+        st_ok = (ind.get("status") == "APROVADO")
+        with st.container(border=True):
+            st.markdown(f"##### Resultado da Execução Individual: `{ind.get('teste')}` ({ind.get('requisito')})")
+            c_ind1, c_ind2, c_ind3 = st.columns([1, 1, 3])
+            c_ind1.metric("Status", ind.get("status"))
+            c_ind2.metric("Tempo de Execução", f"{ind.get('duracao_ms', 0):.2f} ms")
+            c_ind3.markdown(f"**Cenário Testado:**\n\n{ind.get('cenario')}")
+            st.markdown("**Evidência Factual das Asserções:**")
+            if isinstance(ind.get("evidencia"), dict):
+                st.json(ind.get("evidencia"))
+            elif isinstance(ind.get("evidencia"), list):
+                for ev in ind.get("evidencia"):
+                    st.write(f"- `{ev}`")
+            else:
+                st.info(str(ind.get("evidencia")))
+
+    # Execução da Matriz Completa
+    if executar_todos:
+        avaliador = AvaliadorDesafio02(indice=indice_vetorial)
+        lista_resultados = []
+        barra = st.progress(0, text="Iniciando execução da matriz de testes...")
+
+        with st.status("Executando bateria de 15 testes contratuais em tempo real...", expanded=True) as status_box:
+            codigos = [f"T{i:02d}" for i in range(1, 16)]
+            for i, cod in enumerate(codigos, 1):
+                status_box.write(f"Executando `{cod}`...")
+                t_res = avaliador.executar_teste_individual(cod)
+                lista_resultados.append(t_res)
+                stt_label = "APROVADO" if t_res["status"] == "APROVADO" else "FALHOU"
+                status_box.write(f"[{stt_label}] **{cod}** ({t_res['requisito']}) — {t_res['cenario']} ({t_res.get('duracao_ms', 0):.2f}ms)")
+                barra.progress(i / len(codigos), text=f"Progresso: {i}/15 testes concluídos ({cod})")
+
+            res_nlp = avaliador.avaliar_solicitacoes_nlp()
+            res_chunking = avaliador.avaliar_recuperacao_chunking()
+            res_rag = avaliador.avaliar_rag_completo()
+            res_sent = avaliador.avaliar_sentimentos()
+            duracao_total = round(sum(m.get("duracao_ms", 0) for m in lista_resultados), 2)
+
+            relatorio_ao_vivo = {
+                "timestamp": datetime.now().isoformat(),
+                "origem": "execucao_ao_vivo_usuario",
+                "total_testes": len(lista_resultados),
+                "aprovados": sum(1 for m in lista_resultados if m["status"] == "APROVADO"),
+                "duracao_total_ms": duracao_total,
+                "resumo_metricas": {
+                    "nlp_solicitacoes": {
+                        "acuracia_categoria": res_nlp["acuracia_categoria"],
+                        "total_omissoes": res_nlp["total_omissoes"],
+                        "total_fatos_sem_suporte": res_nlp["total_fatos_sem_suporte"],
+                    },
+                    "chunking_recuperacao": res_chunking["comparativo_configs"],
+                    "rag_8_perguntas": {
+                        "taxa_acerto_status": res_rag["taxa_acerto_status"],
+                        "taxa_acerto_citacao": res_rag["taxa_acerto_citacao"],
+                    },
+                    "sentimentos_12_avaliacoes": {
+                        "taxa_acerto": res_sent["taxa_acerto"],
+                        "distribuicao": res_sent["agregacao"]["distribuicao"],
+                    },
+                },
+                "matriz": lista_resultados,
+            }
+
+            try:
+                os.makedirs("resultados/metricas", exist_ok=True)
+                with open("resultados/metricas/relatorio_avaliacao_d02.json", "w", encoding="utf-8") as f_rel:
+                    json.dump(relatorio_ao_vivo, f_rel, indent=2, ensure_ascii=False)
+            except OSError:
+                pass
+
+            st.session_state.testes_ao_vivo = relatorio_ao_vivo
+            status_box.update(label=f"Bateria concluída: {relatorio_ao_vivo['aprovados']}/15 aprovados em {duracao_total:.2f}ms!", state="complete", expanded=False)
+
+    # Dados a exibir na interface
+    if st.session_state.testes_ao_vivo:
+        rel_ativo = st.session_state.testes_ao_vivo
+        tag_origem = "Executado ao Vivo nesta Sessão"
+    elif caminho_rel_d02.exists():
+        rel_ativo = json.loads(caminho_rel_d02.read_text(encoding="utf-8"))
+        tag_origem = "Último Relatório em Disco"
     else:
-        rel_d02 = json.loads(caminho_rel_d02.read_text(encoding="utf-8"))
-        resumo_m = rel_d02.get("resumo_matriz", {})
-        testes_lista = resumo_m.get("testes", [])
-        total_testes = resumo_m.get("total_testes", len(testes_lista))
-        aprovados = resumo_m.get("aprovados", sum(1 for t in testes_lista if t.get("status") == "APROVADO"))
-        reprovados = resumo_m.get("reprovados", total_testes - aprovados)
-        taxa = resumo_m.get("taxa_aprovacao", (aprovados / total_testes * 100) if total_testes else 0.0)
+        rel_ativo = None
+        tag_origem = "Nenhuma Execução Realizada"
 
-        ts_raw = rel_d02.get("timestamp", "")
+    if not rel_ativo:
+        st.info("Nenhuma execução de testes registrada. Utilize o painel acima para executar a bateria contratual ou rodar o pytest.")
+    else:
+        testes_lista = rel_ativo.get("matriz") or rel_ativo.get("resumo_matriz", {}).get("testes", [])
+        total_testes = rel_ativo.get("total_testes", len(testes_lista))
+        aprovados = rel_ativo.get("aprovados", sum(1 for t in testes_lista if t.get("status") == "APROVADO"))
+        reprovados = total_testes - aprovados
+        taxa = (aprovados / total_testes * 100) if total_testes else 0.0
+
+        ts_raw = rel_ativo.get("timestamp", "")
         if ts_raw:
             try:
                 dt = datetime.fromisoformat(ts_raw)
@@ -1803,38 +2099,42 @@ elif menu.startswith("10."):
         else:
             ts_formatado = "Não registrado"
 
-        # KPIs Principais
-        k1, k2, k3, k4 = st.columns(4)
+        dur_tot_ms = rel_ativo.get("duracao_total_ms")
+        dur_txt = f"{dur_tot_ms:.1f} ms" if dur_tot_ms else "—"
+
+        k1, k2, k3, k4, k5 = st.columns(5)
         k1.metric("Total de Testes", total_testes)
         k2.metric("Aprovados", f"{aprovados} / {total_testes}")
-        k3.metric("Taxa de Conformidade", f"{taxa:.1f}%")
-        k4.metric("Última Execução", ts_formatado)
+        k3.metric("Taxa de Sucesso", f"{taxa:.1f}%")
+        k4.metric("Duração da Bateria", dur_txt)
+        k5.metric("Origem dos Dados", tag_origem, help="Indica se os dados foram executados ao vivo nesta sessão ou lidos do disco")
+
         st.divider()
 
-        tab_t_cards, tab_t_chunking, tab_t_raw = st.tabs([
-            "Resultados Detalhados dos Testes (T01 a T15)",
-            "Experimento Comparativo de Chunking (RF18)",
-            "Visão Consolidada / JSON Completo",
+        tab_t_cards, tab_t_pytest, tab_t_chunking, tab_t_raw = st.tabs([
+            "1. Cards da Matriz Contratual (T01 a T15)",
+            "2. Terminal Pytest Oficial (Execução Real)",
+            "3. Comparativo de Chunking (RF18)",
+            "4. Evidências Fatuais / JSON Completo",
         ])
 
-        # ABA 1: CARDS DETALHADOS COM FILTROS
         with tab_t_cards:
-            st.markdown("##### Inspeção Individual dos Testes")
+            st.markdown("##### Inspeção Detalhada de Cada Teste Contratual")
             f_col1, f_col2, f_col3 = st.columns([1, 1, 2])
 
             with f_col1:
                 filtro_status = st.selectbox(
                     "Filtrar por Status:",
-                    ["Todos", "Apenas Aprovados", "Apenas Reprovados"]
+                    ["Todos", "Apenas Aprovados", "Apenas Reprovados"],
+                    key="filtro_status_testes"
                 )
             with f_col2:
                 reqs = sorted(list({t.get("requisito", "") for t in testes_lista if t.get("requisito")}))
-                filtro_req = st.selectbox("Filtrar por Requisito:", ["Todos"] + reqs)
+                filtro_req = st.selectbox("Filtrar por Requisito:", ["Todos"] + reqs, key="filtro_req_testes")
 
             with f_col3:
-                filtro_busca = st.text_input("Buscar teste por texto (ex: T01, SQL, chunking, P6):")
+                filtro_busca = st.text_input("Buscar teste por texto (ex: T01, SQL, chunking, P6):", key="filtro_busca_testes")
 
-            # Aplicação dos filtros
             testes_exibicao = []
             for t in testes_lista:
                 stt = t.get("status", "")
@@ -1851,18 +2151,18 @@ elif menu.startswith("10."):
                         continue
                 testes_exibicao.append(t)
 
-            st.caption(f"Exibindo {len(testes_exibicao)} de {len(testes_lista)} testes registrados.")
+            st.caption(f"Exibindo {len(testes_exibicao)} de {len(testes_lista)} testes contratuais.")
 
             for t in testes_exibicao:
                 t_id = t.get("teste", "T??")
                 t_req = t.get("requisito", "RF??")
                 t_cenario = t.get("cenario", "")
                 t_status = t.get("status", "PENDENTE")
+                t_ms = t.get("duracao_ms")
+                tempo_str = f" • {t_ms:.1f}ms" if t_ms is not None else ""
                 is_aprovado = (t_status == "APROVADO")
 
-                # Cor e rótulo no título do expander
-                cor_status = "#28a745" if is_aprovado else "#dc3545"
-                titulo_expander = f"[{t_id}] • {t_status} • {t_req} — {t_cenario}"
+                titulo_expander = f"[{t_id}] • {t_status} • {t_req} — {t_cenario}{tempo_str}"
 
                 with st.expander(titulo_expander, expanded=(not is_aprovado)):
                     col_det1, col_det2 = st.columns([3, 1])
@@ -1874,12 +2174,13 @@ elif menu.startswith("10."):
                             st.success(f"Status: {t_status}")
                         else:
                             st.error(f"Status: {t_status}")
+                        if t_ms is not None:
+                            st.caption(f"Tempo de execução: **{t_ms:.2f} ms**")
 
                     st.markdown("**Evidência Factual Registrada:**")
                     evid = t.get("evidencia")
 
                     if isinstance(evid, dict):
-                        # Formata o dicionário em duas colunas organizadas
                         col_ev1, col_ev2 = st.columns(2)
                         itens_ev = list(evid.items())
                         metade = (len(itens_ev) + 1) // 2
@@ -1895,12 +2196,65 @@ elif menu.startswith("10."):
                     else:
                         st.info(str(evid))
 
-        # ABA 2: EXPERIMENTO DE CHUNKING (RF18)
+        with tab_t_pytest:
+            st.markdown("##### Execução da Suíte Oficial Pytest no Terminal")
+            st.markdown(
+                "Dispara o executável real do `pytest` no ambiente Python local, testando arquivos de teste unitário e de integração "
+                "com captura direta do console, contagem de asserções e tempo decorrido."
+            )
+
+            opcoes_pytest = {
+                "testes/test_desafio02_rf14_rf24.py": "1. Testes do Desafio 02 (15 testes contratuais — RF14 a RF24)",
+                "testes/test_sistema.py": "2. Regressão Geral do Sistema (test_sistema.py)",
+                "testes/test_integracao_main.py": "3. Pipeline de Integração e CLI (test_integracao_main.py)",
+                "testes/": "4. Suíte Completa do Repositório (todos os 318 testes — D01 + D02)",
+            }
+
+            col_py1, col_py2 = st.columns([2.5, 1])
+            with col_py1:
+                alvo_pytest = st.selectbox(
+                    "Selecione a suíte pytest a executar:",
+                    list(opcoes_pytest.keys()),
+                    format_func=lambda k: opcoes_pytest[k],
+                    key="sel_alvo_pytest"
+                )
+            with col_py2:
+                st.write("")
+                st.write("")
+                btn_rodar_pytest = st.button("Executar Pytest no Terminal", type="primary", use_container_width=True)
+
+            if btn_rodar_pytest:
+                with st.spinner(f"Executando pytest em `{alvo_pytest}`..."):
+                    t_py_ini = time.perf_counter()
+                    cmd = [sys.executable, "-m", "pytest", alvo_pytest, "-v"]
+                    proc = subprocess.run(cmd, capture_output=True, text=True, encoding="utf-8")
+                    t_py_fim = time.perf_counter()
+                    st.session_state.pytest_resultado = {
+                        "alvo": alvo_pytest,
+                        "exit_code": proc.returncode,
+                        "stdout": proc.stdout,
+                        "stderr": proc.stderr,
+                        "duracao_s": round(t_py_fim - t_py_ini, 2),
+                    }
+
+            if st.session_state.pytest_resultado:
+                py_res = st.session_state.pytest_resultado
+                c_py_k1, c_py_k2, c_py_k3 = st.columns(3)
+                if py_res["exit_code"] == 0:
+                    c_py_k1.success("Resultado: SUCESSO (Exit Code 0)")
+                else:
+                    c_py_k1.error(f"Resultado: FALHA (Exit Code {py_res['exit_code']})")
+                c_py_k2.metric("Tempo Total", f"{py_res['duracao_s']:.2f} s")
+                c_py_k3.metric("Arquivo Executado", py_res["alvo"].split("/")[-1])
+
+                st.markdown("**Saída Real do Console Pytest:**")
+                st.code(py_res["stdout"] if py_res["stdout"] else py_res["stderr"], language="bash")
+
         with tab_t_chunking:
             st.markdown("##### Comparativo Experimental de Recuperação Vetorial (RF18 / T07)")
             st.markdown("Avaliação de sensibilidade das duas estratégias de fatiamento de documentos sobre as perguntas respondíveis do gabarito oficial.")
 
-            chunk_data = rel_d02.get("resumo_metricas", {}).get("chunking_recuperacao", {})
+            chunk_data = rel_ativo.get("resumo_metricas", {}).get("chunking_recuperacao", {})
             cfg_a = chunk_data.get("config_a", {})
             cfg_b = chunk_data.get("config_b", {})
 
@@ -1923,7 +2277,6 @@ elif menu.startswith("10."):
                     f"- **Taxa de Acerto (Top-3):** `{cfg_b.get('percentual', '100.0%')}` ({cfg_b.get('numerador', 5)}/{cfg_b.get('denominador', 5)})"
                 )
 
-            # Tabela comparativa por pergunta
             detalhes_a = {item["id"]: item for item in cfg_a.get("detalhes", [])}
             detalhes_b = {item["id"]: item for item in cfg_b.get("detalhes", [])}
 
@@ -1945,16 +2298,12 @@ elif menu.startswith("10."):
                 st.markdown("##### Tabela Comparativa de Recuperação por Pergunta")
                 st.dataframe(tabela_comp, width='stretch', hide_index=True)
 
-        # ABA 3: JSON COMPLETO / VISÃO CONSOLIDADA
         with tab_t_raw:
             st.markdown("##### Dados Consolidados da Bateria de Avaliação")
             st.download_button(
                 label="Baixar Relatório Completo (JSON)",
-                data=json.dumps(rel_d02, indent=2, ensure_ascii=False),
+                data=json.dumps(rel_ativo, indent=2, ensure_ascii=False),
                 file_name="relatorio_avaliacao_d02.json",
                 mime="application/json",
             )
-            st.json(rel_d02)
-
-st.divider()
-st.caption("Governo do Estado de Mato Grosso — Secretaria de Estado de Ciência, Tecnologia e Inovação (SECITECI/MT)")
+            st.json(rel_ativo)

@@ -1,0 +1,36 @@
+{
+  "id_execucao": "EXEC_20261029_105923_725257",
+  "timestamp": "2026-10-29T10:59:23.545941",
+  "modalidade": "rag_minuta",
+  "arquivo_origem": "indice/indice_vetorial.json",
+  "provedor": "abstencao_entidade_nao_localizada",
+  "modelo": "abstencao_entidade_nao_localizada",
+  "versao_prompt": "RAG_FUNDAMENTADO_V2",
+  "versao_esquema": "2.0.0",
+  "consulta": "revisão  Gostaria de saber se meu nome saiu na lista de convocados e se já estou matriculado na turma da noite.",
+  "ids_recuperados": [],
+  "versao_indice": "v2.0-49c-5167d33347",
+  "parametros": {
+    "top_k": 0,
+    "max_tokens": 2500
+  },
+  "duracao_segundos": 0.0003221000006305985,
+  "erros": [],
+  "resultado_resumo": {
+    "sucesso": true,
+    "campos_extraidos": 0,
+    "status_decisao": "sem_evidencia_suficiente"
+  },
+  "decisao_humana": {
+    "status": "pendente_revisao",
+    "operador": "aguardando_validacao",
+    "justificativa": "Aguardando deliberação de servidor responsável no painel Streamlit."
+  },
+  "detalhes_completos": {
+    "sucesso": true,
+    "status_decisao": "sem_evidencia_suficiente",
+    "citacoes": [],
+    "necessidade_revisao": true,
+    "modo_geracao": "abstencao_entidade_nao_localizada"
+  }
+}

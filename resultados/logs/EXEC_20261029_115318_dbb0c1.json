@@ -1,0 +1,39 @@
+{
+  "id_execucao": "EXEC_20261029_115318_dbb0c1",
+  "timestamp": "2026-10-29T11:53:18.469489",
+  "modalidade": "atendimento_integrado_rag",
+  "arquivo_origem": "SOL-01 — email (completa)",
+  "provedor": "extrator_fundamentado_local",
+  "modelo": "MotorRAG+NLP_v2",
+  "versao_prompt": "RAG_MINUTA_v2.0",
+  "versao_esquema": "ExtracaoFicha_v2.0",
+  "consulta": "Prezados, Meu nome é Marcos Vinícius de Almeida Santos, nasci em 12/08/2008, em Cuiabá, e solicito a efetivação da minha matrícula no curso Técnico em Enfermagem, eixo tecnológico Saúde, com carga hor",
+  "ids_recuperados": [
+    "DOC-SECITECI-001-p1-c007",
+    "DOC-SECITECI-003-p1-c005",
+    "DOC-SECITECI-001-p1-c008"
+  ],
+  "versao_indice": "v2.0-49c-5167d33347",
+  "parametros": {
+    "top_k": 3,
+    "provedor_geracao": "extrator_fundamentado_local"
+  },
+  "duracao_segundos": 0.05,
+  "erros": [],
+  "resultado_resumo": {
+    "sucesso": true,
+    "campos_extraidos": 0,
+    "status_decisao": null
+  },
+  "decisao_humana": {
+    "status": "pendente_revisao",
+    "operador": "aguardando_validacao",
+    "justificativa": "Aguardando deliberação de servidor responsável no painel Streamlit."
+  },
+  "detalhes_completos": {
+    "sucesso": true,
+    "status_rag": "fundamentada",
+    "categoria": "Matrícula e Ingresso",
+    "necessidade_revisao": false
+  }
+}

@@ -1,0 +1,44 @@
+{
+  "id_execucao": "EXEC_20261029_094516_4ccb30",
+  "timestamp": "2026-10-29T09:45:16.271861",
+  "modalidade": "rag_minuta",
+  "arquivo_origem": "indice/indice_vetorial.json",
+  "provedor": "extrator_fundamentado_local",
+  "modelo": "extrator_fundamentado_local",
+  "versao_prompt": "RAG_FUNDAMENTADO_V2",
+  "versao_esquema": "2.0.0",
+  "consulta": "Matrícula e Ingresso Técnico em Enfermagem solicito a efetivação da minha matrícula no curso Técnico em Enfermagem em Cuiabá. Cuiabá",
+  "ids_recuperados": [
+    "DOC-SECITECI-003:DOC-SECITECI-003-p1-c005",
+    "DOC-SECITECI-001:DOC-SECITECI-001-p1-c007",
+    "DOC-SECITECI-003:DOC-SECITECI-003-p1-c003"
+  ],
+  "versao_indice": "v2.0-49c-5167d33347",
+  "parametros": {
+    "top_k": 3,
+    "max_tokens": 2500
+  },
+  "duracao_segundos": 0.0015937999996822327,
+  "erros": [],
+  "resultado_resumo": {
+    "sucesso": true,
+    "campos_extraidos": 0,
+    "status_decisao": "fundamentada"
+  },
+  "decisao_humana": {
+    "status": "pendente_revisao",
+    "operador": "aguardando_validacao",
+    "justificativa": "Aguardando deliberação de servidor responsável no painel Streamlit."
+  },
+  "detalhes_completos": {
+    "sucesso": true,
+    "status_decisao": "fundamentada",
+    "citacoes": [
+      "[DOC-SECITECI-003, EDITAL RETIFICADOR Nº 06/2026/SECITECI-MT - ALTERAÇÃO PONTUAL DE CALENDÁRIO, v1.2, p. 1]",
+      "[DOC-SECITECI-001, EDITAL Nº 006/2026/SECITECI-MT - PROCESSO SELETIVO DE ALUNOS PARA CURSOS TÉCNICOS NAS ETECS 2026/2, v1.0, p. 1]",
+      "[DOC-SECITECI-003, EDITAL RETIFICADOR Nº 06/2026/SECITECI-MT - ALTERAÇÃO PONTUAL DE CALENDÁRIO, v1.2, p. 1]"
+    ],
+    "necessidade_revisao": false,
+    "modo_geracao": "extrator_fundamentado_local"
+  }
+}
