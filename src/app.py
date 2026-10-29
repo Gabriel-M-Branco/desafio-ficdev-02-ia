@@ -5,6 +5,8 @@ Interface oficial consolidada para os Desafios Práticos 01 (RF01 a RF13) e 02 (
 
 import os
 import sys
+import subprocess
+import time
 from dotenv import load_dotenv
 
 load_dotenv()
@@ -135,6 +137,12 @@ if "rag_atendimento_resultado" not in st.session_state:
     st.session_state.rag_atendimento_resultado = None
 if "rag_consulta_resultado" not in st.session_state:
     st.session_state.rag_consulta_resultado = None
+if "testes_ao_vivo" not in st.session_state:
+    st.session_state.testes_ao_vivo = None
+if "teste_individual_resultado" not in st.session_state:
+    st.session_state.teste_individual_resultado = None
+if "pytest_resultado" not in st.session_state:
+    st.session_state.pytest_resultado = None
 
 # ==============================================================================
 # Ajuste Dinâmico de Altura e CSS para Exibição Integral
@@ -1931,39 +1939,157 @@ elif menu.startswith("9."):
 # MÓDULO 10: Matriz de Testes Automatizados T01 a T15 (RF23 / RF24)
 # ==============================================================================
 elif menu.startswith("10."):
-    st.subheader("10. Matriz de Avaliação e Testes Automatizados (T01 a T15 — RF23 / RF24)")
+    st.subheader("10. Central de Execução e Verificação de Testes (T01 a T15 — RF23 / RF24)")
     st.markdown(
-        "Painel centralizado de verificação da suíte automatizada de 15 testes contratuais (`T01` a `T15`), "
-        "validação estrita por esquemas Pydantic v2, defesas adversariais (guardrails), RAG fundamentado "
-        "com abstenção, análise de sentimento e regressão integral do Desafio 01."
+        "Ambiente interativo de execução de testes em tempo real: execute a matriz contratual de 15 cenários (`T01` a `T15`), "
+        "dispare asserções individuais sob demanda ou execute a suíte oficial do `pytest` com captura de terminal ao vivo."
     )
 
     caminho_rel_d02 = resolver_caminho("resultados/metricas/relatorio_avaliacao_d02.json")
 
-    col_btn1, col_btn2 = st.columns([2, 3])
-    with col_btn1:
-        executar_clicado = st.button("Executar Bateria Completa (T01 a T15)", type="primary")
-    with col_btn2:
-        if caminho_rel_d02.exists():
-            st.caption(f"Arquivo de evidências: `{caminho_rel_d02.name}`")
+    mapa_testes_desc = {
+        "T01": "T01 — RF14: Esquema Pydantic, Campos Ausentes e Chaves Extras",
+        "T02": "T02 — RF14: Bloqueio de Data Impossível e Alucinação Factual",
+        "T03": "T03 — RF15: Classificação e Omissões nas 6 Solicitações",
+        "T04": "T04 — RF16: Defesas Adversariais (ADV-01 Injeção Direta, ADV-02 Corpus, ADV-03 Segredo)",
+        "T05": "T05 — RF16: Bloqueio Fora de Escopo, Arquivo Excessivo e Limite de Chamadas",
+        "T06": "T06 — RF17: Indexação dos 6 Documentos, Recarga e Deduplicação",
+        "T07": "T07 — RF18: Recuperação Vetorial Top-3 e Chunking (A: 400/80 vs B: 800/150)",
+        "T08": "T08 — RF19: 5 Perguntas Respondíveis (P1 a P5) com Citação Documental",
+        "T09": "T09 — RF19: 2 Perguntas sem Resposta (P6 e P7) com Abstenção Explícita",
+        "T10": "T10 — RF19: Detecção de Fontes Contraditórias (P8: DOC-004 vs DOC-006)",
+        "T11": "T11 — RF20: Fluxo Assistente Completo (Solicitação, RAG, Minuta e Revisão Humana)",
+        "T12": "T12 — RF21: Segunda Configuração de Geração e Falha Simulada sem Reconstruir Índice",
+        "T13": "T13 — RF22: Classificação das 12 Avaliações, Deduplicação e Zero-Division",
+        "T14": "T14 — RF24: Expurgo Vetorial Definitivo e Direito ao Esquecimento",
+        "T15": "T15 — RF23: Regressão dos Fluxos D01 e Acessibilidade TTS para Ausências",
+    }
 
-    if executar_clicado:
-        with st.spinner("Executando bateria completa de testes T01 a T15 sem atalhos simulados..."):
+    # Painel de Disparo de Testes ao Vivo
+    with st.container(border=True):
+        st.markdown("##### Painel de Disparo de Testes ao Vivo")
+        col_ctrl1, col_ctrl2 = st.columns([1.2, 1.8], gap="medium")
+
+        with col_ctrl1:
+            st.markdown("**Execução da Matriz Contratual Completa:**")
+            executar_todos = st.button("Executar Todos os Testes (T01 a T15) ao Vivo", type="primary", use_container_width=True)
+
+        with col_ctrl2:
+            st.markdown("**Execução de Teste Específico sob Demanda:**")
+            col_sel, col_btn_ind = st.columns([2.5, 1.2])
+            with col_sel:
+                teste_escolhido = st.selectbox(
+                    "Selecione o cenário para testar na hora:",
+                    list(mapa_testes_desc.keys()),
+                    format_func=lambda k: mapa_testes_desc[k],
+                    label_visibility="collapsed"
+                )
+            with col_btn_ind:
+                executar_individual = st.button("Executar Teste", type="secondary", use_container_width=True)
+
+    # Execução de Teste Individual
+    if executar_individual:
+        with st.spinner(f"Executando asserções reais do teste {teste_escolhido}..."):
             avaliador = AvaliadorDesafio02(indice=indice_vetorial)
-            avaliador.executar_matriz_testes_completa()
-            st.success("Bateria de testes T01 a T15 concluída com sucesso! Relatório atualizado.")
+            res_ind = avaliador.executar_teste_individual(teste_escolhido)
+            st.session_state.teste_individual_resultado = res_ind
 
-    if not caminho_rel_d02.exists():
-        st.warning("Nenhum relatório de avaliação encontrado. Clique no botão acima para executar a matriz T01 a T15.")
+    if st.session_state.teste_individual_resultado:
+        ind = st.session_state.teste_individual_resultado
+        st_ok = (ind.get("status") == "APROVADO")
+        with st.container(border=True):
+            st.markdown(f"##### Resultado da Execução Individual: `{ind.get('teste')}` ({ind.get('requisito')})")
+            c_ind1, c_ind2, c_ind3 = st.columns([1, 1, 3])
+            c_ind1.metric("Status", ind.get("status"))
+            c_ind2.metric("Tempo de Execução", f"{ind.get('duracao_ms', 0):.2f} ms")
+            c_ind3.markdown(f"**Cenário Testado:**\n\n{ind.get('cenario')}")
+            st.markdown("**Evidência Factual das Asserções:**")
+            if isinstance(ind.get("evidencia"), dict):
+                st.json(ind.get("evidencia"))
+            elif isinstance(ind.get("evidencia"), list):
+                for ev in ind.get("evidencia"):
+                    st.write(f"- `{ev}`")
+            else:
+                st.info(str(ind.get("evidencia")))
+
+    # Execução da Matriz Completa
+    if executar_todos:
+        avaliador = AvaliadorDesafio02(indice=indice_vetorial)
+        lista_resultados = []
+        barra = st.progress(0, text="Iniciando execução da matriz de testes...")
+
+        with st.status("Executando bateria de 15 testes contratuais em tempo real...", expanded=True) as status_box:
+            codigos = [f"T{i:02d}" for i in range(1, 16)]
+            for i, cod in enumerate(codigos, 1):
+                status_box.write(f"Executando `{cod}`...")
+                t_res = avaliador.executar_teste_individual(cod)
+                lista_resultados.append(t_res)
+                stt_label = "APROVADO" if t_res["status"] == "APROVADO" else "FALHOU"
+                status_box.write(f"[{stt_label}] **{cod}** ({t_res['requisito']}) — {t_res['cenario']} ({t_res.get('duracao_ms', 0):.2f}ms)")
+                barra.progress(i / len(codigos), text=f"Progresso: {i}/15 testes concluídos ({cod})")
+
+            res_nlp = avaliador.avaliar_solicitacoes_nlp()
+            res_chunking = avaliador.avaliar_recuperacao_chunking()
+            res_rag = avaliador.avaliar_rag_completo()
+            res_sent = avaliador.avaliar_sentimentos()
+            duracao_total = round(sum(m.get("duracao_ms", 0) for m in lista_resultados), 2)
+
+            relatorio_ao_vivo = {
+                "timestamp": datetime.now().isoformat(),
+                "origem": "execucao_ao_vivo_usuario",
+                "total_testes": len(lista_resultados),
+                "aprovados": sum(1 for m in lista_resultados if m["status"] == "APROVADO"),
+                "duracao_total_ms": duracao_total,
+                "resumo_metricas": {
+                    "nlp_solicitacoes": {
+                        "acuracia_categoria": res_nlp["acuracia_categoria"],
+                        "total_omissoes": res_nlp["total_omissoes"],
+                        "total_fatos_sem_suporte": res_nlp["total_fatos_sem_suporte"],
+                    },
+                    "chunking_recuperacao": res_chunking["comparativo_configs"],
+                    "rag_8_perguntas": {
+                        "taxa_acerto_status": res_rag["taxa_acerto_status"],
+                        "taxa_acerto_citacao": res_rag["taxa_acerto_citacao"],
+                    },
+                    "sentimentos_12_avaliacoes": {
+                        "taxa_acerto": res_sent["taxa_acerto"],
+                        "distribuicao": res_sent["agregacao"]["distribuicao"],
+                    },
+                },
+                "matriz": lista_resultados,
+            }
+
+            try:
+                os.makedirs("resultados/metricas", exist_ok=True)
+                with open("resultados/metricas/relatorio_avaliacao_d02.json", "w", encoding="utf-8") as f_rel:
+                    json.dump(relatorio_ao_vivo, f_rel, indent=2, ensure_ascii=False)
+            except OSError:
+                pass
+
+            st.session_state.testes_ao_vivo = relatorio_ao_vivo
+            status_box.update(label=f"Bateria concluída: {relatorio_ao_vivo['aprovados']}/15 aprovados em {duracao_total:.2f}ms!", state="complete", expanded=False)
+
+    # Dados a exibir na interface
+    if st.session_state.testes_ao_vivo:
+        rel_ativo = st.session_state.testes_ao_vivo
+        tag_origem = "Executado ao Vivo nesta Sessão"
+    elif caminho_rel_d02.exists():
+        rel_ativo = json.loads(caminho_rel_d02.read_text(encoding="utf-8"))
+        tag_origem = "Último Relatório em Disco"
     else:
-        rel_d02 = json.loads(caminho_rel_d02.read_text(encoding="utf-8"))
-        testes_lista = rel_d02.get("matriz") or rel_d02.get("resumo_matriz", {}).get("testes", [])
-        total_testes = rel_d02.get("total_testes", len(testes_lista))
-        aprovados = rel_d02.get("aprovados", sum(1 for t in testes_lista if t.get("status") == "APROVADO"))
+        rel_ativo = None
+        tag_origem = "Nenhuma Execução Realizada"
+
+    if not rel_ativo:
+        st.info("Nenhuma execução de testes registrada. Utilize o painel acima para executar a bateria contratual ou rodar o pytest.")
+    else:
+        testes_lista = rel_ativo.get("matriz") or rel_ativo.get("resumo_matriz", {}).get("testes", [])
+        total_testes = rel_ativo.get("total_testes", len(testes_lista))
+        aprovados = rel_ativo.get("aprovados", sum(1 for t in testes_lista if t.get("status") == "APROVADO"))
         reprovados = total_testes - aprovados
         taxa = (aprovados / total_testes * 100) if total_testes else 0.0
 
-        ts_raw = rel_d02.get("timestamp", "")
+        ts_raw = rel_ativo.get("timestamp", "")
         if ts_raw:
             try:
                 dt = datetime.fromisoformat(ts_raw)
@@ -1973,34 +2099,41 @@ elif menu.startswith("10."):
         else:
             ts_formatado = "Não registrado"
 
-        k1, k2, k3, k4 = st.columns(4)
+        dur_tot_ms = rel_ativo.get("duracao_total_ms")
+        dur_txt = f"{dur_tot_ms:.1f} ms" if dur_tot_ms else "—"
+
+        k1, k2, k3, k4, k5 = st.columns(5)
         k1.metric("Total de Testes", total_testes)
         k2.metric("Aprovados", f"{aprovados} / {total_testes}")
-        k3.metric("Taxa de Conformidade", f"{taxa:.1f}%")
-        k4.metric("Última Execução", ts_formatado)
+        k3.metric("Taxa de Sucesso", f"{taxa:.1f}%")
+        k4.metric("Duração da Bateria", dur_txt)
+        k5.metric("Origem dos Dados", tag_origem, help="Indica se os dados foram executados ao vivo nesta sessão ou lidos do disco")
+
         st.divider()
 
-        tab_t_cards, tab_t_chunking, tab_t_raw = st.tabs([
-            "Resultados Detalhados dos Testes (T01 a T15)",
-            "Experimento Comparativo de Chunking (RF18)",
-            "Visão Consolidada / JSON Completo",
+        tab_t_cards, tab_t_pytest, tab_t_chunking, tab_t_raw = st.tabs([
+            "1. Cards da Matriz Contratual (T01 a T15)",
+            "2. Terminal Pytest Oficial (Execução Real)",
+            "3. Comparativo de Chunking (RF18)",
+            "4. Evidências Fatuais / JSON Completo",
         ])
 
         with tab_t_cards:
-            st.markdown("##### Inspeção Individual dos Testes")
+            st.markdown("##### Inspeção Detalhada de Cada Teste Contratual")
             f_col1, f_col2, f_col3 = st.columns([1, 1, 2])
 
             with f_col1:
                 filtro_status = st.selectbox(
                     "Filtrar por Status:",
-                    ["Todos", "Apenas Aprovados", "Apenas Reprovados"]
+                    ["Todos", "Apenas Aprovados", "Apenas Reprovados"],
+                    key="filtro_status_testes"
                 )
             with f_col2:
                 reqs = sorted(list({t.get("requisito", "") for t in testes_lista if t.get("requisito")}))
-                filtro_req = st.selectbox("Filtrar por Requisito:", ["Todos"] + reqs)
+                filtro_req = st.selectbox("Filtrar por Requisito:", ["Todos"] + reqs, key="filtro_req_testes")
 
             with f_col3:
-                filtro_busca = st.text_input("Buscar teste por texto (ex: T01, SQL, chunking, P6):")
+                filtro_busca = st.text_input("Buscar teste por texto (ex: T01, SQL, chunking, P6):", key="filtro_busca_testes")
 
             testes_exibicao = []
             for t in testes_lista:
@@ -2018,29 +2151,31 @@ elif menu.startswith("10."):
                         continue
                 testes_exibicao.append(t)
 
-            st.caption(f"Exibindo {len(testes_exibicao)} de {len(testes_lista)} testes registrados.")
+            st.caption(f"Exibindo {len(testes_exibicao)} de {len(testes_lista)} testes contratuais.")
 
             for t in testes_exibicao:
                 t_id = t.get("teste", "T??")
                 t_req = t.get("requisito", "RF??")
                 t_cenario = t.get("cenario", "")
                 t_status = t.get("status", "PENDENTE")
+                t_ms = t.get("duracao_ms")
+                tempo_str = f" • {t_ms:.1f}ms" if t_ms is not None else ""
                 is_aprovado = (t_status == "APROVADO")
 
-                titulo_expander = f"[{t_id}] • {t_status} • {t_req} — {t_cenario}"
+                titulo_expander = f"[{t_id}] • {t_status} • {t_req} — {t_cenario}{tempo_str}"
 
                 with st.expander(titulo_expander, expanded=(not is_aprovado)):
                     col_det1, col_det2 = st.columns([3, 1])
                     with col_det1:
                         st.markdown(f"**Identificador:** `{t_id}` | **Requisito Contratual:** `{t_req}`")
-                        st.markdown(f"**Cenário Avaliado:**
-
-{t_cenario}")
+                        st.markdown(f"**Cenário Avaliado:**\n\n{t_cenario}")
                     with col_det2:
                         if is_aprovado:
                             st.success(f"Status: {t_status}")
                         else:
                             st.error(f"Status: {t_status}")
+                        if t_ms is not None:
+                            st.caption(f"Tempo de execução: **{t_ms:.2f} ms**")
 
                     st.markdown("**Evidência Factual Registrada:**")
                     evid = t.get("evidencia")
@@ -2061,40 +2196,84 @@ elif menu.startswith("10."):
                     else:
                         st.info(str(evid))
 
+        with tab_t_pytest:
+            st.markdown("##### Execução da Suíte Oficial Pytest no Terminal")
+            st.markdown(
+                "Dispara o executável real do `pytest` no ambiente Python local, testando arquivos de teste unitário e de integração "
+                "com captura direta do console, contagem de asserções e tempo decorrido."
+            )
+
+            opcoes_pytest = {
+                "testes/test_desafio02_rf14_rf24.py": "1. Testes do Desafio 02 (15 testes contratuais — RF14 a RF24)",
+                "testes/test_sistema.py": "2. Regressão Geral do Sistema (test_sistema.py)",
+                "testes/test_integracao_main.py": "3. Pipeline de Integração e CLI (test_integracao_main.py)",
+                "testes/": "4. Suíte Completa do Repositório (todos os 318 testes — D01 + D02)",
+            }
+
+            col_py1, col_py2 = st.columns([2.5, 1])
+            with col_py1:
+                alvo_pytest = st.selectbox(
+                    "Selecione a suíte pytest a executar:",
+                    list(opcoes_pytest.keys()),
+                    format_func=lambda k: opcoes_pytest[k],
+                    key="sel_alvo_pytest"
+                )
+            with col_py2:
+                st.write("")
+                st.write("")
+                btn_rodar_pytest = st.button("Executar Pytest no Terminal", type="primary", use_container_width=True)
+
+            if btn_rodar_pytest:
+                with st.spinner(f"Executando pytest em `{alvo_pytest}`..."):
+                    t_py_ini = time.perf_counter()
+                    cmd = [sys.executable, "-m", "pytest", alvo_pytest, "-v"]
+                    proc = subprocess.run(cmd, capture_output=True, text=True, encoding="utf-8")
+                    t_py_fim = time.perf_counter()
+                    st.session_state.pytest_resultado = {
+                        "alvo": alvo_pytest,
+                        "exit_code": proc.returncode,
+                        "stdout": proc.stdout,
+                        "stderr": proc.stderr,
+                        "duracao_s": round(t_py_fim - t_py_ini, 2),
+                    }
+
+            if st.session_state.pytest_resultado:
+                py_res = st.session_state.pytest_resultado
+                c_py_k1, c_py_k2, c_py_k3 = st.columns(3)
+                if py_res["exit_code"] == 0:
+                    c_py_k1.success("Resultado: SUCESSO (Exit Code 0)")
+                else:
+                    c_py_k1.error(f"Resultado: FALHA (Exit Code {py_res['exit_code']})")
+                c_py_k2.metric("Tempo Total", f"{py_res['duracao_s']:.2f} s")
+                c_py_k3.metric("Arquivo Executado", py_res["alvo"].split("/")[-1])
+
+                st.markdown("**Saída Real do Console Pytest:**")
+                st.code(py_res["stdout"] if py_res["stdout"] else py_res["stderr"], language="bash")
+
         with tab_t_chunking:
             st.markdown("##### Comparativo Experimental de Recuperação Vetorial (RF18 / T07)")
             st.markdown("Avaliação de sensibilidade das duas estratégias de fatiamento de documentos sobre as perguntas respondíveis do gabarito oficial.")
 
-            chunk_data = rel_d02.get("resumo_metricas", {}).get("chunking_recuperacao", {})
+            chunk_data = rel_ativo.get("resumo_metricas", {}).get("chunking_recuperacao", {})
             cfg_a = chunk_data.get("config_a", {})
             cfg_b = chunk_data.get("config_b", {})
 
             col_cfg_a, col_cfg_b = st.columns(2)
             with col_cfg_a:
                 st.info(
-                    "**Configuração A (Granularidade Alta)**
-
-"
-                    "- **Tamanho do Chunk:** 400 caracteres
-"
-                    "- **Sobreposição (Overlap):** 80 caracteres
-"
-                    f"- **Total de Chunks:** `{cfg_a.get('total_chunks', 49)} trechos`
-"
+                    "**Configuração A (Granularidade Alta)**\n\n"
+                    "- **Tamanho do Chunk:** 400 caracteres\n"
+                    "- **Sobreposição (Overlap):** 80 caracteres\n"
+                    f"- **Total de Chunks:** `{cfg_a.get('total_chunks', 49)} trechos`\n"
                     f"- **Taxa de Acerto (Top-3):** `{cfg_a.get('percentual', '100.0%')}` ({cfg_a.get('numerador', 5)}/{cfg_a.get('denominador', 5)})"
                 )
 
             with col_cfg_b:
                 st.info(
-                    "**Configuração B (Contexto Amplo)**
-
-"
-                    "- **Tamanho do Chunk:** 800 caracteres
-"
-                    "- **Sobreposição (Overlap):** 150 caracteres
-"
-                    f"- **Total de Chunks:** `{cfg_b.get('total_chunks', 24)} trechos`
-"
+                    "**Configuração B (Contexto Amplo)**\n\n"
+                    "- **Tamanho do Chunk:** 800 caracteres\n"
+                    "- **Sobreposição (Overlap):** 150 caracteres\n"
+                    f"- **Total de Chunks:** `{cfg_b.get('total_chunks', 24)} trechos`\n"
                     f"- **Taxa de Acerto (Top-3):** `{cfg_b.get('percentual', '100.0%')}` ({cfg_b.get('numerador', 5)}/{cfg_b.get('denominador', 5)})"
                 )
 
@@ -2123,8 +2302,8 @@ elif menu.startswith("10."):
             st.markdown("##### Dados Consolidados da Bateria de Avaliação")
             st.download_button(
                 label="Baixar Relatório Completo (JSON)",
-                data=json.dumps(rel_d02, indent=2, ensure_ascii=False),
+                data=json.dumps(rel_ativo, indent=2, ensure_ascii=False),
                 file_name="relatorio_avaliacao_d02.json",
                 mime="application/json",
             )
-            st.json(rel_d02)
+            st.json(rel_ativo)
