@@ -58,3 +58,14 @@ A execução automatizada (`python -m src.metrics` e `pytest testes/ -v`) compro
 
 1. **Minimização e Mascaramento:** CPFs e e-mails são mascarados nos logs (`123.***.***-00`, `m***@email.ficticio.br`), e contadores numéricos de uso (`max_tokens`, `prompt_tokens`, `completion_tokens`, `total_tokens`) são preservados sem redigir indevidamente valores numéricos, enquanto credenciais (`HF_TOKEN`, `OPENAI_API_KEY`, `OPENROUTER_API_KEY`) jamais são gravadas em disco.
 2. **Direito de Exclusão / Expurgo Vetorial (`T14`):** O método `IndiceVetorial.excluir_documento(documento_id)` remove todos os chunks e vetores associados a um documento e reconstrói a matriz TF-IDF, garantindo que trechos expurgados deixem imediatamente de ser recuperados pelo RAG.
+
+---
+
+## 5. Justificativa de Modelos e Viabilidade de Custos
+
+A seleção de modelos e a arquitetura de inferência encontram-se integralmente detalhadas em [JUSTIFICATIVA_MODELOS_E_CUSTOS.md](JUSTIFICATIVA_MODELOS_E_CUSTOS.md), pautadas em eficiência orçamentária para o serviço público estadual:
+- **Camada Textual e RAG:** Adoção de `gpt-4o-mini` como modelo comercial padrão (~US$ 0,15/1M input tokens e US$ 0,60/1M output tokens), com suporte a `Qwen2.5-72B` (open-weights) e adaptador simulado local identificado para testes sem custo de API (`T12`).
+- **Base Vetorial Soberana:** TF-IDF denso de 512 dimensões com persistência JSON local, eliminando tarifas recorrentes de APIs de embedding e desacoplando o índice do provedor LLM (`RF21`).
+- **Multimodalidade Híbrida e Soberana:** Visão de alta fidelidade via `gpt-4o` Vision com fallback para `Tesseract` e `PyMuPDF` local; transcrição de voz com `whisper-1` ou `faster-whisper` local em CPU; síntese acessível com trava humana prévia; e geração híbrida de artes institucionais (`FLUX` ou `DALL-E` para ilustração central + `Pillow` para diagramação oficial do GOV.MT).
+- **Projeção Orçamentária:** A simulação de 1.000 atendimentos mensais projeta custo entre R$ 12,50 e R$ 30,00 na modalidade comercial, ou R$ 0,00 na modalidade totalmente local/soberana.
+

@@ -5,18 +5,16 @@
     "arquivo": "entrada_audio.mp3",
     "duracao_segundos": 89.16,
     "tamanho_bytes": 2853120,
-    "modelo_stt": "small",
+    "modelo_stt": "whisper-1",
     "idioma_detectado": "pt",
-    "dispositivo": "cpu",
-    "compute_type": "int8",
-    "idioma_configurado": "pt"
+    "provedor": "OpenAI API"
   },
-  "transcricao_bruta": " Bom dia, meu protocolo é 2026-000142 de 14 de outubro de 2026. Meu nome é Marcos Vinícius de Almeida Santos, nasci em 12 de agosto de 2008 em Cuiabá e quero pedir a efetivação da minha matrícula no curso Técnico em Informagem do Eixo Tecnológico de Saúde com cargo a área de 1200 horas no turno, no turno. Meu CPF é 123456789 traço 00. Meu RG é 12345678. O nome da minha mãe é Lúcia Helena de Almeida Santos e o meu e-mail é marcos.almeida.teste-a-roba-exemplo.com Declaro estar ciente de que a matrícula será cancelada automaticamente se eu faltar sem justificativa comprovada nos dois primeiros dias de aula consecutivos ou em três dias de aula consecutivos ou não nos dez primeiros dias de aula. Peço que informe em quais os documentos ainda preciso apresentar. Muito obrigado.",
-  "transcricao_revisada": "Bom dia, meu protocolo é 2026-000142 de 14 de outubro de 2026. Meu nome é Marcos Vinícius de Almeida Santos, nasci em 12 de agosto de 2008 em Cuiabá e quero pedir a efetivação da minha matrícula no curso Técnico em Informagem do Eixo Tecnológico de Saúde com cargo a área de 1200 horas no turno, no turno. Meu CPF é 123456789 traço 00. Meu RG é 12345678. O nome da minha mãe é Lúcia Helena de Almeida Santos e o meu e-mail é marcos.almeida.teste-a-roba-exemplo.com Declaro estar ciente de que a matrícula será cancelada automaticamente se eu faltar sem justificativa comprovada nos dois primeiros dias de aula consecutivos ou em três dias de aula consecutivos ou não nos dez primeiros dias de aula. Peço que informe em quais os documentos ainda preciso apresentar. Muito obrigado.",
+  "transcricao_bruta": "Bom dia, meu protocolo é 2026-000142, de 14 de outubro de 2026. Meu nome é Marcos Vinícius de Almeida Santos, nasci em 12 de agosto de 2008, em Cuiabá, e quero pedir a efetivação da minha matrícula no curso técnico em enfermagem do Eixo Tecnológico de Saúde, com cargo horário de 1200 horas no turno, no turno. Meu CPF é 123456789-00, meu RG é 1234567-8. O nome da minha mãe é Lúcia Helena de Almeida Santos, e o meu e-mail é marcos.almeida.teste.com. Declaro estar ciente de que a matrícula será cancelada automaticamente se eu faltar sem justificativa comprovada nos dois primeiros dias de aula consecutivos ou em três dias de aula consecutivos ou não nos dez primeiros dias de aula. Peço que informe em quais os documentos ainda preciso apresentar. Muito obrigado.",
+  "transcricao_revisada": "Bom dia, meu protocolo é 2026-000142, de 14 de outubro de 2026. Meu nome é Marcos Vinícius de Almeida Santos, nasci em 12 de agosto de 2008, em Cuiabá, e quero pedir a efetivação da minha matrícula no curso técnico em enfermagem do Eixo Tecnológico de Saúde, com cargo horário de 1200 horas no turno, no turno. Meu CPF é 123456789-00, meu RG é 1234567-8. O nome da minha mãe é Lúcia Helena de Almeida Santos, e o meu e-mail é marcos.almeida.teste.com. Declaro estar ciente de que a matrícula será cancelada automaticamente se eu faltar sem justificativa comprovada nos dois primeiros dias de aula consecutivos ou em três dias de aula consecutivos ou não nos dez primeiros dias de aula. Peço que informe em quais os documentos ainda preciso apresentar. Muito obrigado.",
   "revisao_aplicada": "Normalização de espaços; conteúdo pendente de revisão humana.",
-  "origem_processamento": "local",
-  "provedor": "faster-whisper",
-  "tempo_processamento_segundos": 12.952,
+  "origem_processamento": "api_remota",
+  "provedor": "HuggingFace",
+  "tempo_processamento_segundos": 6.288,
   "exige_confirmacao_humana": true,
   "comparacao_gabarito": {
     "todos_campos_criticos_conferidos": false,
@@ -31,7 +29,7 @@
       },
       "curso": {
         "valor_esperado": "Técnico em Enfermagem",
-        "localizado_na_transcricao": false
+        "localizado_na_transcricao": true
       },
       "carga_horaria": {
         "valor_esperado": "1200 horas",
@@ -47,18 +45,17 @@
       }
     },
     "campos_divergentes_ou_ausentes": [
-      "curso",
       "turno"
     ],
-    "acuracia_entidades": "4/6",
+    "acuracia_entidades": "5/6",
     "comparacao_texto_referencia": {
       "status": "comparado",
       "palavras_referencia": 134,
-      "palavras_transcricao": 139,
-      "substituicoes": 6,
+      "palavras_transcricao": 135,
+      "substituicoes": 4,
       "exclusoes": 1,
-      "insercoes": 6,
-      "wer_percentual": 9.7,
+      "insercoes": 2,
+      "wer_percentual": 5.22,
       "criterio": "Comparação lexical normalizada (Word Error Rate - WER); fidelidade institucional."
     },
     "confirmacao_humana_pendente": true

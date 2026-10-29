@@ -40,8 +40,17 @@ class ImageGenerator:
         self.llm_client = LLMClient(config_path)
         image_config = self.config.get("image_generation", {})
         self.image_model = os.getenv("IMAGE_MODEL") or self.config.get("models", {}).get("image", "black-forest-labs/FLUX.1-schnell")
-        self.image_provider = os.getenv("IMAGE_PROVIDER") or image_config.get("provider", "fal-ai")
-        if self.image_provider == "cloudflare":
+        provider_env = os.getenv("IMAGE_PROVIDER", "").strip().lower()
+        if provider_env:
+            self.image_provider = provider_env
+        elif os.getenv("OPENAI_API_KEY", "").strip() and not os.getenv("HF_TOKEN", "").strip():
+            self.image_provider = "openai"
+        else:
+            self.image_provider = image_config.get("provider", "fal-ai")
+
+        if self.image_provider == "openai":
+            self.image_model = os.getenv("OPENAI_IMAGE_MODEL") or "dall-e-3"
+        elif self.image_provider == "cloudflare":
             self.image_model = os.getenv("CLOUDFLARE_IMAGE_MODEL") or "@cf/black-forest-labs/flux-1-schnell"
         elif self.image_provider == "openrouter":
             self.image_model = os.getenv("OPENROUTER_IMAGE_MODEL") or "google/gemini-3.1-flash-image"
@@ -162,6 +171,8 @@ class ImageGenerator:
         token = os.getenv("HF_TOKEN", "").strip()
         if os.getenv("EXECUTION_MODE", "auto").lower() == "mock":
             raise RuntimeError("Geração de imagem desativada no modo mock.")
+        if self.image_provider == "openai":
+            return self._gerar_openai(prompt_en)
         if self.image_provider == "cloudflare":
             return self._gerar_cloudflare(prompt_en)
         if self.image_provider == "openrouter":
@@ -262,6 +273,30 @@ class ImageGenerator:
         img = Image.open(io.BytesIO(dados))
         img.load()
         return img.convert("RGB")
+
+    def _gerar_openai(self, prompt_en: str) -> Image.Image:
+        """Geração da ilustração central via OpenAI DALL-E 3."""
+        import requests
+        key = os.getenv("OPENAI_API_KEY", "").strip()
+        if not key:
+            raise RuntimeError("OPENAI_API_KEY ausente para DALL-E 3.")
+        url = "https://api.openai.com/v1/images/generations"
+        model = os.getenv("OPENAI_IMAGE_MODEL", "dall-e-3").strip()
+        headers = {"Authorization": f"Bearer {key}", "Content-Type": "application/json"}
+        payload = {
+            "model": model,
+            "prompt": prompt_en,
+            "n": 1,
+            "size": "1024x1024",
+            "quality": "standard",
+            "response_format": "b64_json"
+        }
+        resp = requests.post(url, headers=headers, json=payload, timeout=self.image_timeout)
+        if resp.status_code != 200:
+            err = resp.json().get("error", {}).get("message", resp.text) if resp.headers.get("content-type", "").startswith("application/json") else resp.text
+            raise RuntimeError(f"OpenAI DALL-E retornou status {resp.status_code}: {err}")
+        b64 = resp.json()["data"][0]["b64_json"]
+        return Image.open(io.BytesIO(base64.b64decode(b64))).convert("RGB")
 
     def _gerar_cloudflare(self, prompt):
         import requests

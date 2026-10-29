@@ -104,9 +104,11 @@ def test_rf03_seguranca_prompts_payload_e_neutralizacao():
 def test_rf04_sem_credencial_nao_simula_sucesso(monkeypatch):
     monkeypatch.setenv("EXECUTION_MODE", "api")
     monkeypatch.setenv("OPENROUTER_ENABLED", "false")
+    monkeypatch.delenv("OPENAI_API_KEY", raising=False)
     client = LLMClient()
     client.hf_token = ""
     client.openrouter_key = ""
+    client.openai_key = ""
     resp = client.generate(prompt="Solicito matrícula.")
     assert resp.status == "credentials_missing"
     assert resp.text == ""

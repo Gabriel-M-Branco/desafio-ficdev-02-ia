@@ -1,0 +1,31 @@
+{
+  "protocolo": "2022-000142",
+  "data": "não localizado",
+  "solicitante": "MARCUS VINICIUS DE ALMEIDA SANTOS",
+  "cpf": "123.456.789-00",
+  "rg": "1234567-8",
+  "orgao_expedidor": "não localizado",
+  "data_nascimento": "12/03/2008",
+  "naturalidade": "CUIABÁ",
+  "uf": "não localizado",
+  "nome_mae": "LUCIA HELENA DE ALMEIDA SANTOS",
+  "nome_pai": "não localizado",
+  "curso": "TÉCNICO EM ENFERMAGEM",
+  "eixo_tecnologico": "SAÚDE",
+  "carga_horaria": "1200 HORAS",
+  "turno": "NOTURNO",
+  "inicio_curso": "01/02/2027",
+  "email": "MARCUS.ALMEIDA.TESTE@EXEMPLO.COM",
+  "telefone": "não localizado",
+  "assunto": "Efetivação de matrícula com pendências",
+  "pedido": "Regularização de matrícula com apresentação de documentos pendentes",
+  "categoria": "Matrícula e Ingresso",
+  "nivel_confianca": "alta",
+  "campos_ausentes": [
+    "orgao_expedidor",
+    "uf",
+    "nome_pai",
+    "telefone"
+  ],
+  "necessidade_revisao": true
+}
