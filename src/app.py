@@ -1029,29 +1029,216 @@ elif menu.startswith("5."):
         st.dataframe(tabela_lgpd, width='stretch', hide_index=True)
 
     with t_logs:
-        if st.button("Atualizar Trilha de Auditoria"):
-            st.rerun()
+        c_topo1, c_topo2 = st.columns([1.2, 3])
+        with c_topo1:
+            if st.button("Atualizar Trilha de Auditoria", width='stretch'):
+                st.rerun()
 
-        logs = audit_logger.listar_execucoes()
-        if not logs:
-            st.info("Nenhum registro gravado.")
+        logs_brutos = audit_logger.listar_execucoes()
+        if not logs_brutos:
+            st.info("Nenhum registro de auditoria gravado no momento.")
         else:
-            st.markdown(f"**Total de Registros:** `{len(logs)}`")
-            for reg in reversed(logs):
-                exec_id = reg.get("id_execucao", "N/A")
-                mod = reg.get("modalidade", "").upper()
-                dec = reg.get("decisao_humana", {})
-                status_d = dec.get("status", "pendente")
-                dur = reg.get("duracao_segundos", 0.0)
+            # Consolida execuções (último estado prevalece para decisões humanas atualizadas)
+            execucoes_map = {}
+            for reg in logs_brutos:
+                execucoes_map[reg.get("id_execucao")] = reg
+            registros = list(reversed(list(execucoes_map.values())))
 
-                with st.expander(f"[{mod}] {exec_id} — Decisão: {status_d.upper()} ({dur:.2f}s)"):
-                    st.write(f"- **Origem:** `{reg.get('arquivo_origem')}`")
-                    st.write(f"- **Provedor / Modelo:** `{reg.get('provedor')}` / `{reg.get('modelo')}`")
-                    st.write(f"- **Versão Prompt / Esquema / Índice:** `{reg.get('versao_prompt')}` / `{reg.get('versao_esquema', '2.0.0')}` / `{reg.get('versao_indice', 'N/A')}`")
-                    if reg.get("ids_recuperados"):
-                        st.write(f"- **IDs Recuperados (RAG):** `{', '.join(reg['ids_recuperados'])}`")
-                    st.write(f"- **Data/Hora:** `{reg.get('timestamp')}`")
-                    st.write(f"- **Justificativa:** {dec.get('justificativa', 'Nenhuma')}")
+            # Agrupamento temporal
+            agora = datetime.now()
+            grupo_hoje = []
+            grupo_semana = []
+            grupo_anteriores = []
+
+            for reg in registros:
+                ts_str = reg.get("timestamp", "")
+                try:
+                    ts = datetime.fromisoformat(ts_str.split("+")[0].split("Z")[0])
+                    dias = (agora.date() - ts.date()).days
+                    if dias == 0:
+                        grupo_hoje.append(reg)
+                    elif 1 <= dias <= 7:
+                        grupo_semana.append(reg)
+                    else:
+                        grupo_anteriores.append(reg)
+                except Exception:
+                    grupo_anteriores.append(reg)
+
+            total_aprov = sum(1 for r in registros if str(r.get("decisao_humana", {}).get("status", "")).upper() in ("APROVADO", "APROVADA"))
+            total_pend = sum(1 for r in registros if str(r.get("decisao_humana", {}).get("status", "")).upper() in ("PENDENTE", "PENDENTE_REVISAO", "AGUARDANDO_VALIDACAO"))
+            total_rej = sum(1 for r in registros if str(r.get("decisao_humana", {}).get("status", "")).upper() in ("REJEITADO", "REJEITADA"))
+
+            # Indicadores de Topo (KPIs)
+            kpi1, kpi2, kpi3, kpi4, kpi5 = st.columns(5)
+            kpi1.metric("Total de Registros", len(registros))
+            kpi2.metric("Hoje", len(grupo_hoje))
+            kpi3.metric("Esta Semana", len(grupo_semana))
+            kpi4.metric("Anteriores", len(grupo_anteriores))
+            kpi5.metric("Aprovadas", total_aprov)
+
+            st.divider()
+
+            # Filtros integrados
+            f_col1, f_col2, f_col3 = st.columns([1.5, 1.5, 2])
+            with f_col1:
+                filtro_dec = st.selectbox(
+                    "Filtrar por Status de Decisão:",
+                    ["Todos os Status", "Aprovada", "Pendente de Revisão", "Rejeitada", "Não Aplicável"],
+                    key="filtro_audit_decisao"
+                )
+            with f_col2:
+                modalidades_disponiveis = ["Todas as Modalidades"] + sorted(list({str(r.get("modalidade", "")).lower() for r in registros if r.get("modalidade")}))
+                filtro_mod = st.selectbox(
+                    "Filtrar por Modalidade:",
+                    modalidades_disponiveis,
+                    key="filtro_audit_mod"
+                )
+            with f_col3:
+                termo_busca = st.text_input(
+                    "Buscar (ID, modelo, origem ou consulta):",
+                    value="",
+                    placeholder="Ex.: EXEC_20261029, gpt-4o, minuta...",
+                    key="filtro_audit_termo"
+                )
+
+            def filtrar_lista(lista):
+                resultado = []
+                for r in lista:
+                    dec_raw = r.get("decisao_humana", {})
+                    st_val = str(dec_raw.get("status", "pendente")).upper() if isinstance(dec_raw, dict) else str(dec_raw).upper()
+                    mod_val = str(r.get("modalidade", "")).lower()
+
+                    if filtro_dec == "Aprovada" and st_val not in ("APROVADO", "APROVADA"):
+                        continue
+                    if filtro_dec == "Pendente de Revisão" and st_val not in ("PENDENTE", "PENDENTE_REVISAO", "AGUARDANDO_VALIDACAO"):
+                        continue
+                    if filtro_dec == "Rejeitada" and st_val not in ("REJEITADO", "REJEITADA"):
+                        continue
+                    if filtro_dec == "Não Aplicável" and st_val not in ("NAO_APLICAVEL", "NÃO APLICÁVEL"):
+                        continue
+
+                    if filtro_mod != "Todas as Modalidades" and mod_val != filtro_mod:
+                        continue
+
+                    if termo_busca.strip():
+                        tb = termo_busca.strip().lower()
+                        conteudo_busca = f"{r.get('id_execucao', '')} {r.get('modelo', '')} {r.get('provedor', '')} {r.get('arquivo_origem', '')} {r.get('consulta', '')}".lower()
+                        if tb not in conteudo_busca:
+                            continue
+
+                    resultado.append(r)
+                return resultado
+
+            def renderizar_itens(itens, sufixo_pag):
+                itens_filtrados = filtrar_lista(itens)
+                if not itens_filtrados:
+                    st.info("Nenhum registro encontrado para os filtros selecionados.")
+                    return
+
+                col_p1, col_p2 = st.columns([1.2, 3])
+                with col_p1:
+                    limite_sel = st.selectbox(
+                        "Exibir registros:",
+                        [25, 50, 100, "Todos"],
+                        index=0,
+                        key=f"lim_{sufixo_pag}"
+                    )
+                with col_p2:
+                    qtd_visivel = len(itens_filtrados) if limite_sel == "Todos" else min(len(itens_filtrados), int(limite_sel))
+                    st.caption(f"Exibindo **{qtd_visivel}** de **{len(itens_filtrados)}** registros disponíveis neste período.")
+
+                itens_exibir = itens_filtrados if limite_sel == "Todos" else itens_filtrados[:int(limite_sel)]
+
+                for reg in itens_exibir:
+                    exec_id = reg.get("id_execucao", "N/A")
+                    mod = str(reg.get("modalidade", "")).upper()
+                    dec = reg.get("decisao_humana", {})
+                    status_raw = dec.get("status", "pendente") if isinstance(dec, dict) else str(dec)
+                    dur = reg.get("duracao_segundos", 0.0)
+                    ts_reg = reg.get("timestamp", "")
+                    try:
+                        dt_obj = datetime.fromisoformat(ts_reg.split("+")[0].split("Z")[0])
+                        dt_formatada = dt_obj.strftime("%d/%m/%Y %H:%M:%S")
+                    except Exception:
+                        dt_formatada = ts_reg[:19]
+
+                    st_u = str(status_raw).upper()
+                    if st_u in ("APROVADO", "APROVADA"):
+                        tag_expander = ":green[● APROVADA]"
+                        bg_cor, borda_cor, txt_cor = "#DCFCE7", "#16A34A", "#15803D"
+                        label_banner = "DECISÃO HUMANA: APROVADA"
+                    elif st_u in ("REJEITADO", "REJEITADA"):
+                        tag_expander = ":red[● REJEITADA]"
+                        bg_cor, borda_cor, txt_cor = "#FEE2E2", "#DC2626", "#B91C1C"
+                        label_banner = "DECISÃO HUMANA: REJEITADA"
+                    elif st_u in ("REVISAR", "REVISÃO"):
+                        tag_expander = ":blue[● REVISAR]"
+                        bg_cor, borda_cor, txt_cor = "#DBEAFE", "#2563EB", "#1D4ED8"
+                        label_banner = "DECISÃO HUMANA: REVISÃO SOLICITADA"
+                    elif st_u in ("NAO_APLICAVEL", "NÃO APLICÁVEL"):
+                        tag_expander = ":gray[● NÃO APLICÁVEL]"
+                        bg_cor, borda_cor, txt_cor = "#F3F4F6", "#6B7280", "#374151"
+                        label_banner = "DECISÃO HUMANA: NÃO APLICÁVEL (EXECUÇÃO TÉCNICA)"
+                    else:
+                        tag_expander = ":orange[● PENDENTE DE REVISÃO]"
+                        bg_cor, borda_cor, txt_cor = "#FEF3C7", "#D97706", "#B45309"
+                        label_banner = "DECISÃO HUMANA: PENDENTE DE REVISÃO"
+
+                    titulo_exp = f"[{mod}] {exec_id} — Decisão: {tag_expander} ({dur:.2f}s) — {dt_formatada}"
+                    with st.expander(titulo_exp):
+                        operador = dec.get("operador", "sistema") if isinstance(dec, dict) else "sistema"
+                        data_dec = dec.get("data_decisao", dt_formatada) if isinstance(dec, dict) else dt_formatada
+                        just = dec.get("justificativa", "Aguardando deliberação de servidor responsável.") if isinstance(dec, dict) else "Nenhuma"
+
+                        st.markdown(
+                            f"""<div style="background-color:{bg_cor}; border-left:5px solid {borda_cor}; padding:10px 14px; border-radius:4px; margin-bottom:12px;">
+                                <div style="font-size:13px; font-weight:800; color:{txt_cor}; letter-spacing:0.5px;">{label_banner}</div>
+                                <div style="font-size:12px; color:#374151; margin-top:4px;"><strong>Operador Responsável:</strong> {operador} &nbsp;|&nbsp; <strong>Data/Hora do Registro:</strong> {data_dec}</div>
+                                <div style="font-size:12px; color:#374151; margin-top:3px;"><strong>Justificativa Formal:</strong> {just}</div>
+                            </div>""",
+                            unsafe_allow_html=True
+                        )
+
+                        c_d1, c_d2 = st.columns(2)
+                        with c_d1:
+                            st.write(f"- **Origem:** `{reg.get('arquivo_origem', 'N/A')}`")
+                            st.write(f"- **Provedor:** `{reg.get('provedor', 'N/A')}`")
+                            st.write(f"- **Modelo IA:** `{reg.get('modelo', 'N/A')}`")
+                            st.write(f"- **Duração do Processamento:** `{dur:.3f} segundos`")
+                        with c_d2:
+                            st.write(f"- **Versão do Prompt:** `{reg.get('versao_prompt', 'N/A')}`")
+                            st.write(f"- **Versão do Esquema:** `{reg.get('versao_esquema', '2.0.0')}`")
+                            st.write(f"- **Versão do Índice Vetorial:** `{reg.get('versao_indice', 'N/A')}`")
+                            st.write(f"- **Data/Hora Completa:** `{ts_reg}`")
+
+                        if reg.get("ids_recuperados"):
+                            st.write(f"- **IDs Recuperados (RAG):** `{', '.join(reg['ids_recuperados'])}`")
+                        if reg.get("consulta"):
+                            st.info(f"**Consulta / Texto de Entrada:** {reg['consulta']}")
+
+            # Abas de agrupamento por período
+            aba_h, aba_sem, aba_ant, aba_all = st.tabs([
+                f"Hoje ({len(grupo_hoje)})",
+                f"Esta Semana ({len(grupo_semana)})",
+                f"Anteriores ({len(grupo_anteriores)})",
+                f"Todas as Execuções ({len(registros)})"
+            ])
+
+            with aba_h:
+                st.markdown("##### Execuções Registradas Hoje")
+                renderizar_itens(grupo_hoje, "hoje")
+
+            with aba_sem:
+                st.markdown("##### Execuções Registradas nos Últimos 7 Dias")
+                renderizar_itens(grupo_semana, "semana")
+
+            with aba_ant:
+                st.markdown("##### Execuções Registradas em Períodos Anteriores")
+                renderizar_itens(grupo_anteriores, "anteriores")
+
+            with aba_all:
+                st.markdown("##### Visão Geral Completa de Todas as Execuções")
+                renderizar_itens(registros, "todas")
 
 
 # ==============================================================================
