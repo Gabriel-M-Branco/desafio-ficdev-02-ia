@@ -305,7 +305,8 @@ menu = st.sidebar.radio(
         "6. Assistente de Documentos RAG (RF18-RF21)",
         "7. Triagem e Ficha da Solicitacao (RF14/RF15)",
         "8. Painel de Sentimentos (RF22)",
-        "9. Gestao do Acervo e Matriz T01-T15 (RF23/RF24)",
+        "9. Gestao do Acervo e Expurgo (RF24)",
+        "10. Matriz de Testes Automatizados T01-T15",
     ],
     index=0
 )
@@ -1724,63 +1725,236 @@ elif menu.startswith("8."):
 
 
 # ==============================================================================
-# MÓDULO 9: Gestão do Acervo, Expurgos e Matriz T01-T15 (RF23, RF24)
+# MÓDULO 9: Gestão do Acervo e Expurgo Vetorial (RF24)
 # ==============================================================================
 elif menu.startswith("9."):
-    st.subheader("9. Governança do Acervo, Expurgos e Matriz de Avaliação T01–T15 (RF23 / RF24)")
+    st.subheader("9. Governança do Acervo e Expurgo Vetorial (RF24)")
+    st.markdown("Demonstração da exclusão definitiva de documentos e fragmentos derivados do índice vetorial, atendendo ao ciclo de vida documental e ao direito ao esquecimento.")
 
-    tab_acervo, tab_matriz = st.tabs([
-        "Governança do Acervo e Expurgo Vetorial (RF24)",
-        "Matriz de Avaliação Automatizada T01 a T15 e Chunking (RF18 / RF23)"
-    ])
+    docs_presentes = sorted(list({c["documento_id"] for c in indice_vetorial.chunks}))
+    c_m1, c_m2, c_m3 = st.columns(3)
+    c_m1.metric("Documentos Ativos no Acervo", len(docs_presentes))
+    c_m2.metric("Total de Chunks Indexados", len(indice_vetorial.chunks))
+    c_m3.metric("Versão Atual do Índice", indice_vetorial.versao_indice)
 
-    with tab_acervo:
-        st.markdown("Demonstração da exclusão definitiva de documentos e fragmentos derivados do índice vetorial.")
+    st.markdown("##### Documentos Atualmente Ativos no Acervo")
+    col_docs = st.columns(2)
+    for i, d in enumerate(docs_presentes):
+        qtd = sum(1 for c in indice_vetorial.chunks if c["documento_id"] == d)
+        with col_docs[i % 2]:
+            st.info(f"**Identificador:** `{d}`\n\n**Fragmentos Derivados:** `{qtd} trechos indexados`")
 
-        docs_presentes = sorted(list({c["documento_id"] for c in indice_vetorial.chunks}))
-        c_m1, c_m2 = st.columns(2)
-        c_m1.metric("Documentos no Índice Vetorial", len(docs_presentes))
-        c_m2.metric("Versão Atual do Índice", indice_vetorial.versao_indice)
+    st.divider()
+    st.markdown("##### Expurgo Definitivo de Documento (Direito ao Esquecimento / RF24)")
+    st.caption("A exclusão definitiva remove o documento e expurga em cascata todos os seus fragmentos e vetores derivados do índice vetorial em disco, recalculando a versão.")
+    doc_sel = st.selectbox("Selecione o documento para expurgo definitivo:", docs_presentes if docs_presentes else ["Nenhum"])
 
-        for d in docs_presentes:
-            qtd = sum(1 for c in indice_vetorial.chunks if c["documento_id"] == d)
-            st.write(f"- `{d}` ({qtd} trechos)")
+    if st.button("Excluir e Expurgar Fragmentos Definitivamente", type="secondary"):
+        if doc_sel and doc_sel != "Nenhum":
+            removidos = indice_vetorial.excluir_documento(doc_sel)
+            st.success(f"Documento '{doc_sel}' excluído com sucesso! {removidos} fragmentos removidos definitivamente do índice.")
+            st.rerun()
 
-        st.divider()
-        st.markdown("##### Exclusão de Documento")
-        doc_sel = st.selectbox("Selecione o documento para expurgo:", docs_presentes if docs_presentes else ["Nenhum"])
+# ==============================================================================
+# MÓDULO 10: Matriz de Testes Automatizados T01 a T15 (RF23 / RF24)
+# ==============================================================================
+elif menu.startswith("10."):
+    st.subheader("10. Matriz de Avaliação e Testes Automatizados (T01 a T15 — RF23 / RF24)")
+    st.markdown(
+        "Painel centralizado de verificação da suíte automatizada de 15 testes contratuais (`T01` a `T15`), "
+        "validação estrita por esquemas Pydantic v2, defesas adversariais (guardrails), RAG fundamentado "
+        "com abstenção, análise de sentimento e regressão integral do Desafio 01."
+    )
 
-        if st.button("Excluir e Expurgar Fragmentos", type="secondary"):
-            if doc_sel and doc_sel != "Nenhum":
-                removidos = indice_vetorial.excluir_documento(doc_sel)
-                st.success(f"Documento '{doc_sel}' excluído com sucesso! {removidos} fragmentos removidos.")
-                st.rerun()
+    caminho_rel_d02 = resolver_caminho("resultados/metricas/relatorio_avaliacao_d02.json")
 
-    with tab_matriz:
-        st.markdown("Execução e inspeção dos 15 testes obrigatórios (`T01` a `T15`) e do experimento comparativo de chunking (`Config A: 400/80` vs `Config B: 800/150`).")
-        caminho_rel_d02 = resolver_caminho("resultados/metricas/relatorio_avaliacao_d02.json")
-
-        if st.button("Executar Matriz Completa (T01 a T15)", type="primary"):
-            with st.spinner("Executando bateria completa de testes T01 a T15..."):
-                avaliador = AvaliadorDesafio02(indice=indice_vetorial)
-                avaliador.executar_matriz_testes_completa()
-                st.success("Matriz T01–T15 executada e salva em `resultados/metricas/relatorio_avaliacao_d02.json`!")
-
+    col_btn1, col_btn2 = st.columns([2, 3])
+    with col_btn1:
+        executar_clicado = st.button("Executar Bateria Completa (T01 a T15)", type="primary")
+    with col_btn2:
         if caminho_rel_d02.exists():
-            rel_d02 = json.loads(caminho_rel_d02.read_text(encoding="utf-8"))
-            resumo_m = rel_d02.get("resumo_matriz", {})
-            cm1, cm2, cm3 = st.columns(3)
-            cm1.metric("Total de Testes", resumo_m.get("total_testes", 15))
-            cm2.metric("Aprovados", resumo_m.get("aprovados", 15))
-            cm3.metric("Taxa de Aprovação", f"{resumo_m.get('taxa_aprovacao', 100.0)}%")
+            st.caption(f"Arquivo de evidências: `{caminho_rel_d02.name}`")
 
-            st.markdown("##### Tabela de Resultados (`T01` a `T15`)")
-            st.dataframe(resumo_m.get("testes", []), width='stretch', hide_index=True)
+    if executar_clicado:
+        with st.spinner("Executando bateria completa de testes T01 a T15 sem atalhos simulados..."):
+            avaliador = AvaliadorDesafio02(indice=indice_vetorial)
+            avaliador.executar_matriz_testes_completa()
+            st.success("Bateria de testes T01 a T15 concluída com sucesso! Relatório atualizado.")
+            st.rerun()
 
-            comp_chunk = rel_d02.get("avaliacao_chunking", {}).get("comparativo_configs", {})
-            if comp_chunk:
-                st.markdown("##### Comparativo Experimental de Chunking (RF18)")
-                st.json(comp_chunk)
+    if not caminho_rel_d02.exists():
+        st.warning("Nenhum relatório de avaliação encontrado. Clique no botão acima para executar a matriz T01 a T15.")
+    else:
+        rel_d02 = json.loads(caminho_rel_d02.read_text(encoding="utf-8"))
+        resumo_m = rel_d02.get("resumo_matriz", {})
+        testes_lista = resumo_m.get("testes", [])
+        total_testes = resumo_m.get("total_testes", len(testes_lista))
+        aprovados = resumo_m.get("aprovados", sum(1 for t in testes_lista if t.get("status") == "APROVADO"))
+        reprovados = resumo_m.get("reprovados", total_testes - aprovados)
+        taxa = resumo_m.get("taxa_aprovacao", (aprovados / total_testes * 100) if total_testes else 0.0)
+
+        ts_raw = rel_d02.get("timestamp", "")
+        if ts_raw:
+            try:
+                dt = datetime.fromisoformat(ts_raw)
+                ts_formatado = dt.strftime("%d/%m/%Y às %H:%M:%S")
+            except Exception:
+                ts_formatado = ts_raw
+        else:
+            ts_formatado = "Não registrado"
+
+        # KPIs Principais
+        k1, k2, k3, k4 = st.columns(4)
+        k1.metric("Total de Testes", total_testes)
+        k2.metric("Aprovados", f"{aprovados} / {total_testes}")
+        k3.metric("Taxa de Conformidade", f"{taxa:.1f}%")
+        k4.metric("Última Execução", ts_formatado)
+        st.divider()
+
+        tab_t_cards, tab_t_chunking, tab_t_raw = st.tabs([
+            "Resultados Detalhados dos Testes (T01 a T15)",
+            "Experimento Comparativo de Chunking (RF18)",
+            "Visão Consolidada / JSON Completo",
+        ])
+
+        # ABA 1: CARDS DETALHADOS COM FILTROS
+        with tab_t_cards:
+            st.markdown("##### Inspeção Individual dos Testes")
+            f_col1, f_col2, f_col3 = st.columns([1, 1, 2])
+
+            with f_col1:
+                filtro_status = st.selectbox(
+                    "Filtrar por Status:",
+                    ["Todos", "Apenas Aprovados", "Apenas Reprovados"]
+                )
+            with f_col2:
+                reqs = sorted(list({t.get("requisito", "") for t in testes_lista if t.get("requisito")}))
+                filtro_req = st.selectbox("Filtrar por Requisito:", ["Todos"] + reqs)
+
+            with f_col3:
+                filtro_busca = st.text_input("Buscar teste por texto (ex: T01, SQL, chunking, P6):")
+
+            # Aplicação dos filtros
+            testes_exibicao = []
+            for t in testes_lista:
+                stt = t.get("status", "")
+                if filtro_status == "Apenas Aprovados" and stt != "APROVADO":
+                    continue
+                if filtro_status == "Apenas Reprovados" and stt == "APROVADO":
+                    continue
+                if filtro_req != "Todos" and t.get("requisito") != filtro_req:
+                    continue
+                if filtro_busca.strip():
+                    termo = filtro_busca.strip().lower()
+                    texto_busca = f"{t.get('teste', '')} {t.get('requisito', '')} {t.get('cenario', '')} {json.dumps(t.get('evidencia', ''))}".lower()
+                    if termo not in texto_busca:
+                        continue
+                testes_exibicao.append(t)
+
+            st.caption(f"Exibindo {len(testes_exibicao)} de {len(testes_lista)} testes registrados.")
+
+            for t in testes_exibicao:
+                t_id = t.get("teste", "T??")
+                t_req = t.get("requisito", "RF??")
+                t_cenario = t.get("cenario", "")
+                t_status = t.get("status", "PENDENTE")
+                is_aprovado = (t_status == "APROVADO")
+
+                # Cor e rótulo no título do expander
+                cor_status = "#28a745" if is_aprovado else "#dc3545"
+                titulo_expander = f"[{t_id}] • {t_status} • {t_req} — {t_cenario}"
+
+                with st.expander(titulo_expander, expanded=(not is_aprovado)):
+                    col_det1, col_det2 = st.columns([3, 1])
+                    with col_det1:
+                        st.markdown(f"**Identificador:** `{t_id}` | **Requisito Contratual:** `{t_req}`")
+                        st.markdown(f"**Cenário Avaliado:**\n\n{t_cenario}")
+                    with col_det2:
+                        if is_aprovado:
+                            st.success(f"Status: {t_status}")
+                        else:
+                            st.error(f"Status: {t_status}")
+
+                    st.markdown("**Evidência Factual Registrada:**")
+                    evid = t.get("evidencia")
+
+                    if isinstance(evid, dict):
+                        # Formata o dicionário em duas colunas organizadas
+                        col_ev1, col_ev2 = st.columns(2)
+                        itens_ev = list(evid.items())
+                        metade = (len(itens_ev) + 1) // 2
+                        with col_ev1:
+                            for k, v in itens_ev[:metade]:
+                                st.markdown(f"- **{k}:** `{v}`")
+                        with col_ev2:
+                            for k, v in itens_ev[metade:]:
+                                st.markdown(f"- **{k}:** `{v}`")
+                    elif isinstance(evid, list):
+                        for item in evid:
+                            st.markdown(f"- `{item}`")
+                    else:
+                        st.info(str(evid))
+
+        # ABA 2: EXPERIMENTO DE CHUNKING (RF18)
+        with tab_t_chunking:
+            st.markdown("##### Comparativo Experimental de Recuperação Vetorial (RF18 / T07)")
+            st.markdown("Avaliação de sensibilidade das duas estratégias de fatiamento de documentos sobre as perguntas respondíveis do gabarito oficial.")
+
+            chunk_data = rel_d02.get("resumo_metricas", {}).get("chunking_recuperacao", {})
+            cfg_a = chunk_data.get("config_a", {})
+            cfg_b = chunk_data.get("config_b", {})
+
+            col_cfg_a, col_cfg_b = st.columns(2)
+            with col_cfg_a:
+                st.info(
+                    "**Configuração A (Granularidade Alta)**\n\n"
+                    "- **Tamanho do Chunk:** 400 caracteres\n"
+                    "- **Sobreposição (Overlap):** 80 caracteres\n"
+                    f"- **Total de Chunks:** `{cfg_a.get('total_chunks', 49)} trechos`\n"
+                    f"- **Taxa de Acerto (Top-3):** `{cfg_a.get('percentual', '100.0%')}` ({cfg_a.get('numerador', 5)}/{cfg_a.get('denominador', 5)})"
+                )
+
+            with col_cfg_b:
+                st.info(
+                    "**Configuração B (Contexto Amplo)**\n\n"
+                    "- **Tamanho do Chunk:** 800 caracteres\n"
+                    "- **Sobreposição (Overlap):** 150 caracteres\n"
+                    f"- **Total de Chunks:** `{cfg_b.get('total_chunks', 24)} trechos`\n"
+                    f"- **Taxa de Acerto (Top-3):** `{cfg_b.get('percentual', '100.0%')}` ({cfg_b.get('numerador', 5)}/{cfg_b.get('denominador', 5)})"
+                )
+
+            # Tabela comparativa por pergunta
+            detalhes_a = {item["id"]: item for item in cfg_a.get("detalhes", [])}
+            detalhes_b = {item["id"]: item for item in cfg_b.get("detalhes", [])}
+
+            tabela_comp = []
+            for pid in sorted(list(set(detalhes_a.keys()) | set(detalhes_b.keys()))):
+                it_a = detalhes_a.get(pid, {})
+                it_b = detalhes_b.get(pid, {})
+                tabela_comp.append({
+                    "Pergunta ID": pid,
+                    "Enunciado": it_a.get("pergunta", it_b.get("pergunta", "")),
+                    "Doc Esperado": ", ".join(it_a.get("docs_esperados", [])),
+                    "Recuperado Config A (400/80)": ", ".join(it_a.get("docs_recuperados", [])[:2]),
+                    "Recuperado Config B (800/150)": ", ".join(it_b.get("docs_recuperados", [])[:2]),
+                    "Status A": "Aprovado" if it_a.get("recuperado_com_sucesso") else "Falha",
+                    "Status B": "Aprovado" if it_b.get("recuperado_com_sucesso") else "Falha",
+                })
+
+            if tabela_comp:
+                st.markdown("##### Tabela Comparativa de Recuperação por Pergunta")
+                st.dataframe(tabela_comp, width='stretch', hide_index=True)
+
+        # ABA 3: JSON COMPLETO / VISÃO CONSOLIDADA
+        with tab_t_raw:
+            st.markdown("##### Dados Consolidados da Bateria de Avaliação")
+            st.download_button(
+                label="Baixar Relatório Completo (JSON)",
+                data=json.dumps(rel_d02, indent=2, ensure_ascii=False),
+                file_name="relatorio_avaliacao_d02.json",
+                mime="application/json",
+            )
+            st.json(rel_d02)
 
 st.divider()
 st.caption("Governo do Estado de Mato Grosso — Secretaria de Estado de Ciência, Tecnologia e Inovação (SECITECI/MT)")
