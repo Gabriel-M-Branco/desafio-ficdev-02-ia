@@ -1,0 +1,66 @@
+{
+  "id_execucao": "EXEC_20261028_200715_a8b553",
+  "timestamp": "2026-10-28T20:07:15.589866",
+  "modalidade": "texto",
+  "arquivo_origem": "dados/originais/visao_documento.txt",
+  "provedor": "OpenAI_API",
+  "modelo": "gpt-4o-2024-08-06",
+  "versao_prompt": "PRODUCAO",
+  "versao_esquema": "2.0.0",
+  "consulta": null,
+  "ids_recuperados": [],
+  "versao_indice": "N/A",
+  "parametros": {
+    "max_tokens": 4096,
+    "response_format": "json_schema"
+  },
+  "duracao_segundos": 3.8228197999997064,
+  "erros": [],
+  "resultado_resumo": {
+    "sucesso": true,
+    "campos_extraidos": 24,
+    "status_decisao": null
+  },
+  "decisao_humana": {
+    "status": "REJEITADO",
+    "operador": "Servidor Público",
+    "justificativa": "teste rejeicao",
+    "data_decisao": "2026-10-28T20:07:30.081143"
+  },
+  "detalhes_completos": {
+    "extracao": {
+      "protocolo": "2022-000142",
+      "data": "não localizado",
+      "solicitante": "MARCUS VINICIUS DE ALMEIDA SANTOS",
+      "cpf": "***.456.***-**",
+      "rg": "1234567-8",
+      "orgao_expedidor": "não localizado",
+      "data_nascimento": "12/03/2008",
+      "naturalidade": "CUIABÁ",
+      "uf": "não localizado",
+      "nome_mae": "LUCIA HELENA DE ALMEIDA SANTOS",
+      "nome_pai": "não localizado",
+      "curso": "TÉCNICO EM ENFERMAGEM",
+      "eixo_tecnologico": "SAÚDE",
+      "carga_horaria": "1200 HORAS",
+      "turno": "NOTURNO",
+      "inicio_curso": "01/02/2027",
+      "email": "M***@EXEMPLO.COM",
+      "telefone": "não localizado",
+      "assunto": "Efetivação de matrícula com pendências",
+      "pedido": "Regularização de matrícula com apresentação de documentos pendentes",
+      "categoria": "Matrícula e Ingresso",
+      "nivel_confianca": "alta",
+      "campos_ausentes": [
+        "orgao_expedidor",
+        "uf",
+        "nome_pai",
+        "telefone"
+      ],
+      "necessidade_revisao": true
+    },
+    "minuta": "Prezado Senhor Marcus Vinicius de Almeida Santos,\n\nProtocolo: 2022-000142\n\nAcolhemos sua manifestação referente à efetivação de matrícula no curso Técnico em Enfermagem. Nome Completo: Marcus Vinicius de Almeida Santos. Protocolo: 2022-000142. Curso pretendido: Técnico em Enfermagem.\n\nDOCUMENTOS E DADOS PENDENTES:\n- Cópia de documento de identificação com Órgão Expedidor e UF\n- Telefone atualizado\n- Documentação regulamentar de conclusão\n\nPor favor, acompanhe as atualizações e orientações nos canais oficiais do GOV.MT para garantir a regularização de sua matrícula.\n\nAtenciosamente,\nCoordenação de Atendimento e Registros Escolares",
+    "arquivo_pdf": "C:\\Users\\branco\\Documents\\GitHub\\desafio-ficdev-02-ia\\resultados\\minutas\\minuta_visao_documento_f8e82a9d.pdf"
+  },
+  "texto_final": "Prezado Senhor Marcus Vinicius de Almeida Santos,\n\nProtocolo: 2022-000142\n\nAcolhemos sua manifestação referente à efetivação de matrícula no curso Técnico em Enfermagem. Nome Completo: Marcus Vinicius de Almeida Santos. Protocolo: 2022-000142. Curso pretendido: Técnico em Enfermagem.\n\nDOCUMENTOS E DADOS PENDENTES:\n- Cópia de documento de identificação com Órgão Expedidor e UF\n- Telefone atualizado\n- Documentação regulamentar de conclusão\n\nPor favor, acompanhe as atualizações e orientações nos canais oficiais do GOV.MT para garantir a regularização de sua matrícula.\n\nAtenciosamente,\nCoordenação de Atendimento e Registros Escolares"
+}

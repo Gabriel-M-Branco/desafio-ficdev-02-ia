@@ -17,8 +17,8 @@
   "inicio_curso": "01/02/2027",
   "email": "marcos.almeida.teste@examplo.com",
   "telefone": "não localizado",
-  "assunto": "Efetivação de matrícula e documentação pendente",
-  "pedido": "Solicitação de efetivação de matrícula no curso Técnico em Enfermagem e orientações sobre documentos pendentes a apresentar",
+  "assunto": "Efetivação de matrícula com pendências",
+  "pedido": "Solicitação de informações sobre documentos pendentes para matrícula",
   "categoria": "Matrícula e Ingresso",
   "nivel_confianca": "alta",
   "campos_ausentes": [

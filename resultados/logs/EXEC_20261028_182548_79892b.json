@@ -1,0 +1,68 @@
+{
+  "id_execucao": "EXEC_20261028_182548_79892b",
+  "timestamp": "2026-10-28T18:25:48.190107",
+  "modalidade": "texto",
+  "arquivo_origem": "dados/originais/texto_original.txt",
+  "provedor": "OpenAI_API",
+  "modelo": "gpt-4o-2024-08-06",
+  "versao_prompt": "PRODUCAO",
+  "versao_esquema": "2.0.0",
+  "consulta": null,
+  "ids_recuperados": [],
+  "versao_indice": "N/A",
+  "parametros": {
+    "max_tokens": 4096,
+    "response_format": "json_schema"
+  },
+  "duracao_segundos": 3.007562999999209,
+  "erros": [],
+  "resultado_resumo": {
+    "sucesso": true,
+    "campos_extraidos": 24,
+    "status_decisao": null
+  },
+  "decisao_humana": {
+    "status": "APROVADO",
+    "operador": "Servidor Público",
+    "justificativa": "Confere",
+    "data_decisao": "2026-10-28T18:26:08.391142",
+    "id_aprovacao": "734cb1885cc94d43b362d8575352c79b",
+    "hash_texto_aprovado": "1f08d7cdf07536256379ec91a99db5d0f0c378fb726b7d40c7dfbc69f54d12ec"
+  },
+  "detalhes_completos": {
+    "extracao": {
+      "protocolo": "2026-000142",
+      "data": "14/10/2026",
+      "solicitante": "Marcos Vinícius de Almeida Santos",
+      "cpf": "***.456.***-**",
+      "rg": "1234567-8",
+      "orgao_expedidor": "não localizado",
+      "data_nascimento": "12/08/2008",
+      "naturalidade": "Cuiabá",
+      "uf": "não localizado",
+      "nome_mae": "Lúcia Helena de Almeida Santos",
+      "nome_pai": "não localizado",
+      "curso": "Técnico em Enfermagem",
+      "eixo_tecnologico": "Saúde",
+      "carga_horaria": "1200 horas",
+      "turno": "noturno",
+      "inicio_curso": "01/02/2027",
+      "email": "m***@examplo.com",
+      "telefone": "não localizado",
+      "assunto": "Efetivação de matrícula no curso Técnico em Enfermagem",
+      "pedido": "Informação sobre documentos pendentes para matrícula",
+      "categoria": "Matrícula e Ingresso",
+      "nivel_confianca": "alta",
+      "campos_ausentes": [
+        "orgao_expedidor",
+        "uf",
+        "nome_pai",
+        "telefone"
+      ],
+      "necessidade_revisao": true
+    },
+    "minuta": "Prezado Marcos Vinícius de Almeida Santos,\n\nProtocolo: 2026-000142\n\nAcolhemos sua manifestação referente à efetivação de matrícula no curso Técnico em Enfermagem, sob o protocolo 2026-000142.\n\nDOCUMENTOS E DADOS PENDENTES:\n- Cópia de documento de identificação com Órgão Expedidor e UF\n- Telefone atualizado\n- Documentação regulamentar de conclusão do ensino médio\n\nPor favor, acompanhe as orientações e atualizações nos canais oficiais do GOV.MT para garantir a regularização de sua matrícula.\n\nAtenciosamente,\nCoordenação de Atendimento e Registros Escolares",
+    "arquivo_pdf": "C:\\Users\\branco\\Documents\\GitHub\\desafio-ficdev-02-ia\\resultados\\minutas\\minuta_texto_original_45147d1e.pdf"
+  },
+  "texto_final": "Prezado Marcos Vinícius de Almeida Santos,\n\nProtocolo: 2026-000142\n\nAcolhemos sua manifestação referente à efetivação de matrícula no curso Técnico em Enfermagem, sob o protocolo 2026-000142.\n\nDOCUMENTOS E DADOS PENDENTES:\n- Cópia de documento de identificação com Órgão Expedidor e UF\n- Telefone atualizado\n- Documentação regulamentar de conclusão do ensino médio\n\nPor favor, acompanhe as orientações e atualizações nos canais oficiais do GOV.MT para garantir a regularização de sua matrícula.\n\nAtenciosamente,\nCoordenação de Atendimento e Registros Escolares"
+}

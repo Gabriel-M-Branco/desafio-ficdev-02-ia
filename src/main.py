@@ -5,6 +5,9 @@ Suporta execução da Interface Oficial Streamlit (padrão), Servidor API (--api
 
 import os
 import sys
+from dotenv import load_dotenv
+
+load_dotenv()
 import json
 import argparse
 import subprocess

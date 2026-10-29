@@ -1,7 +1,11 @@
 """Central Inteligente de Atendimento e Comunicação Institucional - GOV.MT"""
 from pathlib import Path
+from dotenv import load_dotenv
 
 BASE_DIR = Path(__file__).resolve().parent.parent
+
+# Carrega variáveis de ambiente do arquivo .env localizado na raiz do projeto
+load_dotenv(dotenv_path=BASE_DIR / ".env")
 
 
 def resolver_caminho(caminho: str | Path | None) -> Path:
@@ -24,4 +28,3 @@ def caminho_relativo(caminho: str | Path | None) -> str:
 
 
 __version__ = "1.0.0"
-

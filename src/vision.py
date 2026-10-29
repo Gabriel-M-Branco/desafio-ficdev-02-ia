@@ -12,6 +12,9 @@ import hashlib
 import subprocess
 import base64
 from pathlib import Path
+from dotenv import load_dotenv
+
+load_dotenv()
 from typing import Optional
 
 import pymupdf
@@ -175,12 +178,14 @@ class VisionProcessor:
 
     @classmethod
     def _obter_provedor_visao(cls) -> str:
-        """Determina o provedor de OCR/Visão (openrouter ou local)."""
+        """Determina o provedor de OCR/Visão (openai, openrouter ou local)."""
         if os.getenv("PYTEST_CURRENT_TEST") and not os.getenv("VISION_PROVIDER"):
             return "local"
         provider = os.getenv("VISION_PROVIDER", "").strip().lower()
-        if provider in {"local", "openrouter"}:
+        if provider in {"local", "openai", "openrouter"}:
             return provider
+        if os.getenv("OPENAI_API_KEY", "").strip():
+            return "openai"
         if os.getenv("OPENROUTER_API_KEY", "").strip():
             return "openrouter"
         return "local"
@@ -191,13 +196,16 @@ class VisionProcessor:
         except (OSError, ValueError):
             self.config = {}
         self.vision_provider = self._obter_provedor_visao()
+        self.vision_model_openai = os.getenv("OPENAI_VISION_MODEL", "gpt-4o").strip()
         self.vision_model_openrouter = (
             os.getenv("OPENROUTER_VISION_MODEL")
             or os.getenv("VISION_MODEL")
             or self.config.get("models", {}).get("vision")
             or "google/gemini-2.0-flash"
         )
-        if self.vision_provider == "openrouter":
+        if self.vision_provider == "openai":
+            self.vision_model = self.vision_model_openai
+        elif self.vision_provider == "openrouter":
             self.vision_model = self.vision_model_openrouter
         else:
             self.vision_model = "Tesseract OCR / PyMuPDF (por)"
@@ -205,7 +213,14 @@ class VisionProcessor:
     def obter_status_visao(self) -> dict:
         """Retorna as informações do provedor de visão para a API e Web UI."""
         provedor = self._obter_provedor_visao()
-        if provedor == "openrouter":
+        if provedor == "openai":
+            return {
+                "provedor": "openai",
+                "modelo": self.vision_model_openai,
+                "fallback": "Tesseract local / PyMuPDF",
+                "revisao_humana_obrigatoria": True,
+            }
+        elif provedor == "openrouter":
             return {
                 "provedor": "openrouter",
                 "modelo": self.vision_model_openrouter,
@@ -334,7 +349,10 @@ class VisionProcessor:
         for b64 in imagens_b64:
             content.append({
                 "type": "image_url",
-                "image_url": {"url": f"data:image/png;base64,{b64}"}
+                "image_url": {
+                    "url": f"data:image/png;base64,{b64}",
+                    "detail": "high"
+                }
             })
 
         modelo_vlm = self.vision_model_openrouter
@@ -415,6 +433,136 @@ class VisionProcessor:
             "comparacao_gabarito": comparacao,
             "justificativa_soberania_privacidade": "Processamento via modelo multimodal com revisão e deliberação humana prévia.",
             "tempo_processamento_segundos": time.perf_counter() - inicio,
+        }
+
+    def _analisar_resposta_vlm(self, texto_vlm: str) -> dict:
+        """Processa a resposta textual retornada pelo VLM (compatibilidade e parsing estruturado)."""
+        corrigido = "\n".join(re.sub(r"[ \t]+", " ", linha).strip() for linha in (texto_vlm or "").splitlines())
+        campos = self._extrair_campos(corrigido)
+        if campos.get("assinatura_aluno") == AUSENTE and re.search(r"assinatura.*aluno.*consta\s+assinatura", texto_vlm or "", re.IGNORECASE):
+            campos["assinatura_aluno"] = "Consta assinatura do aluno"
+        comparacao = self.comparar_com_gabarito(campos)
+        return {
+            "texto_bruto": texto_vlm,
+            "texto_corrigido": corrigido,
+            "campos_extraidos": campos,
+            "comparacao_gabarito": comparacao,
+        }
+
+    def _processar_openai(self, path: Path, inicio: float, base: dict, hash_original: str) -> dict:
+        """Executa OCR / Leitura multimodal com GPT-4o Vision da OpenAI."""
+        import requests
+        api_key = os.getenv("OPENAI_API_KEY", "").strip()
+        if not api_key:
+            raise ValueError("OPENAI_API_KEY não configurada para visão.")
+        if os.getenv("EXECUTION_MODE", "auto").lower() == "mock":
+            raise ValueError("Modo mock ativo; chamadas remotas de visão desabilitadas.")
+
+        imagens_b64 = []
+        if path.suffix.lower() == ".pdf":
+            with pymupdf.open(str(path)) as doc:
+                if doc.needs_pass or not 0 < len(doc) <= 50:
+                    raise ValueError("Documento protegido, vazio ou com páginas demais.")
+                for pagina in doc:
+                    pix = pagina.get_pixmap(dpi=200)
+                    png_bytes = pix.tobytes("png")
+                    imagens_b64.append(base64.b64encode(png_bytes).decode("utf-8"))
+        else:
+            imagens_b64.append(base64.b64encode(path.read_bytes()).decode("utf-8"))
+
+        if not imagens_b64:
+            raise ValueError("Nenhuma imagem gerada para envio ao VLM.")
+
+        content = [{"type": "text", "text": PROMPT_OCR_VLM}]
+        for b64 in imagens_b64:
+            content.append({
+                "type": "image_url",
+                "image_url": {
+                    "url": f"data:image/png;base64,{b64}",
+                    "detail": "high"
+                }
+            })
+
+        modelo_vlm = self.vision_model_openai
+        payload = {
+            "model": modelo_vlm,
+            "messages": [{"role": "user", "content": content}],
+            "temperature": 0.0,
+            "max_tokens": 2000,
+        }
+
+        timeout = self.config.get("generation_params", {}).get("timeout_seconds", 60)
+        resp = requests.post(
+            "https://api.openai.com/v1/chat/completions",
+            headers={
+                "Authorization": f"Bearer {api_key}",
+                "Content-Type": "application/json",
+            },
+            json=payload,
+            timeout=timeout,
+        )
+        if resp.status_code != 200:
+            err_msg = ""
+            try:
+                err_msg = resp.json().get("error", {}).get("message", "")
+            except Exception:
+                pass
+            raise RuntimeError(f"OpenAI Vision retornou status {resp.status_code}: {err_msg}")
+
+        data = resp.json()
+        texto_vlm = data["choices"][0]["message"]["content"]
+        if not texto_vlm or not texto_vlm.strip():
+            raise RuntimeError("OpenAI Vision retornou resposta vazia.")
+
+        corrigido = "\n".join(re.sub(r"[ \t]+", " ", linha).strip() for linha in texto_vlm.splitlines())
+        campos = self._extrair_campos(corrigido)
+        if campos.get("assinatura_aluno") == AUSENTE and re.search(r"assinatura.*aluno.*consta\s+assinatura", texto_vlm, re.IGNORECASE):
+            campos["assinatura_aluno"] = "Consta assinatura do aluno"
+        comparacao = self.comparar_com_gabarito(campos)
+
+        versoes = {
+            "openai_vision": {
+                "texto_bruto": texto_vlm,
+                "campos_extraidos": campos,
+                "comparacao_gabarito": comparacao,
+                "erros": [],
+            }
+        }
+
+        incertos = [
+            "Todos os campos críticos exigem conferência humana; OCR não valida assinaturas ou autenticidade cartorial."
+        ]
+        incertos += [f"Campo '{c}': ausente, ilegível ou pendente no documento."
+                     for c, v in campos.items() if v == AUSENTE]
+
+        return {
+            "arquivo_analisado": path.name,
+            "modelo_utilizado": modelo_vlm,
+            "provedor": f"OpenAI ({modelo_vlm})",
+            "exige_confirmacao_humana": True,
+            "sucesso": True,
+            "texto_bruto": texto_vlm,
+            "texto_corrigido": corrigido,
+            "campos_extraidos": campos,
+            "paginas_processadas": len(imagens_b64),
+            "origem_campos": "openai_vision",
+            "perfil_regional": "vlm_direto",
+            "erros_regioes": [],
+            "versoes_ocr": versoes,
+            "divergencias_entre_estrategias": [],
+            "estrategias_por_pagina": ["openai_vision"] * len(imagens_b64),
+            "politica_selecao": "Visão multimodal de alta acurácia (OpenAI Vision); conferência humana obrigatória.",
+            "parametros_ocr": {"provedor": "openai", "modelo": modelo_vlm, "temperatura": 0.0},
+            "sha256_original": hash_original,
+            "trechos_incertos_ou_ilegiveis": incertos,
+            "comparacao_gabarito": comparacao,
+            "justificativa_soberania_privacidade": "Processamento via modelo multimodal com revisão e deliberação humana prévia.",
+            "tempo_processamento_segundos": time.perf_counter() - inicio,
+            "metadados_execucao": {
+                "provedor": "openai",
+                "modelo": modelo_vlm,
+                "tokens": data.get("usage", {}),
+            }
         }
 
     def _processar_tesseract_local(self, path: Path, inicio: float, base: dict, hash_original: str) -> dict:
@@ -532,8 +680,13 @@ class VisionProcessor:
         hash_original = hashlib.sha256(path.read_bytes()).hexdigest()
         provedor = self._obter_provedor_visao()
 
-        # 1. Tenta primeiro OpenRouter VLM se configurado
-        if provedor == "openrouter":
+        # 1. Tenta OpenAI Vision ou OpenRouter VLM se configurados
+        if provedor == "openai":
+            try:
+                return self._processar_openai(path, inicio, base, hash_original)
+            except Exception as exc:
+                print(f"[RF08] OpenAI Vision indisponível ({exc}). Acionando fallback para Tesseract local...", flush=True)
+        elif provedor == "openrouter":
             try:
                 return self._processar_openrouter(path, inicio, base, hash_original)
             except Exception as exc:
@@ -543,6 +696,8 @@ class VisionProcessor:
         resultado_local = self._processar_tesseract_local(path, inicio, base, hash_original)
         if provedor == "openrouter" and resultado_local.get("sucesso"):
             resultado_local["aviso_fallback"] = "OpenRouter VLM indisponível; OCR executado via Tesseract local como fallback."
+        elif provedor == "openai" and resultado_local.get("sucesso"):
+            resultado_local["aviso_fallback"] = "OpenAI Vision indisponível; OCR executado via Tesseract local como fallback."
         return resultado_local
 
 
@@ -595,7 +750,7 @@ class VisionProcessor:
         resultado["id_execucao"] = audit_logger.registrar_execucao(
             modalidade="visao", arquivo_origem=caminho_arquivo,
             provedor=resultado["provedor"], modelo=resultado["modelo_utilizado"],
-            versao_prompt="N/A (OCR local)", parametros=resultado.get("parametros_ocr", {"idioma": "por", "dpi": 300}),
+            versao_prompt=f"VLM ({resultado['provedor']})" if ("OpenAI" in str(resultado.get("provedor", "")) or "OpenRouter" in str(resultado.get("provedor", ""))) else "N/A (OCR local)", parametros=resultado.get("parametros_ocr", {"idioma": "por", "dpi": 300}),
             resultado=resultado, duracao_segundos=resultado["tempo_processamento_segundos"],
             erros=[] if resultado.get("sucesso") else [resultado["codigo_erro"]])
         return resultado

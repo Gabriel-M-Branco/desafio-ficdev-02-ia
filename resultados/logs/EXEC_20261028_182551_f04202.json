@@ -1,0 +1,41 @@
+{
+  "id_execucao": "EXEC_20261028_182551_f04202",
+  "timestamp": "2026-10-28T18:25:51.970585",
+  "modalidade": "tts",
+  "arquivo_origem": "resultados/logs/EXEC_20261028_182548_79892b.json",
+  "provedor": "edge-tts",
+  "modelo": "não localizado",
+  "versao_prompt": "N/A (síntese de acessibilidade)",
+  "versao_esquema": "2.0.0",
+  "consulta": null,
+  "ids_recuperados": [],
+  "versao_indice": "N/A",
+  "parametros": {
+    "id_execucao_aprovacao": "EXEC_20261028_182548_79892b",
+    "hash_texto_aprovado": null,
+    "status_aprovacao": null
+  },
+  "duracao_segundos": 0.0005113999995955965,
+  "erros": [
+    "texto_nao_aprovado"
+  ],
+  "resultado_resumo": {
+    "sucesso": false,
+    "campos_extraidos": 0,
+    "status_decisao": null
+  },
+  "decisao_humana": {
+    "status": "nao_aplicavel",
+    "operador": "sistema",
+    "justificativa": "Geração com falha técnica; nenhum artefato gerado para validação humana."
+  },
+  "detalhes_completos": {
+    "sucesso": false,
+    "provedor": "edge-tts",
+    "metodo": "edge-tts",
+    "id_execucao_aprovacao": "EXEC_20261028_182548_79892b",
+    "codigo_erro": "texto_nao_aprovado",
+    "erro": "Aprove o texto exato antes de gerar o áudio.",
+    "tempo_processamento_segundos": 0.0005113999995955965
+  }
+}

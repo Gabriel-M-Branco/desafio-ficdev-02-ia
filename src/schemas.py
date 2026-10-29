@@ -310,6 +310,13 @@ class RespostaRAG(BaseModel):
     minuta_institucional: Optional[str] = None
     modo_geracao: str = "extrator_fundamentado_local"
 
+    @field_validator("fontes", mode="before")
+    @classmethod
+    def _converter_fontes(cls, v):
+        if isinstance(v, list):
+            return [x.model_dump() if hasattr(x, "model_dump") else x for x in v]
+        return v
+
 
 class ClassificacaoSentimento(BaseModel):
     model_config = ConfigDict(extra="forbid")

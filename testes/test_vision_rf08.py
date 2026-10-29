@@ -279,8 +279,13 @@ def test_falha_recortes_nao_apaga_ocr_original(ocr, monkeypatch):
 def test_obter_provedor_visao_prioridades(monkeypatch):
     monkeypatch.delenv("PYTEST_CURRENT_TEST", raising=False)
     monkeypatch.delenv("VISION_PROVIDER", raising=False)
+    monkeypatch.delenv("OPENAI_API_KEY", raising=False)
     monkeypatch.delenv("OPENROUTER_API_KEY", raising=False)
     assert vision.VisionProcessor._obter_provedor_visao() == "local"
+
+    monkeypatch.setenv("OPENAI_API_KEY", "chave-openai")
+    assert vision.VisionProcessor._obter_provedor_visao() == "openai"
+    monkeypatch.delenv("OPENAI_API_KEY", raising=False)
 
     monkeypatch.setenv("OPENROUTER_API_KEY", "chave-teste")
     assert vision.VisionProcessor._obter_provedor_visao() == "openrouter"

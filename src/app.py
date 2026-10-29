@@ -5,6 +5,9 @@ Interface oficial consolidada para os Desafios Práticos 01 (RF01 a RF13) e 02 (
 
 import os
 import sys
+from dotenv import load_dotenv
+
+load_dotenv()
 import json
 import uuid
 import re
@@ -58,7 +61,6 @@ st.set_page_config(
 # ==============================================================================
 # Singletons de Serviços Centrais
 # ==============================================================================
-@st.cache_resource
 def obter_servicos():
     llm = LLMClient()
     audio = AudioProcessor()
@@ -143,9 +145,9 @@ def obter_status_todos_motores() -> Dict[str, Any]:
     """Identifica o estado real e verdadeiro de cada motor (texto, imagem, áudio, OCR, RAG),
     diferenciando modelos remotos com chave ativa de modos locais/offline sem chave."""
     prov_texto = llm_client.text_provider
-    tem_chave_oa = bool(getattr(llm_client, "openai_key", ""))
-    tem_chave_or = bool(llm_client.openrouter_key)
-    tem_chave_hf = bool(llm_client.hf_token)
+    tem_chave_oa = bool(getattr(llm_client, "openai_key", "") or os.getenv("OPENAI_API_KEY", "").strip())
+    tem_chave_or = bool(llm_client.openrouter_key or os.getenv("OPENROUTER_API_KEY", "").strip())
+    tem_chave_hf = bool(llm_client.hf_token or os.getenv("HF_TOKEN", "").strip())
 
     # 1. Texto (LLM / NLP)
     if prov_texto == "openai" and tem_chave_oa:
@@ -177,7 +179,11 @@ def obter_status_todos_motores() -> Dict[str, Any]:
 
     # 2. Áudio STT (Voz para Texto)
     stt_prov = audio_processor.stt_provider
-    if stt_prov == "huggingface" and tem_chave_hf:
+    if stt_prov == "openai" and tem_chave_oa:
+        stt_status = "[Conectado via API]"
+        stt_nome = "OpenAI Whisper API"
+        stt_modelo = audio_processor.stt_model
+    elif stt_prov == "huggingface" and tem_chave_hf:
         stt_status = "[Conectado via API]"
         stt_nome = "Hugging Face Whisper"
         stt_modelo = "whisper-large-v3-turbo"
@@ -203,7 +209,11 @@ def obter_status_todos_motores() -> Dict[str, Any]:
 
     # 4. Visão / OCR
     vis_status_dict = vision_processor.obter_status_visao()
-    if vis_status_dict.get("provedor") == "openrouter" and tem_chave_or:
+    if vis_status_dict.get("provedor") == "openai" and tem_chave_oa:
+        ocr_status = "[Conectado via API]"
+        ocr_nome = "OpenAI GPT-4o Vision"
+        ocr_modelo = vis_status_dict.get("modelo", "gpt-4o")
+    elif vis_status_dict.get("provedor") == "openrouter" and tem_chave_or:
         ocr_status = "[Conectado via API]"
         ocr_nome = "OpenRouter VLM"
         ocr_modelo = vis_status_dict.get("modelo", "google/gemini-2.0-flash")
@@ -215,7 +225,12 @@ def obter_status_todos_motores() -> Dict[str, Any]:
     # 5. Imagem Institucional (RF10)
     img_prov = image_generator.image_provider
     tem_cf = bool(os.getenv("CLOUDFLARE_ACCOUNT_ID") and os.getenv("CLOUDFLARE_API_TOKEN"))
-    if img_prov == "cloudflare" and tem_cf:
+    if img_prov == "openai" and tem_chave_oa:
+        img_status = "[Conectado via API]"
+        img_nome = "OpenAI DALL-E 3"
+        img_modelo = image_generator.image_model
+        img_em_uso = True
+    elif img_prov == "cloudflare" and tem_cf:
         img_status = "[Conectado via API]"
         img_nome = "Cloudflare Workers AI"
         img_modelo = image_generator.image_model
@@ -270,8 +285,9 @@ p_brasao = resolver_caminho("dados/originais/brasao.png")
 if p_brasao.exists():
     st.sidebar.image(str(p_brasao), width=100)
 
-st.sidebar.title("Central GOV.MT")
-st.sidebar.caption("SECITECI/MT • ETEC Cuiabá")
+st.sidebar.subheader("Central GOV.MT")
+st.sidebar.markdown("**SECITECI/MT** • ETEC Cuiabá")
+st.sidebar.divider()
 
 menu = st.sidebar.radio(
     "Navegação:",
@@ -333,16 +349,17 @@ st.sidebar.divider()
 st.sidebar.markdown("**Governança:** `[Human-in-the-Loop Ativo]`")
 
 # ==============================================================================
-# Cabeçalho Principal
+# Cabeçalho Principal (Banner com Alto Contraste Institucional)
 # ==============================================================================
-c_hdr1, c_hdr2 = st.columns([3, 1.2])
-with c_hdr1:
-    st.title("Central Inteligente de Atendimento ao Cidadão")
-    st.caption("Governo do Estado de Mato Grosso — Secretaria de Estado de Ciência, Tecnologia e Inovação (SECITECI/MT)")
-with c_hdr2:
-    st.info("**Revisao Humana Obrigatoria**\n\nNenhuma resposta oficial é emitida sem homologação de servidor.")
+with st.container(border=True):
+    c_hdr1, c_hdr2 = st.columns([3, 1.3], vertical_alignment="center")
+    with c_hdr1:
+        st.header("Central Inteligente de Atendimento ao Cidadão")
+        st.markdown("**Governo do Estado de Mato Grosso** — Secretaria de Estado de Ciência, Tecnologia e Inovação (SECITECI/MT)")
+    with c_hdr2:
+        st.info("**Revisão Humana Obrigatória**\n\nNenhum ato oficial é finalizado sem homologação formal de servidor público.")
 
-st.divider()
+st.markdown("")
 
 
 # ==============================================================================
@@ -357,11 +374,17 @@ if menu.startswith("1."):
     with col_in:
         st.markdown("##### Entrada da Solicitação")
 
+        vis_st = vision_processor.obter_status_visao()
+        nome_visao_caso = (
+            "OpenAI GPT-4o Vision" if vis_st.get("provedor") == "openai"
+            else ("OpenRouter VLM" if vis_st.get("provedor") == "openrouter"
+            else "PyMuPDF / Tesseract Local")
+        )
         casos_opcoes = {
             "texto_original": "Mensagem de Texto (entrada_texto.txt)",
-            "audio_transcricao": "Transcricao de Audio (Whisper STT)",
-            "visao_documento": "Documento Digitalizado / OCR (PyMuPDF)",
-            "prompt_injection": "Teste de Injecao de Prompt (Adversarial)",
+            "audio_transcricao": "Transcrição de Áudio (Whisper STT)",
+            "visao_documento": f"Documento Digitalizado / OCR ({nome_visao_caso})",
+            "prompt_injection": "Teste de Injeção de Prompt (Adversarial)",
             "personalizado": "Texto Livre / Personalizado",
         }
 
@@ -567,8 +590,8 @@ if menu.startswith("1."):
                     if st.button("Sintetizar Voz Acessivel (RF07)", width='stretch'):
                         with st.spinner("Verificando aprovação humana e sintetizando voz neural com aviso sonoro..."):
                             res_tts = audio_processor.sintetizar_minuta_audio(
-                                texto=st.session_state.minuta_editavel,
-                                nome_arquivo=f"minuta_{exec_atual['id_execucao']}.mp3",
+                                texto_minuta=st.session_state.minuta_editavel,
+                                nome_arquivo_saida=f"minuta_{exec_atual['id_execucao']}.mp3",
                                 id_execucao=exec_atual["id_execucao"],
                                 audit_logger=audit_logger,
                                 exigir_aprovacao=True
@@ -796,16 +819,26 @@ elif menu.startswith("3."):
 
     with col_v:
         st.markdown("##### Documento Digitalizado / OCR (RF08)")
-        st.warning("O PDF da ficha possui baixa legibilidade e manuscritos. A conferência humana é indispensável.")
+        vis_st = vision_processor.obter_status_visao()
+        prov_label = (
+            "OpenAI GPT-4o Vision" if vis_st.get("provedor") == "openai"
+            else ("OpenRouter VLM" if vis_st.get("provedor") == "openrouter"
+            else "Tesseract Local")
+        )
+        st.info(f"Motor Ativo de OCR: **{prov_label}** (Modelo: `{vis_st.get('modelo', 'gpt-4o')}`)")
+        st.caption("Documento analisado: `dados/originais/entrada_pdf-imagem.pdf` (Ficha de Matrícula ETEC/SECITECI)")
 
         if st.button("Executar Leitura OCR", type="primary", width='stretch'):
-            with st.spinner("Analisando PDF/Imagem com OCR local..."):
+            with st.spinner(f"Analisando documento com {prov_label}..."):
                 res_visao = vision_processor.processar_com_auditoria(audit_logger)
                 st.session_state.visao_ocr_resultado = res_visao
 
         res_v = st.session_state.visao_ocr_resultado
         if res_v:
             if res_v.get("sucesso"):
+                st.success(f"OCR Concluído via {res_v.get('provedor', prov_label)} | Modelo: {res_v.get('modelo_utilizado', 'gpt-4o')}")
+                if res_v.get("aviso_fallback"):
+                    st.warning(res_v["aviso_fallback"])
                 st.metric("Acurácia contra Gabarito", res_v.get("comparacao_gabarito", {}).get("taxa_acuracia_percentual", "N/A"))
                 txt_ocr = res_v.get("texto_corrigido") or res_v.get("texto_bruto") or ""
                 st.text_area("Texto Extraído pelo OCR:", value=txt_ocr, height=140, disabled=True)
@@ -1089,7 +1122,7 @@ elif menu.startswith("6."):
                 else:
                     with st.spinner("Extraindo ficha estruturada, consultando editais e redigindo minuta fundamentada..."):
                         ficha_int = processar_solicitacao(
-                            texto=texto_int,
+                            texto_original=texto_int,
                             protocolo_externo=prot_int if prot_int.strip() else None,
                             data_externa=data_int if data_int.strip() else None,
                         )
@@ -1178,17 +1211,16 @@ elif menu.startswith("6."):
 
             if st.button("Registrar Decisão Humana (RF20/RF21)", width='stretch'):
                 dec_validada = DecisaoOperador(
-                    id_execucao=res_int["id_execucao"],
-                    status_decisao=novo_status_op,
+                    solicitacao_id=res_int["id_execucao"],
+                    decisao=novo_status_op,
                     justificativa=just_op_int,
-                    texto_revisado=minuta_int_editada,
                 )
                 audit_logger.atualizar_decisao_humana(
-                    exec_id=dec_validada.id_execucao,
-                    decisao=dec_validada.status_decisao.upper(),
+                    exec_id=dec_validada.solicitacao_id,
+                    decisao=dec_validada.decisao.upper(),
                     justificativa=dec_validada.justificativa,
                     operador=dec_validada.operador,
-                    texto_final=dec_validada.texto_revisado,
+                    texto_final=minuta_int_editada,
                 )
                 st.session_state.rag_atendimento_resultado["status_operador"] = novo_status_op
                 st.success(f"Decisão '{novo_status_op.upper()}' registrada na auditoria com sucesso!")
@@ -1290,11 +1322,21 @@ elif menu.startswith("8."):
             st.warning("Nenhuma avaliação encontrada para o filtro selecionado (tratamento seguro de conjunto vazio sem divisão por zero).")
         else:
             col_s1, col_s2, col_s3, col_s4, col_s5 = st.columns(5)
-            col_s1.metric("Denominador (Total)", agregacao["denominador"])
-            col_s2.metric("Positivas", f"{agregacao['distribuicao']['positiva']} ({agregacao['percentuais']['positiva']}%)")
-            col_s3.metric("Negativas", f"{agregacao['distribuicao']['negativa']} ({agregacao['percentuais']['negativa']}%)")
-            col_s4.metric("Neutras", f"{agregacao['distribuicao']['neutra']} ({agregacao['percentuais']['neutra']}%)")
-            col_s5.metric("Indeterminadas", f"{agregacao['distribuicao']['indeterminada']} ({agregacao['percentuais']['indeterminada']}%)")
+            with col_s1:
+                with st.container(border=True):
+                    st.metric("Total Único", agregacao["denominador"], help="Denominador de avaliações únicas")
+            with col_s2:
+                with st.container(border=True):
+                    st.metric("Positivas", agregacao["distribuicao"]["positiva"], delta=f"{agregacao['percentuais']['positiva']}%", delta_color="normal")
+            with col_s3:
+                with st.container(border=True):
+                    st.metric("Negativas", agregacao["distribuicao"]["negativa"], delta=f"-{agregacao['percentuais']['negativa']}%", delta_color="inverse")
+            with col_s4:
+                with st.container(border=True):
+                    st.metric("Neutras", agregacao["distribuicao"]["neutra"], delta=f"{agregacao['percentuais']['neutra']}%", delta_color="off")
+            with col_s5:
+                with st.container(border=True):
+                    st.metric("Indeterminadas", agregacao["distribuicao"]["indeterminada"], delta=f"{agregacao['percentuais']['indeterminada']}%", delta_color="inverse", help="Casos com necessidade de revisão")
 
             st.bar_chart(agregacao["distribuicao"])
             st.caption(f"**Nota Metodológica:** {agregacao['nota_metodologica']}")

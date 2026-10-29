@@ -1,0 +1,53 @@
+{
+  "id_execucao": "EXEC_20261028_184218_7b3d90",
+  "timestamp": "2026-10-28T18:42:18.766847",
+  "modalidade": "tts",
+  "arquivo_origem": "resultados/logs/EXEC_20261028_184148_4083d2.json",
+  "provedor": "edge-tts",
+  "modelo": "pt-BR-AntonioNeural",
+  "versao_prompt": "N/A (síntese de acessibilidade)",
+  "versao_esquema": "2.0.0",
+  "consulta": null,
+  "ids_recuperados": [],
+  "versao_indice": "N/A",
+  "parametros": {
+    "id_execucao_aprovacao": "EXEC_20261028_184148_4083d2",
+    "hash_texto_aprovado": "d89862efe948815042ab5747bddf0f4a46c2c77ba1e05bedb33337ee58e16182",
+    "status_aprovacao": "aprovado"
+  },
+  "duracao_segundos": 13.841111499998078,
+  "erros": [],
+  "resultado_resumo": {
+    "sucesso": true,
+    "campos_extraidos": 0,
+    "status_decisao": null
+  },
+  "decisao_humana": {
+    "status": "APROVADO",
+    "operador": "Servidor Público",
+    "justificativa": "confere",
+    "data_decisao": "2026-10-28T18:42:02.957338",
+    "id_aprovacao": "b66d10328061458bb6205d037f4f4275",
+    "hash_texto_aprovado": "d89862efe948815042ab5747bddf0f4a46c2c77ba1e05bedb33337ee58e16182"
+  },
+  "detalhes_completos": {
+    "sucesso": true,
+    "provedor": "edge-tts",
+    "metodo": "edge-tts",
+    "id_execucao_aprovacao": "EXEC_20261028_184148_4083d2",
+    "status_aprovacao": "aprovado",
+    "hash_texto_aprovado": "d89862efe948815042ab5747bddf0f4a46c2c77ba1e05bedb33337ee58e16182",
+    "caminho_arquivo": "resultados/audios/minuta_EXEC_20261028_184148_4083d2_4721ffed26e748b784aa2a12ebf4cc86.mp3",
+    "voz_utilizada": "pt-BR-AntonioNeural",
+    "formato": "mp3",
+    "tamanho_bytes": 369072,
+    "duracao_segundos": 61.512,
+    "id_aprovacao": "b66d10328061458bb6205d037f4f4275",
+    "texto_sintetizado": "Prezado Marcos Vinícius de Almeida Santos,\n\nProtocolo: 2026-000142\n\nAcolhemos sua manifestação referente à efetivação de matrícula no curso Técnico em Enfermagem. Conforme registrado, seu protocolo é 2026-000142 e o curso pretendido é o Técnico em Enfermagem.\n\nDOCUMENTOS E DADOS PENDENTES:\n- Cópia de documento de identificação com Órgão Expedidor e UF\n- Telefone atualizado\n- Documentação regulamentar de conclusão do ensino médio\n\nPor favor, acompanhe as orientações institucionais nos canais oficiais do GOV.MT para garantir a regularização de sua matrícula. Lembramos que a matrícula será cancelada automaticamente em caso de faltas injustificadas nos dois primeiros dias consecutivos ou em três dias nos dez primeiros dias de aula.\n\nAtenciosamente,\nCoordenação de Atendimento e Registros Escolares",
+    "hash_texto_sintetizado": "d89862efe948815042ab5747bddf0f4a46c2c77ba1e05bedb33337ee58e16182",
+    "sha256_audio": "bf98d89e28431c2c807de6e673ad61356be424a0025c6f2a3b27cd1b99c84288",
+    "aviso_acessibilidade_aplicado": false,
+    "impacto_acessibilidade": "Leitura da minuta acessível com aviso explícito sobre informações pendentes.",
+    "tempo_processamento_segundos": 13.841111499998078
+  }
+}

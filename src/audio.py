@@ -33,10 +33,14 @@ class AudioProcessor:
     @classmethod
     def _obter_provedor_stt(cls) -> str:
         provider = os.getenv("STT_PROVIDER", "").strip().lower()
-        if provider in {"local", "huggingface", "openrouter"}:
+        if provider in {"local", "openai", "huggingface", "openrouter"}:
             return provider
+        if os.getenv("OPENAI_API_KEY", "").strip() and not os.getenv("HF_TOKEN", "").strip():
+            return "openai"
         if os.getenv("HF_TOKEN", "").strip():
             return "huggingface"
+        if os.getenv("OPENAI_API_KEY", "").strip():
+            return "openai"
         if os.getenv("OPENROUTER_API_KEY", "").strip():
             return "openrouter"
         return "local"
@@ -45,7 +49,7 @@ class AudioProcessor:
         self.config = self._load_config(config_path)
         self.llm_client = LLMClient(config_path)
         self.stt_provider = self._obter_provedor_stt()
-        self.stt_model = "small" if self.stt_provider == "local" else self.config.get("models", {}).get("stt", "openai/whisper-large-v3-turbo")
+        self.stt_model = "small" if self.stt_provider == "local" else (os.getenv("OPENAI_STT_MODEL", "whisper-1").strip() if self.stt_provider == "openai" else self.config.get("models", {}).get("stt", "openai/whisper-large-v3-turbo"))
         self.tts_voice = self.config.get("models", {}).get("tts_voice", "pt-BR-AntonioNeural")
         self.audios_dir = resolver_caminho(self.config.get("paths", {}).get("resultados_audios", "resultados/audios"))
         self.audios_dir.mkdir(parents=True, exist_ok=True)
@@ -172,19 +176,49 @@ class AudioProcessor:
         content = data["choices"][0]["message"]["content"]
         return {"text": content, "language": "pt", "model": model}
 
+    def _transcrever_openai(self, path: Path) -> Dict[str, Any]:
+        """Transcreve via OpenAI Whisper API (whisper-1)."""
+        import requests
+        key = os.getenv("OPENAI_API_KEY", "").strip()
+        if not key:
+            raise RuntimeError("OPENAI_API_KEY não configurada para STT.")
+        url = "https://api.openai.com/v1/audio/transcriptions"
+        model = os.getenv("OPENAI_STT_MODEL", "whisper-1").strip()
+        timeout = self.config.get("generation_params", {}).get("timeout_seconds", 60)
+        ext = path.suffix.lower()
+        content_type = "audio/mpeg" if ext in {".mp3", ".mpeg"} else ("audio/wav" if ext == ".wav" else "application/octet-stream")
+        with open(path, "rb") as f:
+            files = {"file": (path.name, f, content_type)}
+            data = {"model": model, "language": "pt"}
+            headers = {"Authorization": f"Bearer {key}"}
+            resp = requests.post(url, headers=headers, files=files, data=data, timeout=timeout)
+        if resp.status_code != 200:
+            err_msg = ""
+            try:
+                err_msg = resp.json().get("error", {}).get("message", "")
+            except Exception:
+                pass
+            raise RuntimeError(f"OpenAI Whisper retornou status {resp.status_code}: {err_msg}")
+        dados = resp.json()
+        return {"text": dados.get("text", "").strip(), "language": "pt", "model": model}
+
     def transcrever_audio(self, caminho_audio: str) -> Dict[str, Any]:
         """Executa transcrição de áudio (STT) com Whisper ou OpenRouter Gemini."""
         valido, mensagem = self.validar_arquivo_audio(caminho_audio)
         if not valido:
             return {"sucesso": False, "erro": mensagem, "codigo_erro": "arquivo_invalido"}
         provedor_env = os.getenv("STT_PROVIDER", "").strip().lower()
-        if provedor_env and provedor_env not in {"local", "huggingface", "openrouter"}:
+        if provedor_env and provedor_env not in {"local", "openai", "huggingface", "openrouter"}:
             return {"sucesso": False, "erro": "STT_PROVIDER deve ser local, huggingface ou openrouter.",
                     "codigo_erro": "provedor_invalido"}
         provider = self._obter_provedor_stt()
         token = os.getenv("HF_TOKEN", "").strip()
         if provider == "huggingface" and (os.getenv("EXECUTION_MODE", "auto").lower() == "mock" or not token):
             return {"sucesso": False, "erro": "STT real requer HF_TOKEN e modo diferente de mock.",
+                    "codigo_erro": "stt_indisponivel"}
+        openai_key = os.getenv("OPENAI_API_KEY", "").strip()
+        if provider == "openai" and (os.getenv("EXECUTION_MODE", "auto").lower() == "mock" or not openai_key):
+            return {"sucesso": False, "erro": "STT via OpenAI requer OPENAI_API_KEY e modo diferente de mock.",
                     "codigo_erro": "stt_indisponivel"}
         openrouter_key = os.getenv("OPENROUTER_API_KEY", "").strip()
         if provider == "openrouter" and (os.getenv("EXECUTION_MODE", "auto").lower() == "mock" or not openrouter_key):
@@ -195,6 +229,8 @@ class AudioProcessor:
         try:
             if provider == "local":
                 resultado = self._transcrever_local(path)
+            elif provider == "openai":
+                resultado = self._transcrever_openai(path)
             elif provider == "openrouter":
                 resultado = self._transcrever_openrouter(path)
             else:
@@ -210,6 +246,9 @@ class AudioProcessor:
             if provider == "local":
                 metadados.update(modelo_stt="small", dispositivo="cpu", compute_type="int8",
                                  idioma_configurado="pt")
+            elif provider == "openai":
+                metadados.update(modelo_stt=resultado.get("model", "whisper-1"),
+                                 provedor="OpenAI API", idioma_detectado="pt")
             elif provider == "openrouter":
                 metadados.update(modelo_stt=resultado.get("model", "google/gemini-3.8-flash"),
                                  provedor="OpenRouter", idioma_detectado="pt")
@@ -495,10 +534,17 @@ try {
             raise ValueError("Duração inválida.")
         return duracao
 
-    def sintetizar_minuta_audio(self, texto_minuta: str, nome_arquivo_saida: str = "minuta_acessivel.mp3",
+    def sintetizar_minuta_audio(self, texto_minuta: Optional[str] = None, nome_arquivo_saida: str = "minuta_acessivel.mp3",
                                 id_execucao: Optional[str] = None, audit_logger=None,
-                                exigir_aprovacao: bool = True) -> Dict[str, Any]:
+                                exigir_aprovacao: bool = True, texto: Optional[str] = None,
+                                nome_arquivo: Optional[str] = None, **kwargs) -> Dict[str, Any]:
         """Sintetiza áudio de minuta para acessibilidade (RF07). Pode ser executado em prévia para conferência humana ou após aprovação formal."""
+        if texto is not None:
+            texto_minuta = texto
+        if nome_arquivo is not None:
+            nome_arquivo_saida = nome_arquivo
+        if texto_minuta is None:
+            texto_minuta = ""
         from src.audit import AuditLogger
         logger = audit_logger or AuditLogger(self.config.get("paths", {}).get("resultados_logs", "resultados/logs"))
         inicio = time.perf_counter()
