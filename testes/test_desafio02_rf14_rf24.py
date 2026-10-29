@@ -236,6 +236,14 @@ def test_rf19_abstencao_sem_alucinacao(indice_preparado):
     assert "pizza estudantil" in resp_pizza.resposta.lower()
     assert resp_pizza.modo_geracao == "abstencao_entidade_nao_localizada"
 
+    # Pergunta com entidade esportiva / fora de escopo (Processo Seletivo do Corinthians)
+    resp_corinthians = rag.responder(
+        "Qual é o prazo final prorrogado para realização das sleecoes no Processo Seletivo do Corinthians?"
+    )
+    assert resp_corinthians.status == "sem_evidencia_suficiente"
+    assert "corinthians" in resp_corinthians.resposta.lower()
+    assert resp_corinthians.modo_geracao in ("abstencao_entidade_nao_localizada", "abstencao_termo_alienigena")
+
 
 def test_rf19_fontes_contraditorias_e_minuta_fundamentada(indice_preparado):
     """T10 e RF19 item 5: Conflito de prazos gera conflito_de_fontes e minuta separa fatos de regras."""

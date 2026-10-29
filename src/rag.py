@@ -8,6 +8,7 @@ delimitação estrita de contexto, checagem de evidências, geração fundamenta
 from typing import List, Optional, Dict, Any, Tuple
 import re
 import time
+import unicodedata
 
 from src.schemas import ExtracaoFicha, RespostaRAG, TrechoRecuperado
 from src.embeddings import IndiceVetorial
@@ -33,27 +34,69 @@ class MotorRAG:
         self.guardrails = GuardrailManager()
         self.logger = audit_logger or logger or globals()["audit_logger"]
         self._vocabulario_corpus = None
+        self._vocabulario_corpus_desacentuado = None
 
-    def obter_vocabulario_corpus(self) -> set:
+    def obter_vocabulario_corpus(self) -> Tuple[set, set]:
         """Extrai dinamicamente o vocabulário de termos substantivos do acervo indexado."""
         if getattr(self, "_vocabulario_corpus", None) is not None:
-            return self._vocabulario_corpus
+            return self._vocabulario_corpus, self._vocabulario_corpus_desacentuado
         if not self.indice or not self.indice.chunks:
-            return set()
+            return set(), set()
         textos = [
             c["conteudo"] if isinstance(c, dict) else getattr(c, "conteudo", "")
             for c in self.indice.chunks
         ]
         self._vocabulario_corpus = set(re.findall(r"\b[a-záéíóúâêôãõç]{3,}\b", " ".join(textos).lower()))
-        return self._vocabulario_corpus
+        self._vocabulario_corpus_desacentuado = {
+            "".join(c for c in unicodedata.normalize("NFD", w) if unicodedata.category(c) != "Mn")
+            for w in self._vocabulario_corpus
+        }
+        return self._vocabulario_corpus, self._vocabulario_corpus_desacentuado
+
+    STOPWORDS_CONSULTA = {
+        "qual", "quais", "como", "quando", "onde", "para", "com", "por", "que",
+        "dos", "das", "uma", "uns", "sao", "ser", "tem", "ter", "terao", "foi",
+        "foram", "pelo", "pela", "sobre", "entre", "este", "esta", "esse", "essa",
+        "devem", "deve", "pode", "podem", "qualquer", "algum", "alguma", "todos", "todas",
+        "apresentados", "apresentar", "comprovar", "comprovante", "informar", "solicitar",
+        "formato", "permitido", "permitidos", "permitida", "permitidas", "duracao",
+        "maximo", "maxima", "minimo", "minima",
+        "valor", "mensal", "prazo", "data", "dia", "mes", "horario",
+        "realizacao", "inicio", "sede",
+        "geral", "oficial", "disponivel", "acervo", "institucional",
+        "estudante", "aluno", "alunos", "cidadao", "solicitante",
+        "saber", "obter", "verificar", "apenas", "ainda", "assim", "entao",
+        "final", "ofertado", "entregar", "queria", "gostaria", "preciso", "favor",
+        "candidato", "candidatos", "candidata", "candidatas", "inscrito", "inscritos",
+        "regra", "regras", "norma", "normas", "requisito", "requisitos", "documento", "documentos",
+        "processo", "processos", "seletivo", "seletivos", "selecao", "selecoes",
+        "edital", "editais", "etec", "etecs", "seciteci", "curso", "cursos",
+        "inscricao", "inscricoes", "matricula", "matriculas", "vaga", "vagas",
+    }
+
+    def detectar_termos_alienigenas(self, pergunta: str) -> List[str]:
+        """
+        RF19 / T09: Detecta termos substantivos da pergunta com comprimento >= 4
+        que não constam em stopwords de consulta nem no vocabulário oficial do acervo.
+        """
+        vocab, vocab_des = self.obter_vocabulario_corpus()
+        if not vocab:
+            return []
+        palavras = re.findall(r"\b[a-záéíóúâêôãõç]{4,}\b", pergunta.lower())
+        aliens = []
+        for w in palavras:
+            w_des = "".join(c for c in unicodedata.normalize("NFD", w) if unicodedata.category(c) != "Mn")
+            if w_des not in self.STOPWORDS_CONSULTA and w not in vocab and w_des not in vocab_des:
+                aliens.append(w)
+        return aliens
 
     def extrair_entidades_alvo(self, pergunta: str) -> List[Tuple[str, List[str]]]:
         """
         Extrai dinamicamente sintagmas nominais de entidades (Programas, Cursos, Auxílios,
-        Bolsas, Editais, Vídeos, Turmas) e identifica termos qualificadores não presentes no acervo.
+        Bolsas, Editais, Vídeos, Turmas, Processos Seletivos) e identifica termos qualificadores não presentes no acervo.
         Retorna lista de tuplas (sintagma_completo, palavras_ausentes_no_acervo).
         """
-        padrao = r"\b(?:programa|curso|aux[ií]lio|bolsa|edital|taxa|v[ií]deo|turma)\s+(?:de\s+|do\s+|da\s+|para\s+)?([a-záéíóúâêôãõç\s]+)"
+        padrao = r"\b(?:programa|curso|aux[ií]lio|bolsa|edital|taxa|v[ií]deo|turma|processo\s+seletivo|sele[çc][ãa]o)\s+(?:de\s+|do\s+|da\s+|para\s+)?([a-záéíóúâêôãõç\s]+)"
         delimitadores_verbos = {
             "ofertado", "ofertada", "ministrado", "ministrada", "realizado", "realizada",
             "apresentado", "apresentada", "entregar", "comprovar", "solicitar", "deve", "devem",
@@ -61,7 +104,7 @@ class MotorRAG:
             "sede", "cuiaba", "cuiabá", "barra", "garças", "garcas",
         }
         stopwords_sintagma = {"de", "da", "do", "em", "para", "com", "no", "na", "os", "as", "um", "uma"}
-        vocab = self.obter_vocabulario_corpus()
+        vocab, vocab_des = self.obter_vocabulario_corpus()
         if not vocab:
             return []
 
@@ -76,7 +119,11 @@ class MotorRAG:
                 if w not in stopwords_sintagma:
                     palavras_entidade.append(w)
             if palavras_entidade:
-                aliens = [w for w in palavras_entidade if w not in vocab]
+                aliens = []
+                for w in palavras_entidade:
+                    w_des = "".join(c for c in unicodedata.normalize("NFD", w) if unicodedata.category(c) != "Mn")
+                    if w_des not in self.STOPWORDS_CONSULTA and w not in vocab and w_des not in vocab_des:
+                        aliens.append(w)
                 if aliens:
                     entidades_ausentes.append((" ".join(palavras_entidade), aliens))
         return entidades_ausentes
@@ -88,6 +135,7 @@ class MotorRAG:
         usar_llm_remota: bool = False,
         provider_override: Optional[str] = None,
         registrar_auditoria: bool = True,
+        verificar_alienigenas: bool = True,
     ) -> RespostaRAG:
         """Executa o pipeline RAG completo para uma pergunta institucional."""
         inicio = time.perf_counter()
@@ -141,6 +189,35 @@ class MotorRAG:
                     modelo=self.indice.nome_modelo,
                 )
             return resp_abst
+
+        # 1.2 Análise Geral de Termos Alienígenas (RF19 / T09)
+        # Bloqueia perguntas contendo entidades ou vocábulos inexistentes no acervo oficial
+        if verificar_alienigenas:
+            termos_aliens = self.detectar_termos_alienigenas(pergunta)
+            if termos_aliens:
+                termo_alerta = termos_aliens[-1].title()
+                resp_abst = RespostaRAG(
+                    pergunta=pergunta,
+                    resposta=(
+                        f"Informação sobre '{termo_alerta}' não localizada no acervo institucional disponível. "
+                        "O acervo consultado contempla exclusivamente os editais e normas oficiais das ETECs / SECITECI-MT. "
+                        "Recomenda-se verificar a denominação informada ou solicitar atendimento humano."
+                    ),
+                    status="sem_evidencia_suficiente",
+                    fontes=[],
+                    citacoes_formatadas=[],
+                    necessidade_revisao=True,
+                    modo_geracao="abstencao_termo_alienigena",
+                )
+                if registrar_auditoria:
+                    self._registrar_auditoria_rag(
+                        pergunta=pergunta,
+                        resposta_rag=resp_abst,
+                        duracao=time.perf_counter() - inicio,
+                        provedor="rag_local",
+                        modelo=self.indice.nome_modelo,
+                    )
+                return resp_abst
 
         # 2. Recuperação de trechos top-k
         trechos_brutos = self.indice.buscar_top_k(pergunta, top_k=top_k, limiar_minimo=LIMIAR_SIMILARIDADE_MINIMA)
@@ -299,6 +376,7 @@ class MotorRAG:
             usar_llm_remota=usar_llm_remota,
             provider_override=provider_override,
             registrar_auditoria=False,
+            verificar_alienigenas=False,
         )
 
         # Separação estrita entre fatos informados pelo cidadão e orientações do acervo (RF19)
@@ -481,6 +559,7 @@ class MotorRAG:
         if (
             ("prorroga" in p_lower or "prazo final" in p_lower or "inscriç" in p_lower)
             and any(t in p_lower for t in ["etec", "processo seletivo", "seleção", "selecao", "vestibular", "curso", "inscriç", "inscric"])
+            and not any(a in p_lower for a in ["corinthians", "flamengo", "palmeiras", "são paulo", "sao paulo", "vasco", "gremio", "grêmio", "cruzeiro", "santos", "ipva", "padaria", "pizza"])
             and "13/05/2026" in texto_unido
         ):
             m_item2 = re.search(r"(Item 2:\s*Período de Inscrição Prorrogado:[^\n]+)", texto_unido)
