@@ -228,6 +228,14 @@ def test_rf19_abstencao_sem_alucinacao(indice_preparado):
     assert resp_cul.status == "sem_evidencia_suficiente"
     assert "heteroidentificação" not in resp_cul.resposta.lower()
 
+    # Pergunta com entidade inventada / não ancorada (Pizza Estudantil em vez de Permanência Estudantil)
+    resp_pizza = rag.responder(
+        "Quais documentos devem ser apresentados por trabalhadores assalariados para comprovar a renda familiar no Programa de Pizza Estudantil?"
+    )
+    assert resp_pizza.status == "sem_evidencia_suficiente"
+    assert "pizza estudantil" in resp_pizza.resposta.lower()
+    assert resp_pizza.modo_geracao == "abstencao_entidade_nao_localizada"
+
 
 def test_rf19_fontes_contraditorias_e_minuta_fundamentada(indice_preparado):
     """T10 e RF19 item 5: Conflito de prazos gera conflito_de_fontes e minuta separa fatos de regras."""
