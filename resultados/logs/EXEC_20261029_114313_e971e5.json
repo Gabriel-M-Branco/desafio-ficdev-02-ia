@@ -1,0 +1,36 @@
+{
+  "id_execucao": "EXEC_20261029_114313_e971e5",
+  "timestamp": "2026-10-29T11:43:13.661434",
+  "modalidade": "rag_consulta",
+  "arquivo_origem": "indice/indice_vetorial.json",
+  "provedor": "rag_local",
+  "modelo": "tfidf-dense-pt",
+  "versao_prompt": "RAG_FUNDAMENTADO_V2",
+  "versao_esquema": "2.0.0",
+  "consulta": "Qual é o prazo final prorrogado para realização das sleecoes no Processo Seletivo do Corinthians?",
+  "ids_recuperados": [],
+  "versao_indice": "v2.0-49c-5167d33347",
+  "parametros": {
+    "top_k": 0,
+    "max_tokens": 2500
+  },
+  "duracao_segundos": 0.0025357999984407797,
+  "erros": [],
+  "resultado_resumo": {
+    "sucesso": true,
+    "campos_extraidos": 0,
+    "status_decisao": "sem_evidencia_suficiente"
+  },
+  "decisao_humana": {
+    "status": "pendente_revisao",
+    "operador": "aguardando_validacao",
+    "justificativa": "Aguardando deliberação de servidor responsável no painel Streamlit."
+  },
+  "detalhes_completos": {
+    "sucesso": true,
+    "status_decisao": "sem_evidencia_suficiente",
+    "citacoes": [],
+    "necessidade_revisao": true,
+    "modo_geracao": "abstencao_entidade_nao_localizada"
+  }
+}

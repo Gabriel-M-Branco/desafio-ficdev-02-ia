@@ -1,0 +1,44 @@
+{
+  "id_execucao": "EXEC_20261029_105923_3a658c",
+  "timestamp": "2026-10-29T10:59:23.565625",
+  "modalidade": "rag_minuta",
+  "arquivo_origem": "indice/indice_vetorial.json",
+  "provedor": "extrator_fundamentado_local",
+  "modelo": "extrator_fundamentado_local",
+  "versao_prompt": "RAG_FUNDAMENTADO_V2",
+  "versao_esquema": "2.0.0",
+  "consulta": "Matrícula e Ingresso Técnico em Enfermagem Posso fazer minha matrícula presencial na ETEC Cuiabá e assistir as aulas em Cuiabá a partir de outubro? Barra do Garças Cuiabá",
+  "ids_recuperados": [
+    "DOC-SECITECI-003:DOC-SECITECI-003-p1-c003",
+    "DOC-SECITECI-001:DOC-SECITECI-001-p1-c007",
+    "DOC-SECITECI-001:DOC-SECITECI-001-p1-c008"
+  ],
+  "versao_indice": "v2.0-49c-5167d33347",
+  "parametros": {
+    "top_k": 3,
+    "max_tokens": 2500
+  },
+  "duracao_segundos": 0.0020874999991065124,
+  "erros": [],
+  "resultado_resumo": {
+    "sucesso": true,
+    "campos_extraidos": 0,
+    "status_decisao": "fundamentada"
+  },
+  "decisao_humana": {
+    "status": "pendente_revisao",
+    "operador": "aguardando_validacao",
+    "justificativa": "Aguardando deliberação de servidor responsável no painel Streamlit."
+  },
+  "detalhes_completos": {
+    "sucesso": true,
+    "status_decisao": "fundamentada",
+    "citacoes": [
+      "[DOC-SECITECI-003, EDITAL RETIFICADOR Nº 06/2026/SECITECI-MT - ALTERAÇÃO PONTUAL DE CALENDÁRIO, v1.2, p. 1]",
+      "[DOC-SECITECI-001, EDITAL Nº 006/2026/SECITECI-MT - PROCESSO SELETIVO DE ALUNOS PARA CURSOS TÉCNICOS NAS ETECS 2026/2, v1.0, p. 1]",
+      "[DOC-SECITECI-001, EDITAL Nº 006/2026/SECITECI-MT - PROCESSO SELETIVO DE ALUNOS PARA CURSOS TÉCNICOS NAS ETECS 2026/2, v1.0, 4. DAS INSCRIÇÕES, p. 1]"
+    ],
+    "necessidade_revisao": true,
+    "modo_geracao": "extrator_fundamentado_local"
+  }
+}

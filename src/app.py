@@ -11,10 +11,12 @@ load_dotenv()
 import json
 import uuid
 import re
-from datetime import datetime
+from datetime import datetime, date
 from pathlib import Path
 from typing import Dict, Any, List, Optional
 import streamlit as st
+import pandas as pd
+import altair as alt
 
 # Garante que a raiz do projeto esteja no sys.path mesmo ao executar 'streamlit run src/app.py'
 ROOT_DIR = Path(__file__).resolve().parent.parent
@@ -133,6 +135,94 @@ if "rag_atendimento_resultado" not in st.session_state:
     st.session_state.rag_atendimento_resultado = None
 if "rag_consulta_resultado" not in st.session_state:
     st.session_state.rag_consulta_resultado = None
+
+# ==============================================================================
+# Ajuste Dinâmico de Altura e CSS para Exibição Integral
+# ==============================================================================
+st.markdown(
+    """
+    <style>
+    /* Força o Streamlit a libertar a altura fixa injetada por JavaScript */
+    div[data-baseweb="textarea"] > div {
+        height: auto !important;
+        min-height: fit-content !important;
+    }
+    textarea {
+        field-sizing: content !important;
+        height: auto !important;
+        padding-top: 12px !important;
+        padding-bottom: 12px !important;
+        line-height: 1.45 !important;
+        resize: none !important; /* Desativa a pega de redimensionamento manual */
+    }
+
+    /* Campos de visualização (disabled) 100% opacos, com contraste nítido e fundo sólido */
+    textarea:disabled,
+    textarea[disabled] {
+        opacity: 1 !important;
+        -webkit-text-fill-color: #1e293b !important;
+        color: #1e293b !important;
+        background-color: #f1f5f9 !important;
+        cursor: default !important;
+    }
+    div[data-baseweb="textarea"]:has(textarea:disabled) {
+        opacity: 1 !important;
+        background-color: #f1f5f9 !important;
+        border-color: #cbd5e1 !important;
+    }
+
+    /* Reduz o espaco vazio no topo da tela principal sem cortar a borda superior */
+    .block-container,
+    [data-testid="stMainBlockContainer"] {
+        padding-top: 3.2rem !important;
+        padding-bottom: 2rem !important;
+    }
+
+    /* Reduz espacamento e bordas no brasao e cabecalho da barra lateral */
+    [data-testid="stSidebar"] [data-testid="stImage"] {
+        margin-top: -12px !important;
+        margin-bottom: 2px !important;
+        padding: 0 !important;
+    }
+    [data-testid="stSidebar"] hr {
+        margin-top: 0.45rem !important;
+        margin-bottom: 0.45rem !important;
+    }
+    </style>
+    """,
+    unsafe_allow_html=True
+)
+
+
+def calcular_altura_dinamica(
+    texto: Any,
+    min_height: int = 80,
+    max_height: int = 1800,
+    chars_per_line: int = 85,  # Ponto de quebra conservador para evitar cortes
+    line_height: int = 24      # Espaçamento vertical real da fonte
+) -> int:
+    """Calcula dinamicamente a altura ideal em píxeis com precisão,
+    evitando cortes na base e margens vazias exageradas."""
+    if not texto:
+        return min_height
+    texto_str = str(texto).strip()
+    if not texto_str:
+        return min_height
+        
+    linhas = texto_str.splitlines()
+    total_linhas = 0
+    for linha in linhas:
+        if not linha:
+            total_linhas += 1
+        else:
+            # Calcula quebras visuais assumindo um ecrã mais apertado
+            quebras = max(1, (len(linha) + chars_per_line - 1) // chars_per_line)
+            total_linhas += quebras
+            
+    # 30px exatos para cobrir o padding superior (12px) e inferior (12px) + bordas
+    altura = (total_linhas * line_height) + 30
+    return max(min_height, min(altura, max_height))
+
 
 def formatar_identificador(campo: str, valor: Any, formato: str) -> str:
     texto = str(valor or "")
@@ -288,10 +378,17 @@ def obter_status_todos_motores() -> Dict[str, Any]:
 # ==============================================================================
 p_brasao = resolver_caminho("dados/originais/brasao.png")
 if p_brasao.exists():
-    st.sidebar.image(str(p_brasao), width=100)
+    st.sidebar.image(str(p_brasao), width=75)
 
-st.sidebar.subheader("Central GOV.MT")
-st.sidebar.markdown("**SECITECI/MT** • ETEC Cuiabá")
+st.sidebar.markdown(
+    """
+    <div style='margin-top: -6px; margin-bottom: 2px;'>
+        <div style='font-size: 1.15rem; font-weight: 700; color: #0f172a; line-height: 1.2;'>Central GOV.MT</div>
+        <div style='font-size: 0.82rem; color: #475569; margin-top: 2px;'><strong>SECITECI/MT</strong> • ETEC Cuiabá</div>
+    </div>
+    """,
+    unsafe_allow_html=True
+)
 st.sidebar.divider()
 
 menu = st.sidebar.radio(
@@ -316,7 +413,7 @@ st.sidebar.markdown("##### Status Real dos Motores de IA")
 
 status_motores = obter_status_todos_motores()
 
-with st.sidebar.expander("Texto / LLM", expanded=True):
+with st.sidebar.expander("Texto / LLM", expanded=False):
     st.caption(status_motores["texto"]["status"])
     if status_motores["texto"]["em_uso"]:
         st.write(f"• **Provedor:** `{status_motores['texto']['provedor']}`")
@@ -425,7 +522,7 @@ if menu.startswith("1."):
         texto_digitado = st.text_area(
             "Texto da Manifestação:",
             value=st.session_state.solicitacao_texto,
-            height=280,
+            height=calcular_altura_dinamica(st.session_state.solicitacao_texto, min_height=100),
             placeholder="Digite ou cole aqui a solicitação do cidadão..."
         )
         st.session_state.solicitacao_texto = texto_digitado
@@ -576,7 +673,7 @@ if menu.startswith("1."):
                 texto_editado = st.text_area(
                     "Minuta de Despacho (Editável pelo Operador):",
                     value=st.session_state.minuta_editavel,
-                    height=250,
+                    height=calcular_altura_dinamica(st.session_state.minuta_editavel, min_height=140),
                     key="minuta_textarea_key"
                 )
                 st.session_state.minuta_editavel = texto_editado
@@ -778,11 +875,11 @@ elif menu.startswith("2."):
 
     t1, t2, t3 = st.tabs(["Prompt A (Zero-Shot)", "Prompt B (Estruturado)", "Prompt C (Produção)"])
     with t1:
-        st.text_area("Saída A:", value=exp["prompt_a"]["texto"], height=260, disabled=True)
+        st.text_area("Saída A:", value=exp["prompt_a"]["texto"], height=calcular_altura_dinamica(exp["prompt_a"]["texto"], min_height=100), disabled=True)
     with t2:
-        st.text_area("Saída B:", value=exp["prompt_b"]["texto"], height=260, disabled=True)
+        st.text_area("Saída B:", value=exp["prompt_b"]["texto"], height=calcular_altura_dinamica(exp["prompt_b"]["texto"], min_height=100), disabled=True)
     with t3:
-        st.text_area("Saída C:", value=exp["prompt_c"]["texto"], height=260, disabled=True)
+        st.text_area("Saída C:", value=exp["prompt_c"]["texto"], height=calcular_altura_dinamica(exp["prompt_c"]["texto"], min_height=100), disabled=True)
 
 
 # ==============================================================================
@@ -810,7 +907,7 @@ elif menu.startswith("3."):
             if res_a.get("sucesso"):
                 comp = res_a.get("comparacao_gabarito", {})
                 st.metric("Acurácia de Entidades", comp.get("acuracia_entidades", "4/6"))
-                st.text_area("Transcrição Revisada:", value=res_a.get("transcricao_revisada", ""), height=140, disabled=True)
+                st.text_area("Transcrição Revisada:", value=res_a.get("transcricao_revisada", ""), height=calcular_altura_dinamica(res_a.get("transcricao_revisada", ""), min_height=50), disabled=True)
 
                 st.markdown("**Validação de Entidades Críticas:**")
                 for c_nome, c_item in comp.get("detalhes", {}).items():
@@ -847,7 +944,7 @@ elif menu.startswith("3."):
                     st.warning(res_v["aviso_fallback"])
                 st.metric("Acurácia contra Gabarito", res_v.get("comparacao_gabarito", {}).get("taxa_acuracia_percentual", "N/A"))
                 txt_ocr = res_v.get("texto_corrigido") or res_v.get("texto_bruto") or ""
-                st.text_area("Texto Extraído pelo OCR:", value=txt_ocr, height=140, disabled=True)
+                st.text_area("Texto Extraído pelo OCR:", value=txt_ocr, height=calcular_altura_dinamica(txt_ocr, min_height=50), disabled=True)
 
                 if res_v.get("trechos_incertos_ou_ilegiveis"):
                     st.markdown("**Trechos Incertos / Manuscritos:**")
@@ -1107,10 +1204,6 @@ elif menu.startswith("5."):
             </style>""",
             unsafe_allow_html=True
         )
-        c_topo1, c_topo2 = st.columns([1.2, 3])
-        with c_topo1:
-            if st.button("Atualizar Trilha de Auditoria", width='stretch'):
-                st.rerun()
 
         logs_brutos = audit_logger.listar_execucoes()
         if not logs_brutos:
@@ -1431,7 +1524,7 @@ elif menu.startswith("6."):
                 for idx, t in enumerate(resp.fontes, start=1):
                     with st.expander(f"Trecho {idx}: {t.documento_id} v{t.versao} (Pág. {t.pagina or '1'}) — Similaridade: {t.score_similaridade:.4f}"):
                         st.caption(f"ID: {t.trecho_id} | Seção: {t.secao or 'Geral'} | Distância: {t.score_distancia:.4f}")
-                        st.text_area("Fragmento:", value=t.conteudo, height=90, disabled=True, key=f"rag_{t.trecho_id}")
+                        st.text_area("Fragmento:", value=t.conteudo, height=calcular_altura_dinamica(t.conteudo, min_height=40), disabled=True, key=f"rag_{t.trecho_id}")
             else:
                 st.caption("Nenhum trecho documental recuperado ou aplicável para esta resposta.")
 
@@ -1479,7 +1572,7 @@ elif menu.startswith("6."):
 
         col_f1, col_f2 = st.columns([3, 1])
         with col_f1:
-            texto_int = st.text_area("Texto da Solicitação:", value=texto_int_padrao, height=130, key="txt_int_area")
+            texto_int = st.text_area("Texto da Solicitação:", value=texto_int_padrao, height=calcular_altura_dinamica(texto_int_padrao, min_height=70), key="txt_int_area")
         with col_f2:
             prot_int = st.text_input("Protocolo (se houver):", value=prot_int_padrao, key="prot_int_in")
             data_int = st.text_input("Data de Registro (se houver):", value=data_int_padrao, key="data_int_in")
@@ -1563,7 +1656,7 @@ elif menu.startswith("6."):
             minuta_int_editada = st.text_area(
                 "Minuta Institucional Fundamentada (Fatos do Solicitante + Regras do Acervo):",
                 value=pacote_i.minuta_institucional or "",
-                height=260,
+                height=calcular_altura_dinamica(pacote_i.minuta_institucional or "", min_height=140),
                 key="minuta_int_edit_area"
             )
 
@@ -1617,7 +1710,7 @@ elif menu.startswith("7."):
     else:
         caso_sol = None
 
-    texto_f = st.text_area("Texto da Manifestação:", value=caso_sol["texto_original"] if caso_sol else "", height=150)
+    texto_f = st.text_area("Texto da Manifestação:", value=caso_sol["texto_original"] if caso_sol else "", height=calcular_altura_dinamica(caso_sol["texto_original"] if caso_sol else "", min_height=70))
     prot_f = st.text_input("Protocolo Externo (opcional):", value=(caso_sol.get("protocolo") or "") if caso_sol else "")
 
     if st.button("Processar Ficha Pydantic", type="primary"):
@@ -1667,28 +1760,50 @@ elif menu.startswith("8."):
         with open(p_av, "r", encoding="utf-8") as fa:
             avaliacoes = json.load(fa)
 
-        categorias_disp = ["Todas"] + sorted(list({a.get("categoria_servico", "Geral") for a in avaliacoes}))
-        datas_disp = sorted([a.get("data", "2026-10-01") for a in avaliacoes])
+        categorias_disp = ["Todas"] + sorted(list({a.get("categoria_servico", "Geral") for a in avaliacoes if a.get("categoria_servico")}))
 
         cf1, cf2, cf3 = st.columns(3)
         with cf1:
             cat_filtro = st.selectbox("Filtrar por Categoria/Canal:", categorias_disp)
         with cf2:
-            dt_ini = st.text_input("Data Inicial (YYYY-MM-DD):", value=datas_disp[0] if datas_disp else "2026-10-01")
+            d_ini = st.date_input(
+                "Data Inicial:",
+                value=date(2026, 6, 1),
+                format="DD/MM/YYYY",
+                help="Data de início do recorte temporal (padrão amplo cobrindo todo o exercício de 2026)."
+            )
+            dt_ini = d_ini.strftime("%Y-%m-%d") if d_ini else None
         with cf3:
-            dt_fim = st.text_input("Data Final (YYYY-MM-DD):", value=datas_disp[-1] if datas_disp else "2026-10-31")
+            d_fim = st.date_input(
+                "Data Final:",
+                value=date(2026, 12, 31),
+                format="DD/MM/YYYY",
+                help="Data final do recorte temporal (padrão amplo cobrindo todo o exercício de 2026)."
+            )
+            dt_fim = d_fim.strftime("%Y-%m-%d") if d_fim else None
 
-        avaliacoes_filtradas = filtrar_e_deduplicar_avaliacoes(
-            avaliacoes,
-            categoria_servico=cat_filtro,
-            data_inicio=dt_ini,
-            data_fim=dt_fim,
-        )
+        if d_ini and d_fim and d_ini > d_fim:
+            st.error("A Data Inicial não pode ser posterior à Data Final. Por favor, ajuste o período.")
+            avaliacoes_filtradas = []
+        else:
+            avaliacoes_filtradas = filtrar_e_deduplicar_avaliacoes(
+                avaliacoes,
+                categoria_servico=cat_filtro,
+                data_inicio=dt_ini,
+                data_fim=dt_fim,
+            )
 
         classificacoes = [classificar_sentimento_avaliacao(a["id"], a["texto"]) for a in avaliacoes_filtradas]
         agregacao = agregar_sentimentos_determinístico(classificacoes)
 
-        st.caption(f"**Denominador Visível da Consulta Atual:** `{agregacao['denominador']}` avaliações únicas consideradas.")
+        periodo_txt = f"{d_ini.strftime('%d/%m/%Y')} até {d_fim.strftime('%d/%m/%Y')}" if (d_ini and d_fim) else "Período Completo"
+        st.markdown(
+            f"<div style='color: #334155; font-size: 0.9rem; margin-bottom: 0.6rem;'>"
+            f"<strong>Recorte Temporal Ativo:</strong> <code>{periodo_txt}</code> | "
+            f"<strong>Denominador Visível da Consulta Atual:</strong> <code>{agregacao['denominador']}</code> avaliações únicas consideradas."
+            f"</div>",
+            unsafe_allow_html=True
+        )
 
         if agregacao["denominador"] == 0:
             st.warning("Nenhuma avaliação encontrada para o filtro selecionado (tratamento seguro de conjunto vazio sem divisão por zero).")
@@ -1696,22 +1811,71 @@ elif menu.startswith("8."):
             col_s1, col_s2, col_s3, col_s4, col_s5 = st.columns(5)
             with col_s1:
                 with st.container(border=True):
-                    st.metric("Total Único", agregacao["denominador"], help="Denominador de avaliações únicas")
+                    st.metric("Total Único", agregacao["denominador"], help="Denominador de avaliações únicas no filtro ativo")
+                    st.markdown("<div style='color: #334155; font-size: 0.85rem; font-weight: 500;'>Avaliações no filtro</div>", unsafe_allow_html=True)
             with col_s2:
                 with st.container(border=True):
-                    st.metric("Positivas", agregacao["distribuicao"]["positiva"], delta=f"{agregacao['percentuais']['positiva']}%", delta_color="normal")
+                    st.metric("Positivas", agregacao["distribuicao"]["positiva"])
+                    st.markdown(f"<div style='color: #166534; font-size: 0.85rem; font-weight: 600;'>{agregacao['percentuais']['positiva']}% do total</div>", unsafe_allow_html=True)
             with col_s3:
                 with st.container(border=True):
-                    st.metric("Negativas", agregacao["distribuicao"]["negativa"], delta=f"-{agregacao['percentuais']['negativa']}%", delta_color="inverse")
+                    st.metric("Negativas", agregacao["distribuicao"]["negativa"])
+                    st.markdown(f"<div style='color: #991b1b; font-size: 0.85rem; font-weight: 600;'>{agregacao['percentuais']['negativa']}% do total</div>", unsafe_allow_html=True)
             with col_s4:
                 with st.container(border=True):
-                    st.metric("Neutras", agregacao["distribuicao"]["neutra"], delta=f"{agregacao['percentuais']['neutra']}%", delta_color="off")
+                    st.metric("Neutras", agregacao["distribuicao"]["neutra"])
+                    st.markdown(f"<div style='color: #334155; font-size: 0.85rem; font-weight: 600;'>{agregacao['percentuais']['neutra']}% do total</div>", unsafe_allow_html=True)
             with col_s5:
                 with st.container(border=True):
-                    st.metric("Indeterminadas", agregacao["distribuicao"]["indeterminada"], delta=f"{agregacao['percentuais']['indeterminada']}%", delta_color="inverse", help="Casos com necessidade de revisão")
+                    st.metric("Indeterminadas", agregacao["distribuicao"]["indeterminada"], help="Casos com necessidade de revisão")
+                    st.markdown(f"<div style='color: #9a3412; font-size: 0.85rem; font-weight: 600;'>{agregacao['percentuais']['indeterminada']}% do total</div>", unsafe_allow_html=True)
 
-            st.bar_chart(agregacao["distribuicao"])
-            st.caption(f"**Nota Metodológica:** {agregacao['nota_metodologica']}")
+            df_barras = pd.DataFrame([
+                {"Sentimento": "Positiva", "Quantidade": agregacao["distribuicao"]["positiva"]},
+                {"Sentimento": "Negativa", "Quantidade": agregacao["distribuicao"]["negativa"]},
+                {"Sentimento": "Neutra", "Quantidade": agregacao["distribuicao"]["neutra"]},
+                {"Sentimento": "Indeterminada", "Quantidade": agregacao["distribuicao"]["indeterminada"]},
+            ])
+
+            grafico_sentimento = (
+                alt.Chart(df_barras)
+                .mark_bar(cornerRadius=4)
+                .encode(
+                    x=alt.X(
+                        "Sentimento:N",
+                        title=None,
+                        sort=["Positiva", "Negativa", "Neutra", "Indeterminada"],
+                        axis=alt.Axis(
+                            labelAngle=0,
+                            labelColor="#334155",
+                            labelFontSize=13,
+                            labelFontWeight="bold",
+                        )
+                    ),
+                    y=alt.Y(
+                        "Quantidade:Q",
+                        title="Quantidade de Avaliações",
+                        axis=alt.Axis(
+                            labelColor="#334155",
+                            titleColor="#334155",
+                            labelFontSize=11,
+                            tickMinStep=1,
+                        )
+                    ),
+                    color=alt.Color(
+                        "Sentimento:N",
+                        scale=alt.Scale(
+                            domain=["Positiva", "Negativa", "Neutra", "Indeterminada"],
+                            range=["#15803d", "#b91c1c", "#475569", "#c2410c"]
+                        ),
+                        legend=None
+                    ),
+                    tooltip=["Sentimento", "Quantidade"]
+                )
+                .properties(height=280)
+            )
+            st.altair_chart(grafico_sentimento, width="stretch")
+            st.markdown(f"<div style='color: #475569; font-size: 0.82rem;'><strong>Nota Metodológica:</strong> {agregacao['nota_metodologica']}</div>", unsafe_allow_html=True)
 
             with st.expander("Inspecionar Prompt Dedicado e Isolado de Sentimento (RF22)"):
                 st.code(montar_prompt_sentimento_isolado(avaliacoes_filtradas[0]["texto"]), language="xml")
@@ -1737,12 +1901,20 @@ elif menu.startswith("9."):
     c_m2.metric("Total de Chunks Indexados", len(indice_vetorial.chunks))
     c_m3.metric("Versão Atual do Índice", indice_vetorial.versao_indice)
 
-    st.markdown("##### Documentos Atualmente Ativos no Acervo")
-    col_docs = st.columns(2)
-    for i, d in enumerate(docs_presentes):
-        qtd = sum(1 for c in indice_vetorial.chunks if c["documento_id"] == d)
-        with col_docs[i % 2]:
-            st.info(f"**Identificador:** `{d}`\n\n**Fragmentos Derivados:** `{qtd} trechos indexados`")
+    st.markdown("##### Documentos Ativos e Detalhamento dos Trechos Indexados")
+    for d in docs_presentes:
+        chunks_d = [c for c in indice_vetorial.chunks if c["documento_id"] == d]
+        titulo_doc = chunks_d[0].get("titulo", d) if chunks_d else d
+        qtd = len(chunks_d)
+
+        with st.expander(f"{d} — {titulo_doc} ({qtd} trechos indexados)"):
+            for c in chunks_d:
+                t_id = c.get("trecho_id", "")
+                p = c.get("pagina", 1)
+                sec = c.get("secao", "Geral")
+                conteudo = c.get("conteudo", "").strip()
+                st.markdown(f"**Trecho:** `{t_id}` | **Página:** `{p}` | **Seção:** `{sec}`")
+                st.text_area(f"Conteúdo do trecho {t_id}", value=conteudo, height=calcular_altura_dinamica(conteudo, min_height=40), disabled=True, label_visibility="collapsed")
 
     st.divider()
     st.markdown("##### Expurgo Definitivo de Documento (Direito ao Esquecimento / RF24)")
@@ -1780,18 +1952,16 @@ elif menu.startswith("10."):
             avaliador = AvaliadorDesafio02(indice=indice_vetorial)
             avaliador.executar_matriz_testes_completa()
             st.success("Bateria de testes T01 a T15 concluída com sucesso! Relatório atualizado.")
-            st.rerun()
 
     if not caminho_rel_d02.exists():
         st.warning("Nenhum relatório de avaliação encontrado. Clique no botão acima para executar a matriz T01 a T15.")
     else:
         rel_d02 = json.loads(caminho_rel_d02.read_text(encoding="utf-8"))
-        resumo_m = rel_d02.get("resumo_matriz", {})
-        testes_lista = resumo_m.get("testes", [])
-        total_testes = resumo_m.get("total_testes", len(testes_lista))
-        aprovados = resumo_m.get("aprovados", sum(1 for t in testes_lista if t.get("status") == "APROVADO"))
-        reprovados = resumo_m.get("reprovados", total_testes - aprovados)
-        taxa = resumo_m.get("taxa_aprovacao", (aprovados / total_testes * 100) if total_testes else 0.0)
+        testes_lista = rel_d02.get("matriz") or rel_d02.get("resumo_matriz", {}).get("testes", [])
+        total_testes = rel_d02.get("total_testes", len(testes_lista))
+        aprovados = rel_d02.get("aprovados", sum(1 for t in testes_lista if t.get("status") == "APROVADO"))
+        reprovados = total_testes - aprovados
+        taxa = (aprovados / total_testes * 100) if total_testes else 0.0
 
         ts_raw = rel_d02.get("timestamp", "")
         if ts_raw:
@@ -1803,7 +1973,6 @@ elif menu.startswith("10."):
         else:
             ts_formatado = "Não registrado"
 
-        # KPIs Principais
         k1, k2, k3, k4 = st.columns(4)
         k1.metric("Total de Testes", total_testes)
         k2.metric("Aprovados", f"{aprovados} / {total_testes}")
@@ -1817,7 +1986,6 @@ elif menu.startswith("10."):
             "Visão Consolidada / JSON Completo",
         ])
 
-        # ABA 1: CARDS DETALHADOS COM FILTROS
         with tab_t_cards:
             st.markdown("##### Inspeção Individual dos Testes")
             f_col1, f_col2, f_col3 = st.columns([1, 1, 2])
@@ -1834,7 +2002,6 @@ elif menu.startswith("10."):
             with f_col3:
                 filtro_busca = st.text_input("Buscar teste por texto (ex: T01, SQL, chunking, P6):")
 
-            # Aplicação dos filtros
             testes_exibicao = []
             for t in testes_lista:
                 stt = t.get("status", "")
@@ -1860,15 +2027,15 @@ elif menu.startswith("10."):
                 t_status = t.get("status", "PENDENTE")
                 is_aprovado = (t_status == "APROVADO")
 
-                # Cor e rótulo no título do expander
-                cor_status = "#28a745" if is_aprovado else "#dc3545"
                 titulo_expander = f"[{t_id}] • {t_status} • {t_req} — {t_cenario}"
 
                 with st.expander(titulo_expander, expanded=(not is_aprovado)):
                     col_det1, col_det2 = st.columns([3, 1])
                     with col_det1:
                         st.markdown(f"**Identificador:** `{t_id}` | **Requisito Contratual:** `{t_req}`")
-                        st.markdown(f"**Cenário Avaliado:**\n\n{t_cenario}")
+                        st.markdown(f"**Cenário Avaliado:**
+
+{t_cenario}")
                     with col_det2:
                         if is_aprovado:
                             st.success(f"Status: {t_status}")
@@ -1879,7 +2046,6 @@ elif menu.startswith("10."):
                     evid = t.get("evidencia")
 
                     if isinstance(evid, dict):
-                        # Formata o dicionário em duas colunas organizadas
                         col_ev1, col_ev2 = st.columns(2)
                         itens_ev = list(evid.items())
                         metade = (len(itens_ev) + 1) // 2
@@ -1895,7 +2061,6 @@ elif menu.startswith("10."):
                     else:
                         st.info(str(evid))
 
-        # ABA 2: EXPERIMENTO DE CHUNKING (RF18)
         with tab_t_chunking:
             st.markdown("##### Comparativo Experimental de Recuperação Vetorial (RF18 / T07)")
             st.markdown("Avaliação de sensibilidade das duas estratégias de fatiamento de documentos sobre as perguntas respondíveis do gabarito oficial.")
@@ -1907,23 +2072,32 @@ elif menu.startswith("10."):
             col_cfg_a, col_cfg_b = st.columns(2)
             with col_cfg_a:
                 st.info(
-                    "**Configuração A (Granularidade Alta)**\n\n"
-                    "- **Tamanho do Chunk:** 400 caracteres\n"
-                    "- **Sobreposição (Overlap):** 80 caracteres\n"
-                    f"- **Total de Chunks:** `{cfg_a.get('total_chunks', 49)} trechos`\n"
+                    "**Configuração A (Granularidade Alta)**
+
+"
+                    "- **Tamanho do Chunk:** 400 caracteres
+"
+                    "- **Sobreposição (Overlap):** 80 caracteres
+"
+                    f"- **Total de Chunks:** `{cfg_a.get('total_chunks', 49)} trechos`
+"
                     f"- **Taxa de Acerto (Top-3):** `{cfg_a.get('percentual', '100.0%')}` ({cfg_a.get('numerador', 5)}/{cfg_a.get('denominador', 5)})"
                 )
 
             with col_cfg_b:
                 st.info(
-                    "**Configuração B (Contexto Amplo)**\n\n"
-                    "- **Tamanho do Chunk:** 800 caracteres\n"
-                    "- **Sobreposição (Overlap):** 150 caracteres\n"
-                    f"- **Total de Chunks:** `{cfg_b.get('total_chunks', 24)} trechos`\n"
+                    "**Configuração B (Contexto Amplo)**
+
+"
+                    "- **Tamanho do Chunk:** 800 caracteres
+"
+                    "- **Sobreposição (Overlap):** 150 caracteres
+"
+                    f"- **Total de Chunks:** `{cfg_b.get('total_chunks', 24)} trechos`
+"
                     f"- **Taxa de Acerto (Top-3):** `{cfg_b.get('percentual', '100.0%')}` ({cfg_b.get('numerador', 5)}/{cfg_b.get('denominador', 5)})"
                 )
 
-            # Tabela comparativa por pergunta
             detalhes_a = {item["id"]: item for item in cfg_a.get("detalhes", [])}
             detalhes_b = {item["id"]: item for item in cfg_b.get("detalhes", [])}
 
@@ -1945,7 +2119,6 @@ elif menu.startswith("10."):
                 st.markdown("##### Tabela Comparativa de Recuperação por Pergunta")
                 st.dataframe(tabela_comp, width='stretch', hide_index=True)
 
-        # ABA 3: JSON COMPLETO / VISÃO CONSOLIDADA
         with tab_t_raw:
             st.markdown("##### Dados Consolidados da Bateria de Avaliação")
             st.download_button(
@@ -1955,6 +2128,3 @@ elif menu.startswith("10."):
                 mime="application/json",
             )
             st.json(rel_d02)
-
-st.divider()
-st.caption("Governo do Estado de Mato Grosso — Secretaria de Estado de Ciência, Tecnologia e Inovação (SECITECI/MT)")

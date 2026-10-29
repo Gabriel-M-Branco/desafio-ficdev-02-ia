@@ -14,7 +14,7 @@
   "revisao_aplicada": "Normalização de espaços; conteúdo pendente de revisão humana.",
   "origem_processamento": "api_remota",
   "provedor": "HuggingFace",
-  "tempo_processamento_segundos": 6.288,
+  "tempo_processamento_segundos": 4.947,
   "exige_confirmacao_humana": true,
   "comparacao_gabarito": {
     "todos_campos_criticos_conferidos": false,
