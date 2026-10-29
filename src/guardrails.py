@@ -35,6 +35,15 @@ PADROES_INJECAO = [
     r"jailbreak",
 ]
 
+# Padroes discriminatorios, ilicitos ou de odio incompativeis com principios constitucionais e institucionais (RF16)
+PADROES_DISCRIMINATORIOS_OU_ILICITOS = [
+    r"\bsegrega[cç][aã]o\b",
+    r"\bapartheid\b",
+    r"\bsupremacia\b",
+    r"\bneonazis\w*\b",
+    r"\bdiscrimina[cç][aã]o\s+racial\b",
+]
+
 PALAVRAS_CHAVE_SEGREDOS = [
     "hf_token", "openrouter_api_key", "openai_api_key", "bearer ", "authorization:",
     "secret_key", "password", "api_key", "credencial",
@@ -46,7 +55,7 @@ ESCOPO_PALAVRAS_CHAVE = [
     "frequência", "frequencia", "renda", "transporte", "alimentação", "alimentacao",
     "conferência", "conferencia", "sorteio", "classificado", "aprovado", "recurso",
     "cuiabá", "cuiaba", "barra do garças", "barra do garcas", "cáceres", "caceres",
-    "heteroidentificação", "heteroidentificacao", "cronograma", "vídeo", "video",
+    "heteroidentificação", "heteroidentificacao", "cronograma",
 ]
 
 
@@ -180,6 +189,17 @@ class GuardrailManager:
                     permitido=False,
                     status="bloquear",
                     motivo="Tentativa de injeção de prompt ou quebra de diretrizes detectada (RF16).",
+                    texto_sanitizado=self.mascarar_conteudo_sensivel(texto),
+                    alerta_seguranca=True,
+                )
+
+        # 1.1 Detecção de termos discriminatórios, ilícitos ou incompatíveis com princípios institucionais
+        for padrao in PADROES_DISCRIMINATORIOS_OU_ILICITOS:
+            if re.search(padrao, texto_lower):
+                return DecisaoGuardrail(
+                    permitido=False,
+                    status="bloquear",
+                    motivo="Entrada bloqueada por conter termo discriminatório, ilícito ou incompatível com os princípios institucionais (RF16).",
                     texto_sanitizado=self.mascarar_conteudo_sensivel(texto),
                     alerta_seguranca=True,
                 )

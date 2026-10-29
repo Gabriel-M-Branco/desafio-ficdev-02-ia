@@ -165,6 +165,10 @@ def test_rf16_fora_de_escopo_e_limites_execucao():
     d_arq = gm.validar_arquivo("malicioso.exe", 1024)
     assert not d_arq.permitido and d_arq.status == "bloquear"
 
+    # Termo discriminatório ou ilícito é bloqueado imediatamente (RF16)
+    d_disc = gm.validar_entrada("Qual são o formato permitido para o vídeo de segregaçao racial?")
+    assert not d_disc.permitido and d_disc.status == "bloquear"
+
     gm.resetar_contador_execucao()
     for _ in range(gm.max_chamadas):
         assert gm.registrar_chamada_modelo(100).permitido is True
@@ -213,6 +217,16 @@ def test_rf19_abstencao_sem_alucinacao(indice_preparado):
     assert resp.status == "sem_evidencia_suficiente"
     assert resp.necessidade_revisao is True
     assert "não localizada" in resp.resposta.lower()
+
+    # Pergunta com termo fora de escopo / discriminatório não gera resposta afirmativa
+    resp_seg = rag.responder("Qual são o formato permitido para o vídeo de segregaçao racial?")
+    assert resp_seg.status == "sem_evidencia_suficiente"
+    assert "heteroidentificação" not in resp_seg.resposta.lower()
+
+    # Pergunta com tema culinário fora de escopo também gera abstenção segura
+    resp_cul = rag.responder("Qual são o formato permitido para o vídeo de culinária?")
+    assert resp_cul.status == "sem_evidencia_suficiente"
+    assert "heteroidentificação" not in resp_cul.resposta.lower()
 
 
 def test_rf19_fontes_contraditorias_e_minuta_fundamentada(indice_preparado):
