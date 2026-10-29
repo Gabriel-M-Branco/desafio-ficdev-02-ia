@@ -17,7 +17,8 @@ A **única interface oficial consolidada** do sistema é construída em **Stream
 3. **Assistente de Documentos Institucionais (RAG)** fundamentado em editais e retificações, com citações explícitas (documento, versão, página/seção, `trecho_id`), abstenção segura sem evidência e detecção de conflitos entre normas;
 4. **Atendimento Integrado com Minuta Fundamentada**, separando fatos informados pelo solicitante e orientações sustentadas pelo acervo;
 5. **Painel Analítico de Sentimentos** com classificação em 4 polaridades e agregação determinística em Python;
-6. **Governança do Acervo, Auditoria, LGPD e Revisão Humana (*Human-in-the-Loop*)** obrigatória antes de qualquer publicação ou síntese final de voz.
+6. **Governança do Acervo, Auditoria, LGPD e Revisão Humana (*Human-in-the-Loop*)** obrigatória antes de qualquer publicação ou síntese final de voz;
+7. **Central de Execução e Verificação de Testes (Módulo 10)** com disparo ao vivo da bateria contratual (T01 a T15), asserções individuais sob demanda e terminal interativo do pytest.
 
 ---
 
@@ -59,7 +60,7 @@ desafio-ficdev-02-ia/
 ├── indice/
 │   └── indice_vetorial.json  # Índice vetorial persistente com metadados, hashes e versão
 ├── src/
-│   ├── app.py                # INTERFACE OFICIAL UNIFICADA EM STREAMLIT (Módulos 1 a 9)
+│   ├── app.py                # INTERFACE OFICIAL UNIFICADA EM STREAMLIT (Módulos 1 a 10)
 │   ├── main.py               # Entrypoint complementar (Streamlit padrão, --api, --cli, --run-all)
 │   ├── llm_client.py         # Cliente multi-provedor (OpenAI, OpenRouter, HF, Adaptador Simulado)
 │   ├── schemas.py            # Contratos Pydantic v2 (extra="forbid"), literal vs inferido (RF14/RF15)
