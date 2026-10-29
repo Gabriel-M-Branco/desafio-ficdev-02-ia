@@ -119,7 +119,8 @@ class MotorRAG:
 
         if termos_chave and (
             len(termos_encontrados) == 0
-            or any(ausente in pergunta.lower() for ausente in ["estágio em empresa", "pós-graduação", "pos-graduacao"])
+            or any(ausente in pergunta.lower() for ausente in ["estágio em empresa", "estagio em empresa", "pós-graduação", "pos-graduacao", "pos graduação", "pos graduacao", "segregação", "segregacao", "apartheid", "culinária", "culinaria"])
+            or bool([t for t in termos_chave if t not in {"formato", "permitido", "permitidos", "permitida", "permitidas", "duração", "duracao", "máximo", "maximo", "máxima", "maxima", "mínimo", "minimo", "mínima", "minima", "valor", "mensal", "prazo", "data", "dia", "mês", "mes"}] and not [t for t in termos_chave if t not in {"formato", "permitido", "permitidos", "permitida", "permitidas", "duração", "duracao", "máximo", "maximo", "máxima", "maxima", "mínimo", "minimo", "mínima", "minima", "valor", "mensal", "prazo", "data", "dia", "mês", "mes"} and t in texto_consolidado])
         ):
             resp_abst = RespostaRAG(
                 pergunta=pergunta,
@@ -383,6 +384,7 @@ class MotorRAG:
                 prompt = (
                     "Você é o assistente institucional oficial da SECITECI-MT / GOV.MT.\n"
                     "Responda à pergunta do cidadão usando EXCLUSIVAMENTE os fatos contidos em <contexto_institucional>.\n"
+                    "Se a pergunta estiver fora do escopo, contiver conceitos ausentes nos documentos ou se a evidência for insuficiente, declare: 'Informação não localizada no acervo institucional disponível.'\n"
                     "Cite sempre o documento de origem ([DOC-SECITECI-...]). Não invente datas, leis ou prazos.\n\n"
                     f"<contexto_institucional>\n{contexto_xml}\n</contexto_institucional>\n\n"
                     f"<conteudo_nao_confiavel>\n{pergunta}\n</conteudo_nao_confiavel>\n\nResposta fundamentada:"
@@ -441,7 +443,11 @@ class MotorRAG:
                 self.indice.nome_modelo,
             )
 
-        if ("vídeo" in p_lower or "video" in p_lower or "heteroidentifica" in p_lower) and ".mp4" in texto_unido.lower():
+        if (
+            ("heteroidentifica" in p_lower or ("autodeclara" in p_lower and ("vídeo" in p_lower or "video" in p_lower)))
+            and "segrega" not in p_lower
+            and ".mp4" in texto_unido.lower()
+        ):
             m_video = re.search(r"formato\s+\.mp4\s+com\s+duração\s+de\s+até\s+2\s+minutos", texto_unido, re.I)
             detalhe_duracao = m_video.group(0) if m_video else "formato .mp4 com duração de até 2 minutos"
             return (

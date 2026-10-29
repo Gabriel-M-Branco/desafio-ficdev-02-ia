@@ -1411,7 +1411,9 @@ elif menu.startswith("6."):
         if res_c:
             resp = res_c["resposta_obj"]
             st.caption(f"Índice Vetorial preservado: `{res_c['versao_indice']}` | Adaptador utilizado: `{res_c['provedor']}`")
-            if resp.status == "fundamentada":
+            if resp.modo_geracao == "guardrail_entrada_bloqueado":
+                st.error("SOLICITAÇÃO BLOQUEADA POR DIRETRIZES DE SEGURANÇA E ESCOPO (GUARDRAIL RF16)")
+            elif resp.status == "fundamentada":
                 st.success("RESPOSTA FUNDAMENTADA COM EVIDÊNCIA SUFICIENTE")
             elif resp.status == "conflito_de_fontes":
                 st.error("CONFLITO DE FONTES DETECTADO (REVISÃO HUMANA OBRIGATÓRIA)")
@@ -1423,11 +1425,14 @@ elif menu.startswith("6."):
             if resp.divergencia_identificada:
                 st.warning(f"**Divergência Normativa Identificada:** {resp.divergencia_identificada}")
 
-            st.markdown("##### Trechos Recuperados do Acervo (Sanitizados contra Injeção Indireta)")
-            for idx, t in enumerate(resp.fontes, start=1):
-                with st.expander(f"Trecho {idx}: {t.documento_id} v{t.versao} (Pág. {t.pagina or '1'}) — Similaridade: {t.score_similaridade:.4f}"):
-                    st.caption(f"ID: {t.trecho_id} | Seção: {t.secao or 'Geral'} | Distância: {t.score_distancia:.4f}")
-                    st.text_area("Fragmento:", value=t.conteudo, height=90, disabled=True, key=f"rag_{t.trecho_id}")
+            if resp.fontes:
+                st.markdown("##### Trechos Recuperados do Acervo (Sanitizados contra Injeção Indireta)")
+                for idx, t in enumerate(resp.fontes, start=1):
+                    with st.expander(f"Trecho {idx}: {t.documento_id} v{t.versao} (Pág. {t.pagina or '1'}) — Similaridade: {t.score_similaridade:.4f}"):
+                        st.caption(f"ID: {t.trecho_id} | Seção: {t.secao or 'Geral'} | Distância: {t.score_distancia:.4f}")
+                        st.text_area("Fragmento:", value=t.conteudo, height=90, disabled=True, key=f"rag_{t.trecho_id}")
+            else:
+                st.caption("Nenhum trecho documental recuperado ou aplicável para esta resposta.")
 
     with aba_integrado:
         st.markdown("##### Fluxo Integrado: Solicitação $\\rightarrow$ Extração Literal/Inferida $\\rightarrow$ Busca RAG $\\rightarrow$ Minuta Fundamentada $\\rightarrow$ Decisão Humana (RF20)")
