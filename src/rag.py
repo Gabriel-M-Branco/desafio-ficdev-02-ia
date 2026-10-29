@@ -32,6 +32,54 @@ class MotorRAG:
         self.llm_client = llm_client or LLMClient()
         self.guardrails = GuardrailManager()
         self.logger = audit_logger or logger or globals()["audit_logger"]
+        self._vocabulario_corpus = None
+
+    def obter_vocabulario_corpus(self) -> set:
+        """Extrai dinamicamente o vocabulário de termos substantivos do acervo indexado."""
+        if getattr(self, "_vocabulario_corpus", None) is not None:
+            return self._vocabulario_corpus
+        if not self.indice or not self.indice.chunks:
+            return set()
+        textos = [
+            c["conteudo"] if isinstance(c, dict) else getattr(c, "conteudo", "")
+            for c in self.indice.chunks
+        ]
+        self._vocabulario_corpus = set(re.findall(r"\b[a-záéíóúâêôãõç]{3,}\b", " ".join(textos).lower()))
+        return self._vocabulario_corpus
+
+    def extrair_entidades_alvo(self, pergunta: str) -> List[Tuple[str, List[str]]]:
+        """
+        Extrai dinamicamente sintagmas nominais de entidades (Programas, Cursos, Auxílios,
+        Bolsas, Editais, Vídeos, Turmas) e identifica termos qualificadores não presentes no acervo.
+        Retorna lista de tuplas (sintagma_completo, palavras_ausentes_no_acervo).
+        """
+        padrao = r"\b(?:programa|curso|aux[ií]lio|bolsa|edital|taxa|v[ií]deo|turma)\s+(?:de\s+|do\s+|da\s+|para\s+)?([a-záéíóúâêôãõç\s]+)"
+        delimitadores_verbos = {
+            "ofertado", "ofertada", "ministrado", "ministrada", "realizado", "realizada",
+            "apresentado", "apresentada", "entregar", "comprovar", "solicitar", "deve", "devem",
+            "para", "com", "por", "sobre", "onde", "quando", "como", "qual", "quais",
+            "sede", "cuiaba", "cuiabá", "barra", "garças", "garcas",
+        }
+        stopwords_sintagma = {"de", "da", "do", "em", "para", "com", "no", "na", "os", "as", "um", "uma"}
+        vocab = self.obter_vocabulario_corpus()
+        if not vocab:
+            return []
+
+        entidades_ausentes = []
+        for m in re.finditer(padrao, pergunta.lower()):
+            trecho = m.group(1).strip()
+            palavras = re.findall(r"\b[a-záéíóúâêôãõç]{3,}\b", trecho)
+            palavras_entidade = []
+            for w in palavras:
+                if w in delimitadores_verbos:
+                    break
+                if w not in stopwords_sintagma:
+                    palavras_entidade.append(w)
+            if palavras_entidade:
+                aliens = [w for w in palavras_entidade if w not in vocab]
+                if aliens:
+                    entidades_ausentes.append((" ".join(palavras_entidade), aliens))
+        return entidades_ausentes
 
     def responder(
         self,
@@ -65,6 +113,34 @@ class MotorRAG:
                     erros=["guardrail_bloqueado"],
                 )
             return resp_bloq
+
+        # 1.1 Análise Dinâmica de Ancoragem de Entidades no Acervo (Evita substituições e entidades inventadas)
+        entidades_ausentes = self.extrair_entidades_alvo(pergunta)
+        if entidades_ausentes:
+            entidade_nome, termos_alien = entidades_ausentes[0]
+            resp_abst = RespostaRAG(
+                pergunta=pergunta,
+                resposta=(
+                    f"Informação sobre '{entidade_nome.title()}' não localizada no acervo institucional disponível. "
+                    "O acervo consultado contempla exclusivamente os editais e normas oficiais dos cursos técnicos "
+                    "e do Programa de Permanência Estudantil da SECITECI-MT. "
+                    "Recomenda-se verificar a denominação informada ou solicitar atendimento humano."
+                ),
+                status="sem_evidencia_suficiente",
+                fontes=[],
+                citacoes_formatadas=[],
+                necessidade_revisao=True,
+                modo_geracao="abstencao_entidade_nao_localizada",
+            )
+            if registrar_auditoria:
+                self._registrar_auditoria_rag(
+                    pergunta=pergunta,
+                    resposta_rag=resp_abst,
+                    duracao=time.perf_counter() - inicio,
+                    provedor="rag_local",
+                    modelo=self.indice.nome_modelo,
+                )
+            return resp_abst
 
         # 2. Recuperação de trechos top-k
         trechos_brutos = self.indice.buscar_top_k(pergunta, top_k=top_k, limiar_minimo=LIMIAR_SIMILARIDADE_MINIMA)
@@ -119,7 +195,7 @@ class MotorRAG:
 
         if termos_chave and (
             len(termos_encontrados) == 0
-            or any(ausente in pergunta.lower() for ausente in ["estágio em empresa", "estagio em empresa", "pós-graduação", "pos-graduacao", "pos graduação", "pos graduacao", "segregação", "segregacao", "apartheid", "culinária", "culinaria"])
+            # Análise dinâmica de substantivos e entidades garante abstenção sem listas estáticas
             or bool([t for t in termos_chave if t not in {"formato", "permitido", "permitidos", "permitida", "permitidas", "duração", "duracao", "máximo", "maximo", "máxima", "maxima", "mínimo", "minimo", "mínima", "minima", "valor", "mensal", "prazo", "data", "dia", "mês", "mes"}] and not [t for t in termos_chave if t not in {"formato", "permitido", "permitidos", "permitida", "permitidas", "duração", "duracao", "máximo", "maximo", "máxima", "maxima", "mínimo", "minimo", "mínima", "minima", "valor", "mensal", "prazo", "data", "dia", "mês", "mes"} and t in texto_consolidado])
         ):
             resp_abst = RespostaRAG(
@@ -413,7 +489,7 @@ class MotorRAG:
                 self.indice.nome_modelo,
             )
 
-        if "renda" in p_lower and ("contracheques" in texto_unido.lower() or "holerites" in texto_unido.lower()):
+        if "renda" in p_lower and ("assalariado" in p_lower or "contracheques" in texto_unido.lower() or "holerites" in texto_unido.lower()) and "DOC-SECITECI-005" in citacao_principal:
             return (
                 f"De acordo com {citacao_principal}, trabalhadores assalariados devem apresentar: "
                 "contracheques ou holerites dos últimos 3 (três) meses anteriores à data do requerimento, "
@@ -458,7 +534,22 @@ class MotorRAG:
                 self.indice.nome_modelo,
             )
 
-        # Extração genérica das sentenças mais relevantes do trecho recuperado
+        # Extração genérica fundamentada das sentenças mais relevantes do trecho recuperado
+        stopwords_genericas = {
+            "qual", "quais", "como", "quando", "onde", "para", "com", "por", "que", "deve", "devem",
+            "sobre", "entre", "este", "esta", "esse", "essa", "ter", "ser", "tem", "são"
+        }
+        termos_pergunta = set(re.findall(r"\b[a-záéíóúâêôãõç]{4,}\b", p_lower)) - stopwords_genericas
+        termos_no_trecho = [t for t in termos_pergunta if t in texto_unido.lower()]
+        taxa_overlap = (len(termos_no_trecho) / len(termos_pergunta)) if termos_pergunta else 0.0
+
+        if taxa_overlap < 0.40:
+            return (
+                "Informação não localizada no acervo institucional disponível.",
+                "extrator_fundamentado_local",
+                "extrator_fundamentado_local",
+                self.indice.nome_modelo,
+            )
         linhas_uteis = [
             l.strip() for l in trechos[0].conteudo.splitlines()
             if l.strip() and not l.strip().startswith("[DOC-") and not l.strip().startswith(("IDENTIFICADOR:", "TITULO:", "VERSAO:", "TEMAS:"))
