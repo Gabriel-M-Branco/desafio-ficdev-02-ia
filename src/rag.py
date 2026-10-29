@@ -156,7 +156,7 @@ class MotorRAG:
                     "Conforme as diretrizes institucionais, o sistema absteve-se de arbitrar o conflito "
                     "e encaminhou a demanda para conferência e deliberação humana."
                 ),
-                fontes=[t.model_dump() if hasattr(t, "model_dump") else t for t in trechos],
+                fontes=trechos,
                 status="conflito_de_fontes",
                 divergencia_identificada=detalhe_conflito,
                 necessidade_revisao=True,
@@ -183,7 +183,7 @@ class MotorRAG:
         resp_ok = RespostaRAG(
             pergunta=pergunta,
             resposta=resposta_sintetizada,
-            fontes=[t.model_dump() if hasattr(t, "model_dump") else t for t in trechos],
+            fontes=trechos,
             status="fundamentada",
             divergencia_identificada=divergencia,
             necessidade_revisao=bool(alertas_corpus),

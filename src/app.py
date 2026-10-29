@@ -21,6 +21,11 @@ ROOT_DIR = Path(__file__).resolve().parent.parent
 if str(ROOT_DIR) not in sys.path:
     sys.path.insert(0, str(ROOT_DIR))
 
+import importlib
+for mod_name in ["src.schemas", "src.rag", "src.nlp", "src.llm_client", "src.embeddings", "src.audit"]:
+    if mod_name in sys.modules:
+        importlib.reload(sys.modules[mod_name])
+
 # Importações dos módulos centrais do sistema
 from src import BASE_DIR, resolver_caminho
 from src.llm_client import LLMClient
