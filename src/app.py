@@ -905,7 +905,7 @@ elif menu.startswith("4."):
 
     c_btn1, c_btn2 = st.columns([1.2, 2])
     with c_btn1:
-        if st.button("Gerar Comunicado Visual Oficial", type="primary", use_container_width=True):
+        if st.button("Gerar Comunicado Visual Oficial", type="primary", width='stretch'):
             with st.spinner("Gerando ilustração sem texto por IA e aplicando moldura GOV.MT com Brasão..."):
                 res_img = image_generator.gerar_comunicado_oficial(audit_logger=audit_logger)
                 st.session_state.imagem_resultado = res_img
@@ -919,7 +919,7 @@ elif menu.startswith("4."):
     if img_dado and img_dado.get("sucesso"):
         c_v1, c_v2 = st.columns([1.2, 1], gap="large")
         with c_v1:
-            st.image(img_dado["caminho_imagem"], caption="Peça Institucional Padronizada GOV.MT (RF10)", use_container_width=True)
+            st.image(img_dado["caminho_imagem"], caption="Peça Institucional Padronizada GOV.MT (RF10)", width='stretch')
             if os.path.exists(img_dado["caminho_imagem"]):
                 with open(img_dado["caminho_imagem"], "rb") as f_img:
                     st.download_button(
@@ -927,7 +927,7 @@ elif menu.startswith("4."):
                         data=f_img.read(),
                         file_name=Path(img_dado["caminho_imagem"]).name,
                         mime="image/png",
-                        use_container_width=True
+                        width='stretch'
                     )
         with c_v2:
             meta = img_dado.get("metadados", {})
@@ -961,7 +961,7 @@ elif menu.startswith("4."):
 
             b_ap, b_rej = st.columns(2)
             with b_ap:
-                if st.button("Aprovar Imagem", type="primary", use_container_width=True):
+                if st.button("Aprovar Imagem", type="primary", width='stretch'):
                     if not chk_v:
                         st.warning("Confirme o checkbox de conferência visual antes de registrar a aprovação.")
                     else:
@@ -981,7 +981,7 @@ elif menu.startswith("4."):
                         else:
                             st.error(f"Não foi possível homologar a imagem: {res_rev.get('erro', 'Erro desconhecido.')}")
             with b_rej:
-                if st.button("Rejeitar Imagem", use_container_width=True):
+                if st.button("Rejeitar Imagem", width='stretch'):
                     res_rev = image_generator.revisar_imagem(
                         id_execucao=img_dado.get("id_execucao") or meta.get("identificador"),
                         hash_imagem=meta.get("sha256_imagem"),
