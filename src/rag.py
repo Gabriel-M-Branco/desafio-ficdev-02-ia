@@ -38,9 +38,9 @@ class MotorRAG:
 
     def obter_vocabulario_corpus(self) -> Tuple[set, set]:
         """Extrai dinamicamente o vocabulário de termos substantivos do acervo indexado."""
-        if getattr(self, "_vocabulario_corpus", None) is not None:
+        if getattr(self, "_vocabulario_corpus", None) is not None and getattr(self, "_vocabulario_corpus_desacentuado", None) is not None:
             return self._vocabulario_corpus, self._vocabulario_corpus_desacentuado
-        if not self.indice or not self.indice.chunks:
+        if not self.indice or not getattr(self.indice, "chunks", None):
             return set(), set()
         textos = [
             c["conteudo"] if isinstance(c, dict) else getattr(c, "conteudo", "")
