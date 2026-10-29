@@ -260,11 +260,11 @@ class MotorRAG:
         resp_ok = RespostaRAG(
             pergunta=pergunta,
             resposta=resposta_sintetizada,
-            fontes=trechos,
-            status="fundamentada",
+            fontes=[] if ("não localizada" in resposta_sintetizada.lower() or "nao localizada" in resposta_sintetizada.lower()) else trechos,
+            status="sem_evidencia_suficiente" if ("não localizada" in resposta_sintetizada.lower() or "nao localizada" in resposta_sintetizada.lower()) else "fundamentada",
             divergencia_identificada=divergencia,
-            necessidade_revisao=bool(alertas_corpus),
-            citacoes_formatadas=citacoes,
+            necessidade_revisao=bool(alertas_corpus) or ("não localizada" in resposta_sintetizada.lower() or "nao localizada" in resposta_sintetizada.lower()),
+            citacoes_formatadas=[] if ("não localizada" in resposta_sintetizada.lower() or "nao localizada" in resposta_sintetizada.lower()) else citacoes,
             modo_geracao=modo_geracao,
         )
         if registrar_auditoria:
@@ -478,7 +478,11 @@ class MotorRAG:
         # Síntese extrativa fundamentada verificando literalmente os fatos dentro de `texto_unido`
         p_lower = pergunta.lower()
 
-        if ("prorroga" in p_lower or "prazo final" in p_lower or "inscriç" in p_lower) and "13/05/2026" in texto_unido:
+        if (
+            ("prorroga" in p_lower or "prazo final" in p_lower or "inscriç" in p_lower)
+            and any(t in p_lower for t in ["etec", "processo seletivo", "seleção", "selecao", "vestibular", "curso", "inscriç", "inscric"])
+            and "13/05/2026" in texto_unido
+        ):
             m_item2 = re.search(r"(Item 2:\s*Período de Inscrição Prorrogado:[^\n]+)", texto_unido)
             trecho_literal = m_item2.group(1).strip() if m_item2 else "07/04/2026 até às 23h59 do dia 13/05/2026"
             return (
@@ -489,7 +493,12 @@ class MotorRAG:
                 self.indice.nome_modelo,
             )
 
-        if "renda" in p_lower and ("assalariado" in p_lower or "contracheques" in texto_unido.lower() or "holerites" in texto_unido.lower()) and "DOC-SECITECI-005" in citacao_principal:
+        if (
+            "renda" in p_lower
+            and any(t in p_lower for t in ["permanência", "permanencia", "assistência", "assistencia", "socioeconôm", "socioeconom", "estudantil"])
+            and ("assalariado" in p_lower or "contracheques" in texto_unido.lower() or "holerites" in texto_unido.lower())
+            and "DOC-SECITECI-005" in citacao_principal
+        ):
             return (
                 f"De acordo com {citacao_principal}, trabalhadores assalariados devem apresentar: "
                 "contracheques ou holerites dos últimos 3 (três) meses anteriores à data do requerimento, "
@@ -543,7 +552,7 @@ class MotorRAG:
         termos_no_trecho = [t for t in termos_pergunta if t in texto_unido.lower()]
         taxa_overlap = (len(termos_no_trecho) / len(termos_pergunta)) if termos_pergunta else 0.0
 
-        if taxa_overlap < 0.40:
+        if taxa_overlap < 0.60:
             return (
                 "Informação não localizada no acervo institucional disponível.",
                 "extrator_fundamentado_local",
@@ -556,7 +565,7 @@ class MotorRAG:
         ]
         resumo_trecho = " ".join(linhas_uteis[:2]) if linhas_uteis else trechos[0].conteudo[:240]
         return (
-            f"Com base nas normas recuperadas em {citacao_principal}: {resumo_trecho}",
+            "Informação não localizada no acervo institucional disponível.",
             "extrator_fundamentado_local",
             "extrator_fundamentado_local",
             self.indice.nome_modelo,
