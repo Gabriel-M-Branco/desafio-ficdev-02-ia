@@ -197,12 +197,15 @@ def gerar_resumo_fiel(texto: str, max_palavras: int = 100) -> str:
 
 
 def processar_solicitacao(
-    texto_original: str,
+    texto_original: str = "",
     protocolo_externo: Optional[str] = None,
     tipo: str = "texto",
     data_externa: Optional[str] = None,
+    texto: Optional[str] = None,
 ) -> ExtracaoFicha:
     """Extrai campos literais, informações inferidas, categoria e resumo gerando a ExtracaoFicha (RF14/RF15)."""
+    if not texto_original and texto:
+        texto_original = texto
     entidades = extrair_entidades_literais(texto_original)
     categoria = classificar_categoria(texto_original)
     resumo = gerar_resumo_fiel(texto_original)

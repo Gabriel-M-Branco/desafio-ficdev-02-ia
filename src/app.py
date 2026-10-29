@@ -1122,7 +1122,7 @@ elif menu.startswith("6."):
                 else:
                     with st.spinner("Extraindo ficha estruturada, consultando editais e redigindo minuta fundamentada..."):
                         ficha_int = processar_solicitacao(
-                            texto=texto_int,
+                            texto_original=texto_int,
                             protocolo_externo=prot_int if prot_int.strip() else None,
                             data_externa=data_int if data_int.strip() else None,
                         )
@@ -1211,17 +1211,16 @@ elif menu.startswith("6."):
 
             if st.button("Registrar Decisão Humana (RF20/RF21)", width='stretch'):
                 dec_validada = DecisaoOperador(
-                    id_execucao=res_int["id_execucao"],
-                    status_decisao=novo_status_op,
+                    solicitacao_id=res_int["id_execucao"],
+                    decisao=novo_status_op,
                     justificativa=just_op_int,
-                    texto_revisado=minuta_int_editada,
                 )
                 audit_logger.atualizar_decisao_humana(
-                    exec_id=dec_validada.id_execucao,
-                    decisao=dec_validada.status_decisao.upper(),
+                    exec_id=dec_validada.solicitacao_id,
+                    decisao=dec_validada.decisao.upper(),
                     justificativa=dec_validada.justificativa,
                     operador=dec_validada.operador,
-                    texto_final=dec_validada.texto_revisado,
+                    texto_final=minuta_int_editada,
                 )
                 st.session_state.rag_atendimento_resultado["status_operador"] = novo_status_op
                 st.success(f"Decisão '{novo_status_op.upper()}' registrada na auditoria com sucesso!")
