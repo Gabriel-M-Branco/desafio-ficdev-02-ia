@@ -1029,6 +1029,83 @@ elif menu.startswith("5."):
         st.dataframe(tabela_lgpd, width='stretch', hide_index=True)
 
     with t_logs:
+        st.markdown(
+            """<style>
+            /* Badges Destacados para Status de Decisão nos Expanders */
+            [data-testid="stExpander"] summary span[style*="green"],
+            [data-testid="stExpander"] summary span[style*="33, 195, 84"],
+            [data-testid="stExpander"] summary span[style*="21, 128, 61"],
+            [data-testid="stExpander"] summary span[style*="16a34a"] {
+                background-color: #16A34A !important;
+                color: #FFFFFF !important;
+                padding: 3px 12px !important;
+                border-radius: 12px !important;
+                font-weight: 800 !important;
+                font-size: 11px !important;
+                display: inline-block !important;
+                letter-spacing: 0.5px !important;
+                box-shadow: 0 1px 2px rgba(0,0,0,0.15) !important;
+            }
+            [data-testid="stExpander"] summary span[style*="red"],
+            [data-testid="stExpander"] summary span[style*="255, 43, 43"],
+            [data-testid="stExpander"] summary span[style*="220, 38, 38"],
+            [data-testid="stExpander"] summary span[style*="dc2626"] {
+                background-color: #DC2626 !important;
+                color: #FFFFFF !important;
+                padding: 3px 12px !important;
+                border-radius: 12px !important;
+                font-weight: 800 !important;
+                font-size: 11px !important;
+                display: inline-block !important;
+                letter-spacing: 0.5px !important;
+                box-shadow: 0 1px 2px rgba(0,0,0,0.15) !important;
+            }
+            [data-testid="stExpander"] summary span[style*="orange"],
+            [data-testid="stExpander"] summary span[style*="255, 170, 0"],
+            [data-testid="stExpander"] summary span[style*="217, 119, 6"],
+            [data-testid="stExpander"] summary span[style*="d97706"] {
+                background-color: #D97706 !important;
+                color: #FFFFFF !important;
+                padding: 3px 12px !important;
+                border-radius: 12px !important;
+                font-weight: 800 !important;
+                font-size: 11px !important;
+                display: inline-block !important;
+                letter-spacing: 0.5px !important;
+                box-shadow: 0 1px 2px rgba(0,0,0,0.15) !important;
+            }
+            [data-testid="stExpander"] summary span[style*="blue"],
+            [data-testid="stExpander"] summary span[style*="37, 99, 235"],
+            [data-testid="stExpander"] summary span[style*="0, 104, 201"],
+            [data-testid="stExpander"] summary span[style*="2563eb"] {
+                background-color: #2563EB !important;
+                color: #FFFFFF !important;
+                padding: 3px 12px !important;
+                border-radius: 12px !important;
+                font-weight: 800 !important;
+                font-size: 11px !important;
+                display: inline-block !important;
+                letter-spacing: 0.5px !important;
+                box-shadow: 0 1px 2px rgba(0,0,0,0.15) !important;
+            }
+            [data-testid="stExpander"] summary span[style*="gray"],
+            [data-testid="stExpander"] summary span[style*="grey"],
+            [data-testid="stExpander"] summary span[style*="128, 128, 128"],
+            [data-testid="stExpander"] summary span[style*="107, 114, 128"],
+            [data-testid="stExpander"] summary span[style*="6b7280"] {
+                background-color: #6B7280 !important;
+                color: #FFFFFF !important;
+                padding: 3px 12px !important;
+                border-radius: 12px !important;
+                font-weight: 800 !important;
+                font-size: 11px !important;
+                display: inline-block !important;
+                letter-spacing: 0.5px !important;
+                box-shadow: 0 1px 2px rgba(0,0,0,0.15) !important;
+            }
+            </style>""",
+            unsafe_allow_html=True
+        )
         c_topo1, c_topo2 = st.columns([1.2, 3])
         with c_topo1:
             if st.button("Atualizar Trilha de Auditoria", width='stretch'):
@@ -1164,57 +1241,73 @@ elif menu.startswith("5."):
 
                     st_u = str(status_raw).upper()
                     if st_u in ("APROVADO", "APROVADA"):
-                        tag_expander = ":green[● APROVADA]"
+                        bg_pill, txt_pill, borda_pill = "#16A34A", "#FFFFFF", "#15803D"
+                        label_curta = "APROVADA"
                         bg_cor, borda_cor, txt_cor = "#DCFCE7", "#16A34A", "#15803D"
                         label_banner = "DECISÃO HUMANA: APROVADA"
                     elif st_u in ("REJEITADO", "REJEITADA"):
-                        tag_expander = ":red[● REJEITADA]"
+                        bg_pill, txt_pill, borda_pill = "#DC2626", "#FFFFFF", "#B91C1C"
+                        label_curta = "REJEITADA"
                         bg_cor, borda_cor, txt_cor = "#FEE2E2", "#DC2626", "#B91C1C"
                         label_banner = "DECISÃO HUMANA: REJEITADA"
                     elif st_u in ("REVISAR", "REVISÃO"):
-                        tag_expander = ":blue[● REVISAR]"
+                        bg_pill, txt_pill, borda_pill = "#2563EB", "#FFFFFF", "#1D4ED8"
+                        label_curta = "REVISAR"
                         bg_cor, borda_cor, txt_cor = "#DBEAFE", "#2563EB", "#1D4ED8"
                         label_banner = "DECISÃO HUMANA: REVISÃO SOLICITADA"
                     elif st_u in ("NAO_APLICAVEL", "NÃO APLICÁVEL"):
-                        tag_expander = ":gray[● NÃO APLICÁVEL]"
+                        bg_pill, txt_pill, borda_pill = "#6B7280", "#FFFFFF", "#4B5563"
+                        label_curta = "NÃO APLICÁVEL"
                         bg_cor, borda_cor, txt_cor = "#F3F4F6", "#6B7280", "#374151"
                         label_banner = "DECISÃO HUMANA: NÃO APLICÁVEL (EXECUÇÃO TÉCNICA)"
                     else:
-                        tag_expander = ":orange[● PENDENTE DE REVISÃO]"
+                        bg_pill, txt_pill, borda_pill = "#D97706", "#FFFFFF", "#B45309"
+                        label_curta = "PENDENTE"
                         bg_cor, borda_cor, txt_cor = "#FEF3C7", "#D97706", "#B45309"
                         label_banner = "DECISÃO HUMANA: PENDENTE DE REVISÃO"
 
-                    titulo_exp = f"[{mod}] {exec_id} — Decisão: {tag_expander} ({dur:.2f}s) — {dt_formatada}"
-                    with st.expander(titulo_exp):
+                    with st.container(border=True):
+                        c_b, c_i, c_d = st.columns([1.6, 6.4, 2])
+                        with c_b:
+                            st.markdown(
+                                f'<div style="background-color:{bg_pill}; color:{txt_pill}; padding:4px 8px; border-radius:6px; font-weight:800; font-size:12px; text-align:center; letter-spacing:0.5px; border:1px solid {borda_pill};">{label_curta}</div>',
+                                unsafe_allow_html=True
+                            )
+                        with c_i:
+                            st.markdown(f"**[{mod}]** `{exec_id}` &nbsp;•&nbsp; <span style='color:#64748B; font-size:13px;'>{dt_formatada}</span>", unsafe_allow_html=True)
+                        with c_d:
+                            st.caption(f"Duração: **{dur:.2f}s**")
+
                         operador = dec.get("operador", "sistema") if isinstance(dec, dict) else "sistema"
                         data_dec = dec.get("data_decisao", dt_formatada) if isinstance(dec, dict) else dt_formatada
                         just = dec.get("justificativa", "Aguardando deliberação de servidor responsável.") if isinstance(dec, dict) else "Nenhuma"
 
-                        st.markdown(
-                            f"""<div style="background-color:{bg_cor}; border-left:5px solid {borda_cor}; padding:10px 14px; border-radius:4px; margin-bottom:12px;">
-                                <div style="font-size:13px; font-weight:800; color:{txt_cor}; letter-spacing:0.5px;">{label_banner}</div>
-                                <div style="font-size:12px; color:#374151; margin-top:4px;"><strong>Operador Responsável:</strong> {operador} &nbsp;|&nbsp; <strong>Data/Hora do Registro:</strong> {data_dec}</div>
-                                <div style="font-size:12px; color:#374151; margin-top:3px;"><strong>Justificativa Formal:</strong> {just}</div>
-                            </div>""",
-                            unsafe_allow_html=True
-                        )
+                        with st.expander("Ver Detalhes do Registro e Trilha Técnica"):
+                            st.markdown(
+                                f"""<div style="background-color:{bg_cor}; border-left:5px solid {borda_cor}; padding:10px 14px; border-radius:4px; margin-bottom:12px;">
+                                    <div style="font-size:13px; font-weight:800; color:{txt_cor}; letter-spacing:0.5px;">{label_banner}</div>
+                                    <div style="font-size:12px; color:#374151; margin-top:4px;"><strong>Operador Responsável:</strong> {operador} &nbsp;|&nbsp; <strong>Data/Hora do Registro:</strong> {data_dec}</div>
+                                    <div style="font-size:12px; color:#374151; margin-top:3px;"><strong>Justificativa Formal:</strong> {just}</div>
+                                </div>""",
+                                unsafe_allow_html=True
+                            )
 
-                        c_d1, c_d2 = st.columns(2)
-                        with c_d1:
-                            st.write(f"- **Origem:** `{reg.get('arquivo_origem', 'N/A')}`")
-                            st.write(f"- **Provedor:** `{reg.get('provedor', 'N/A')}`")
-                            st.write(f"- **Modelo IA:** `{reg.get('modelo', 'N/A')}`")
-                            st.write(f"- **Duração do Processamento:** `{dur:.3f} segundos`")
-                        with c_d2:
-                            st.write(f"- **Versão do Prompt:** `{reg.get('versao_prompt', 'N/A')}`")
-                            st.write(f"- **Versão do Esquema:** `{reg.get('versao_esquema', '2.0.0')}`")
-                            st.write(f"- **Versão do Índice Vetorial:** `{reg.get('versao_indice', 'N/A')}`")
-                            st.write(f"- **Data/Hora Completa:** `{ts_reg}`")
+                            c_d1, c_d2 = st.columns(2)
+                            with c_d1:
+                                st.write(f"- **Origem:** `{reg.get('arquivo_origem', 'N/A')}`")
+                                st.write(f"- **Provedor:** `{reg.get('provedor', 'N/A')}`")
+                                st.write(f"- **Modelo IA:** `{reg.get('modelo', 'N/A')}`")
+                                st.write(f"- **Duração:** `{dur:.3f} segundos`")
+                            with c_d2:
+                                st.write(f"- **Versão do Prompt:** `{reg.get('versao_prompt', 'N/A')}`")
+                                st.write(f"- **Versão do Esquema:** `{reg.get('versao_esquema', '2.0.0')}`")
+                                st.write(f"- **Versão do Índice Vetorial:** `{reg.get('versao_indice', 'N/A')}`")
+                                st.write(f"- **Data/Hora Completa:** `{ts_reg}`")
 
-                        if reg.get("ids_recuperados"):
-                            st.write(f"- **IDs Recuperados (RAG):** `{', '.join(reg['ids_recuperados'])}`")
-                        if reg.get("consulta"):
-                            st.info(f"**Consulta / Texto de Entrada:** {reg['consulta']}")
+                            if reg.get("ids_recuperados"):
+                                st.write(f"- **IDs Recuperados (RAG):** `{', '.join(reg['ids_recuperados'])}`")
+                            if reg.get("consulta"):
+                                st.info(f"**Consulta / Texto de Entrada:** {reg['consulta']}")
 
             # Abas de agrupamento por período
             aba_h, aba_sem, aba_ant, aba_all = st.tabs([
