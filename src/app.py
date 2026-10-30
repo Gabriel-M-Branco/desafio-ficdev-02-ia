@@ -592,7 +592,7 @@ st.markdown("")
 # MÓDULO 1: Central de Atendimento & HITL (RF03, RF05, RF07, RF09, RF13)
 # ==============================================================================
 if menu.startswith("1."):
-    st.subheader("1. Atendimento e redação de minuta")
+    st.subheader("1. Atendimento ao Cidadão e Redação de Minuta Oficial (RF01 a RF05, RF09)")
     st.markdown("Selecione um caso pré-definido ou insira o texto livre. A IA isola o conteúdo não confiável via envelope XML, extrai dados em JSON estrito e redige a minuta institucional.")
 
     col_in, col_out = st.columns([1, 1.3], gap="large")
@@ -961,7 +961,7 @@ if menu.startswith("1."):
 # MÓDULO 2: Experimento de Prompts (RF02)
 # ==============================================================================
 elif menu.startswith("2."):
-    st.subheader("2. Experimento de prompts (RF02)")
+    st.subheader("2. Experimento Comparativo de Prompts (Prompts A, B e C — RF02)")
     st.markdown("Comparativo empírico entre os Prompts A (Zero-Shot Curto), B (Estruturado Manual) e C (Metaprompting de Produção com Envelope XML).")
 
     if st.button("Executar Experimento de Prompts", type="primary"):
@@ -982,43 +982,35 @@ elif menu.startswith("2."):
 
     exp = st.session_state.experimento_resultado
     if not exp:
-        p_dir = resolver_caminho("prompts")
-        def ler_ref(nome):
-            p = p_dir / nome
-            return p.read_text(encoding="utf-8") if p.exists() else ""
-        exp = {
-            "prompt_a": {"texto": ler_ref("saida_prompt_a.txt"), "duracao": 25.72, "tokens": 842},
-            "prompt_b": {"texto": ler_ref("saida_prompt_b.txt"), "duracao": 15.24, "tokens": 612},
-            "prompt_c": {"texto": ler_ref("saida_prompt_c.txt"), "duracao": 15.42, "tokens": 689},
-        }
+        st.info("Nenhum experimento executado nesta sessão. Clique no botão 'Executar Experimento de Prompts' acima para submeter a entrada oficial aos Prompts A, B e C e visualizar os resultados em tempo real.")
+    else:
+        criterios = [
+            {"Critério de Avaliação": "Fidelidade ao Contexto", "Prompt A": "Média (resposta informal)", "Prompt B": "Alta (segue campos)", "Prompt C (Produção)": "Exige conferência documental"},
+            {"Critério de Avaliação": "Alucinação de Dados", "Prompt A": "Risco Alto (infere datas/valores)", "Prompt B": "Baixo Risco", "Prompt C (Produção)": "Zero ('não localizado')"},
+            {"Critério de Avaliação": "Formato de Saída", "Prompt A": "Texto livre sem padrão", "Prompt B": "Texto estruturado", "Prompt C (Produção)": "JSON estrito + Minuta"},
+            {"Critério de Avaliação": "Tom Institucional", "Prompt A": "Informal / Genérico", "Prompt B": "Formal GOV.MT", "Prompt C (Produção)": "Oficial Padrão GOV.MT"},
+            {"Critério de Avaliação": "Tratamento de Lacunas", "Prompt A": "Omissão", "Prompt B": "Aviso parcial", "Prompt C (Produção)": "Obrigatório 'não localizado'"},
+            {"Critério de Avaliação": "Blindagem Injection", "Prompt A": "Inexistente", "Prompt B": "Parcial", "Prompt C (Produção)": "Robusta (Envelope XML)"},
+            {"Critério de Avaliação": "Tempo e Tokens", "Prompt A": f"{exp['prompt_a']['duracao']:.2f}s ({exp['prompt_a']['tokens']} tok)", "Prompt B": f"{exp['prompt_b']['duracao']:.2f}s ({exp['prompt_b']['tokens']} tok)", "Prompt C (Produção)": f"{exp['prompt_c']['duracao']:.2f}s ({exp['prompt_c']['tokens']} tok)"},
+        ]
+        st.dataframe(criterios, width='stretch', hide_index=True)
 
-    criterios = [
-        {"Critério de Avaliação": "Fidelidade ao Contexto", "Prompt A": "Média (resposta informal)", "Prompt B": "Alta (segue campos)", "Prompt C (Produção)": "Exige conferência documental"},
-        {"Critério de Avaliação": "Alucinação de Dados", "Prompt A": "Risco Alto (infere datas/valores)", "Prompt B": "Baixo Risco", "Prompt C (Produção)": "Zero ('não localizado')"},
-        {"Critério de Avaliação": "Formato de Saída", "Prompt A": "Texto livre sem padrão", "Prompt B": "Texto estruturado", "Prompt C (Produção)": "JSON estrito + Minuta"},
-        {"Critério de Avaliação": "Tom Institucional", "Prompt A": "Informal / Genérico", "Prompt B": "Formal GOV.MT", "Prompt C (Produção)": "Oficial Padrão GOV.MT"},
-        {"Critério de Avaliação": "Tratamento de Lacunas", "Prompt A": "Omissão", "Prompt B": "Aviso parcial", "Prompt C (Produção)": "Obrigatório 'não localizado'"},
-        {"Critério de Avaliação": "Blindagem Injection", "Prompt A": "Inexistente", "Prompt B": "Parcial", "Prompt C (Produção)": "Robusta (Envelope XML)"},
-        {"Critério de Avaliação": "Tempo e Tokens", "Prompt A": f"{exp['prompt_a']['duracao']:.2f}s ({exp['prompt_a']['tokens']} tok)", "Prompt B": f"{exp['prompt_b']['duracao']:.2f}s ({exp['prompt_b']['tokens']} tok)", "Prompt C (Produção)": f"{exp['prompt_c']['duracao']:.2f}s ({exp['prompt_c']['tokens']} tok)"},
-    ]
-    st.dataframe(criterios, width='stretch', hide_index=True)
+        st.success("**Prompt selecionado:** Prompt C, com estrutura JSON e isolamento XML. A fidelidade dos dados e a resposta exigem conferência humana.")
 
-    st.success("**Prompt selecionado:** Prompt C, com estrutura JSON e isolamento XML. A fidelidade dos dados e a resposta exigem conferência humana.")
-
-    t1, t2, t3 = st.tabs(["Prompt A (Zero-Shot)", "Prompt B (Estruturado)", "Prompt C (Produção)"])
-    with t1:
-        st.text_area("Saída A:", value=exp["prompt_a"]["texto"], height=calcular_altura_dinamica(exp["prompt_a"]["texto"], min_height=100), disabled=True)
-    with t2:
-        st.text_area("Saída B:", value=exp["prompt_b"]["texto"], height=calcular_altura_dinamica(exp["prompt_b"]["texto"], min_height=100), disabled=True)
-    with t3:
-        st.text_area("Saída C:", value=exp["prompt_c"]["texto"], height=calcular_altura_dinamica(exp["prompt_c"]["texto"], min_height=100), disabled=True)
+        t1, t2, t3 = st.tabs(["Prompt A (Zero-Shot)", "Prompt B (Estruturado)", "Prompt C (Produção)"])
+        with t1:
+            st.text_area("Saída A:", value=exp["prompt_a"]["texto"], height=calcular_altura_dinamica(exp["prompt_a"]["texto"], min_height=100), disabled=True)
+        with t2:
+            st.text_area("Saída B:", value=exp["prompt_b"]["texto"], height=calcular_altura_dinamica(exp["prompt_b"]["texto"], min_height=100), disabled=True)
+        with t3:
+            st.text_area("Saída C:", value=exp["prompt_c"]["texto"], height=calcular_altura_dinamica(exp["prompt_c"]["texto"], min_height=100), disabled=True)
 
 
 # ==============================================================================
 # MÓDULO 3: Áudio STT & Visão OCR (RF06, RF08)
 # ==============================================================================
 elif menu.startswith("3."):
-    st.subheader("3. Áudio e leitura visual (RF06 / RF08)")
+    st.subheader("3. Áudio STT e Leitura Visual OCR (RF06 / RF08)")
     st.markdown("Transcreva áudios e leia documentos digitalizados. Confira os dados extraídos antes de encaminhar ao atendimento.")
 
     col_a, col_v = st.columns(2, gap="large")
@@ -1087,13 +1079,25 @@ elif menu.startswith("3."):
                     st.session_state.solicitacao_texto = txt_ocr
                     st.session_state.solicitacao_caso = "visao_documento"
                     st.success("Texto transferido para o Módulo 1!")
+            else:
+                cod_erro = res_v.get("codigo_erro", "")
+                msg_erro = res_v.get("erro", "Falha no processamento do OCR.")
+                if cod_erro == "ocr_indisponivel":
+                    st.warning(
+                        "Aviso: Tesseract OCR não foi encontrado no sistema ou o pacote de idioma 'por' está ausente. "
+                        "Como o motor local opera como fallback de último caso, para execução local instale o Tesseract-OCR "
+                        "e o arquivo por.traineddata (ou execute o sistema via Docker, onde o Tesseract já está pré-instalado "
+                        "e configurado). Alternativamente, configure as credenciais da OpenAI (GPT-4o Vision) ou OpenRouter no arquivo .env."
+                    )
+                else:
+                    st.error(f"Erro no processamento OCR: {msg_erro}")
 
 
 # ==============================================================================
 # MÓDULO 4: Comunicação Visual Oficial (RF10)
 # ==============================================================================
 elif menu.startswith("4."):
-    st.subheader("4. Comunicação visual institucional (RF10)")
+    st.subheader("4. Comunicação Visual Institucional Híbrida (RF10)")
     st.markdown("Abordagem híbrida: geração de ilustração sem texto por IA combinada com moldura timbrada oficial em Pillow (Brasão do Estado e tarja de proveniência de conteúdo sintético).")
 
     def _obter_ultima_imagem_existente():
@@ -1130,26 +1134,66 @@ elif menu.startswith("4."):
                 continue
         return None
 
-    if st.session_state.get("imagem_resultado") is None:
-        st.session_state.imagem_resultado = _obter_ultima_imagem_existente()
+    texto_padrao_orientacoes = (
+        "• INÍCIO DAS AULAS: 01 de Fevereiro de 2027 | Turno: Noturno (Carga Horária: 1.200h)\n"
+        "• DOCUMENTOS: Apresentar RG, CPF e Comprovante de Residência para validação definitiva\n"
+        "• FREQUÊNCIA: Presença obrigatória nos 10 primeiros dias letivos para garantia da vaga\n"
+        "• ATENDIMENTO: Secretaria Escolar da ETEC Cuiabá | Portal: seciteci.mt.gov.br"
+    )
 
-    c_btn1, c_btn2 = st.columns([1.2, 2])
-    with c_btn1:
-        if st.button("Gerar Comunicado Visual Oficial", type="primary", width='stretch'):
-            with st.spinner("Gerando ilustração sem texto por IA e aplicando moldura GOV.MT com Brasão..."):
-                res_img = image_generator.gerar_comunicado_oficial(audit_logger=audit_logger)
-                st.session_state.imagem_resultado = res_img
-                st.session_state.imagem_aprovada = False
-                if res_img.get("sucesso"):
-                    st.success("Nova peça institucional gerada com sucesso!")
-                else:
-                    st.error(f"Erro na geração da imagem: {res_img.get('erro', 'Falha no provedor de imagens.')}")
+    with st.container(border=True):
+        st.markdown("##### Configuração da Peça Gráfica e Conteúdo Textual")
+        col_t1, col_t2 = st.columns([1.5, 1], gap="medium")
+        with col_t1:
+            titulo_comunicado = st.text_input(
+                "Título do Comunicado Oficial:",
+                value="COMUNICADO OFICIAL: MATRÍCULAS E INGRESSO ETEC 2026",
+                key="input_titulo_comunicado"
+            )
+        with col_t2:
+            st.caption("Padrão institucional SECITECI-MT")
+            st.markdown("*A ilustração central é gerada sem texto por IA; os textos oficiais são renderizados via Pillow com Brasão oficial.*")
+
+        info_comunicado = st.text_area(
+            "Informações e Orientações (painel abaixo da ilustração na arte):",
+            value=texto_padrao_orientacoes,
+            height=110,
+            key="input_info_comunicado",
+            help="Orientações oficiais que constarão no painel inferior da arte institucional."
+        )
+
+        c_btn1, c_btn2 = st.columns([1.2, 2])
+        with c_btn1:
+            if st.button("Gerar Comunicado Visual Oficial", type="primary", width='stretch'):
+                with st.spinner("Gerando ilustração sem texto por IA e aplicando moldura GOV.MT com Brasão..."):
+                    linhas = [l.strip() for l in info_comunicado.strip().split("\n") if l.strip()]
+                    res_img = image_generator.gerar_comunicado_oficial(
+                        titulo=titulo_comunicado,
+                        orientacoes=linhas,
+                        audit_logger=audit_logger
+                    )
+                    st.session_state.imagem_resultado = res_img
+                    st.session_state.imagem_aprovada = False
+                    if res_img.get("sucesso"):
+                        st.success("Nova peça institucional gerada com sucesso!")
+                    else:
+                        st.error(f"Erro na geração da imagem: {res_img.get('erro', 'Falha no provedor de imagens.')}")
 
     img_dado = st.session_state.get("imagem_resultado")
     if img_dado and img_dado.get("sucesso"):
         c_v1, c_v2 = st.columns([1.2, 1], gap="large")
         with c_v1:
             st.image(img_dado["caminho_imagem"], caption="Peça Institucional Padronizada GOV.MT (RF10)", width='stretch')
+
+            # Campo de texto abaixo da imagem com as orientações (editável/copiável para publicação oficial)
+            st.text_area(
+                "Texto de Apoio / Legenda Oficial para Publicação:",
+                value=st.session_state.get("input_info_comunicado", texto_padrao_orientacoes),
+                height=110,
+                key="texto_abaixo_imagem",
+                help="Texto com as orientações oficiais para acompanhar a postagem nos canais institucionais."
+            )
+
             if os.path.exists(img_dado["caminho_imagem"]):
                 with open(img_dado["caminho_imagem"], "rb") as f_img:
                     st.download_button(
@@ -1230,14 +1274,14 @@ elif menu.startswith("4."):
     elif img_dado and not img_dado.get("sucesso"):
         st.error(f"Falha na geração da imagem: {img_dado.get('erro', 'Erro desconhecido.')}")
     else:
-        st.info("Clique em **Gerar Comunicado Visual Oficial** para criar a peça gráfica institucional.")
+        st.info("Nenhuma peça visual gerada nesta sessão. Configure as informações acima e clique em **Gerar Comunicado Visual Oficial** para criar a peça institucional.")
 
 
 # ==============================================================================
 # MÓDULO 5: Auditoria & LGPD (RF11, RF12, RF13, RF21)
 # ==============================================================================
 elif menu.startswith("5."):
-    st.subheader("5. Auditoria e conformidade LGPD (RF11 / RF12 / RF13 / RF21)")
+    st.subheader("5. Trilha de Auditoria, Segurança e Governança LGPD (RF11 a RF13, RF21)")
     st.markdown("Rastreabilidade de todas as chamadas de IA, versões de esquema/prompt/índice e decisões humanas tomadas pelos operadores.")
 
     t_lgpd, t_logs = st.tabs(["Relatório de Conformidade LGPD", "Histórico de Auditoria"])
@@ -1566,7 +1610,7 @@ elif menu.startswith("5."):
 # MÓDULO 6: Assistente de Documentos RAG e Atendimento Integrado (RF17 a RF21)
 # ==============================================================================
 elif menu.startswith("6."):
-    st.subheader("6. Assistente de documentos e atendimento integrado")
+    st.subheader("6. Assistente de Documentos Institucionais — RAG (RF18 a RF21)")
     st.caption("RAG · RF18 / RF19 / RF20 / RF21")
     st.markdown(
         "Consulta semântica fundamentada nos editais e retificações da ETEC/SECITECI-MT, com citações explícitas, "
@@ -1876,7 +1920,7 @@ elif menu.startswith("6."):
 # MÓDULO 7: Triagem & Ficha da Solicitação (RF14/RF15)
 # ==============================================================================
 elif menu.startswith("7."):
-    st.subheader("7. Triagem e ficha de compreensão (RF14 / RF15)")
+    st.subheader("7. Triagem e Ficha Estruturada da Solicitação (RF14 / RF15)")
     st.markdown("Informe a solicitação e confira o resumo, os dados extraídos e a triagem. A validação Pydantic separa os fatos do texto das informações inferidas.")
 
     p_sol = resolver_caminho("dados/solicitacoes/solicitacoes.json")
@@ -1954,7 +1998,7 @@ elif menu.startswith("7."):
 # MÓDULO 8: Painel de Sentimentos (RF22)
 # ==============================================================================
 elif menu.startswith("8."):
-    st.subheader("8. Painel de sentimentos (RF22)")
+    st.subheader("8. Painel Analítico de Avaliações e Sentimento do Cidadão (RF22)")
     st.markdown(
         "Avaliações positivas, negativas, neutras e indeterminadas, "
         "com filtros por categoria e período. As contagens são calculadas sem duplicar avaliações."
@@ -2097,7 +2141,7 @@ elif menu.startswith("8."):
 # MÓDULO 9: Gestão do Acervo e Expurgo Vetorial (RF24)
 # ==============================================================================
 elif menu.startswith("9."):
-    st.subheader("9. Gestão do acervo e expurgo (RF24)")
+    st.subheader("9. Gestão do Acervo, Governança e Expurgo Vetorial (RF17 / RF24)")
     st.markdown("Gerencie a seleção de documentos e sua recuperação. As fontes e evidências históricas são preservadas; a exclusão abaixo remove os vetores ativos.")
     arquivos_acervo = sorted(str(p) for p in resolver_caminho("dados/acervo").iterdir() if p.suffix.lower() in {".txt", ".pdf"})
     selecionados = st.multiselect("Documentos para recriar o índice:", arquivos_acervo, default=arquivos_acervo,
@@ -2157,7 +2201,7 @@ elif menu.startswith("9."):
 # MÓDULO 10: Matriz de Testes Automatizados T01 a T15 (RF23 / RF24)
 # ==============================================================================
 elif menu.startswith("10."):
-    st.subheader("10. Central de testes e verificação")
+    st.subheader("10. Central de Avaliação e Testes Automatizados (T01 a T15 — RF23 / RF24)")
     st.caption("Matriz T01–T15 · RF23 / RF24")
     st.markdown(
         "Ambiente interativo de execução de testes em tempo real: execute a matriz contratual de 15 cenários (`T01` a `T15`), "
@@ -2186,15 +2230,15 @@ elif menu.startswith("10."):
 
     # Painel de Disparo de Testes ao Vivo
     with st.container(border=True):
-        st.markdown("##### Executar testes")
+        st.markdown("##### Central de Disparo de Testes ao Vivo")
         col_ctrl1, col_ctrl2 = st.columns([1.2, 1.8], gap="medium")
 
         with col_ctrl1:
-            st.markdown("**Matriz completa — T01–T15**")
+            st.markdown("**Bateria Contratual Completa (T01 a T15):**")
             executar_todos = st.button("Executar Todos os Testes (T01 a T15) ao Vivo", type="primary", use_container_width=True)
 
         with col_ctrl2:
-            st.markdown("**Teste individual**")
+            st.markdown("**Execução de Teste Específico sob Demanda:**")
             col_sel, col_btn_ind = st.columns([2.5, 1.2])
             with col_sel:
                 teste_escolhido = st.selectbox(
@@ -2337,10 +2381,10 @@ elif menu.startswith("10."):
         st.divider()
 
         tab_t_cards, tab_t_pytest, tab_t_chunking, tab_t_raw = st.tabs([
-            "1. Resultados T01–T15",
-            "2. Execução pytest",
-            "3. Comparativo de chunking (RF18)",
-            "4. Evidências e JSON completo",
+            "1. Resultados da Matriz Contratual (T01 a T15)",
+            "2. Terminal Pytest Oficial (Execução em Tempo Real)",
+            "3. Comparativo Experimental de Chunking (RF18)",
+            "4. Relatório Estruturado e Evidências Fatuais (JSON)",
         ])
 
         with tab_t_cards:

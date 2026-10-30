@@ -1,39 +1,26 @@
 IDENTIFICADOR: DOC-SECITECI-003
-TITULO: Síntese didática adaptada da Retificação 06 - início das aulas
-VERSAO: 2.0
+TITULO: EDITAL RETIFICADOR Nº 06/2026/SECITECI-MT - ALTERAÇÃO PONTUAL DE CALENDÁRIO
+VERSAO: 1.2
 DATA_PUBLICACAO: 03/08/2026
-NATUREZA: ADAPTADO - não é reprodução oficial integral.
+AUTORIDADE: SECRETARIA DE ESTADO DE CIÊNCIA, TECNOLOGIA E INOVAÇÃO - SECITECI/MT
 
-Item 1.1: a data de início passa a 05 de outubro de 2026 somente nas 14 ofertas abaixo.
-ETEC Água Boa | Curso: Técnico em Agropecuária | Localidade: Santa Terezinha | Início das aulas: 05 de outubro de 2026 (05/10/2026).
+A SECRETARIA DE ESTADO DE CIÊNCIA, TECNOLOGIA E INOVAÇÃO DE MATO GROSSO – SECITECI/MT, no uso de suas atribuições legais e com fundamento no item 12.2, alínea 'b' do Edital nº 006/2026/SECITECI-MT;
 
-ETEC Barra do Garças | Curso: Técnico em Enfermagem | Localidade: Barra do Garças | Início das aulas: 05 de outubro de 2026 (05/10/2026).
+CONSIDERANDO a necessidade de adequação de infraestrutura predial e laboratorial em unidades e turmas específicas do interior e extensão;
 
-ETEC Cuiabá | Curso: Técnico em Agropecuária | Localidade: Mimoso | Início das aulas: 05 de outubro de 2026 (05/10/2026).
+RESOLVE:
 
-ETEC Cáceres | Curso: Técnico em Agronegócio | Localidade: Conquista D'Oeste | Início das aulas: 05 de outubro de 2026 (05/10/2026).
+1. DA ALTERAÇÃO DA DATA DE INÍCIO DAS AULAS (ESCOPO RESTRITO)
+1.1. Fica postergada para o dia 05 de outubro de 2026 a data de início das aulas exclusivamente para os seguintes cursos e localidades:
+  - ETEC Barra do Garças: Técnico em Enfermagem (Sede Barra do Garças)
+  - ETEC Água Boa: Técnico em Agropecuária (Santa Terezinha)
+  - ETEC Cuiabá: Técnico em Agropecuária (Turma Descentralizada do Distrito de Mimoso / Santo Antônio de Leverger)
+  - ETEC Cáceres: Técnico em Agronegócio (Turma de Conquista D'Oeste)
 
-ETEC Cáceres | Curso: Técnico em Administração | Localidade: Nova Lacerda | Início das aulas: 05 de outubro de 2026 (05/10/2026).
+1.2. A alteração estabelecida neste Edital Retificador aplica-se estritamente aos cursos e localidades individualizados no item 1.1.
+1.3. Para todos os demais cursos da rede ETEC do Estado de Mato Grosso abrangidos pelo Edital nº 006/2026 – incluindo os cursos da sede da ETEC Cuiabá (Técnico em Enfermagem e Técnico em Recursos Humanos) e da sede da ETEC Cáceres (Técnico em Enfermagem) –, permanecem integralmente vigentes as datas anteriormente fixadas, com início das aulas em 21 de julho de 2026.
+1.4. Distinção Institucional entre Escola Gestora e Local de Oferta:
+  A ETEC Cuiabá é a escola técnica certificadora e gestora administrativa, enquanto Mimoso é a comunidade/localidade de oferta descentralizada. A postergação para 05/10/2026 alcança somente os matriculados na turma descentralizada de Mimoso.
 
-ETEC Cáceres | Curso: Técnico em Agropecuária | Localidade: Porto Esperidião | Início das aulas: 05 de outubro de 2026 (05/10/2026).
-
-ETEC Cáceres | Curso: Técnico em Administração | Localidade: Salto do Céu | Início das aulas: 05 de outubro de 2026 (05/10/2026).
-
-ETEC Diamantino | Curso: Técnico em Mineração | Localidade: Nobres | Início das aulas: 05 de outubro de 2026 (05/10/2026).
-
-ETEC Diamantino | Curso: Técnico em Agroindústria | Localidade: Nova Marilândia | Início das aulas: 05 de outubro de 2026 (05/10/2026).
-
-ETEC Poxoréu | Curso: Técnico em Agropecuária | Localidade: Comunidade Aparecida do Leste | Início das aulas: 05 de outubro de 2026 (05/10/2026).
-
-ETEC Poxoréu | Curso: Técnico em Agropecuária | Localidade: Comunidade Paraíso do Leste | Início das aulas: 05 de outubro de 2026 (05/10/2026).
-
-ETEC Primavera do Leste | Curso: Técnico em Agropecuária | Localidade: Santo Antônio do Leste | Início das aulas: 05 de outubro de 2026 (05/10/2026).
-
-ETEC Rondonópolis | Curso: Técnico em Agronegócio | Localidade: Alto Araguaia | Início das aulas: 05 de outubro de 2026 (05/10/2026).
-
-ETEC Várzea Grande | Curso: Técnico em Mineração | Localidade: Poconé | Início das aulas: 05 de outubro de 2026 (05/10/2026).
-
-Item 1.3: os demais cursos mantêm o calendário anterior, conforme Retificação 05, p. 2.
-Curso: Técnico em Enfermagem | Localidade: Cuiabá (sede) | Início das aulas: 21 de julho de 2026 (21/07/2026); não incluído na exceção da Retificação 06.
-Curso: Técnico em Enfermagem | Localidade: Confresa | Início das aulas: 21 de julho de 2026 (21/07/2026); não incluído na exceção da Retificação 06.
-Item 2.1: a Retificação 06 não altera os demais prazos de inscrição e matrícula.
+2. DISPOSIÇÕES FINAIS
+2.1. Permanecem inalteradas todas as demais disposições do Edital nº 006/2026/SECITECI-MT e de suas retificações anteriores.

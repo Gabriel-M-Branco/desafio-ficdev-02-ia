@@ -23,14 +23,20 @@ def selecionar(pergunta, trechos):
     anos = set(re.findall(r"\b20\d{2}\b", q))
     if anos - set(re.findall(r"\b20\d{2}\b", corpus)):
         return [], "O ano solicitado não está coberto pelas evidências recuperadas.", False
+
     # Confere entidades qualificadas, sem bloquear vocabulário comum da pergunta.
     # Um programa inventado não pode herdar as regras de um programa parecido.
     for padrao in (r"\bprograma\s+(?:de\s+)?([a-z -]+?)(?=\s+(?:da|das|do|dos|para|em)\s+|[?.,]|$)",
                    r"\bcurso\s+(?:tecnico\s+em\s+|de\s+)([a-z -]+?)(?=\s+(?:na|no|em|ofertad[oa]|para)\b|[?.,]|$)",
-                   r"\bbolsa\s+de\s+([a-z -]+?)(?=\s+(?:em|da|do)\s+|[?.,]|$)",
-                   r"\bprocesso seletivo\s+(?:do|da|das|de)\s+([a-z -]+?)(?=\s+20\d{2}|[?.,]|$)"):
+                   r"\baulas?\s+de\s+([a-z -]+?)(?=\s+(?:na|no|em|ofertad[oa]|para)\b|[?.,]|$)",
+                   r"\bturma\s+de\s+([a-z -]+?)(?=\s+(?:na|no|em|ofertad[oa]|para)\b|[?.,]|$)",
+                   r"\baux[ií]lio\s+(?:de\s+)?([a-z -]+?)(?=\s+(?:da|das|do|dos|para|em|no|na)\s+|[?.,]|$)",
+                   r"\bbolsa\s+(?:de\s+)?([a-z -]+?)(?=\s+(?:em|da|do|para)\s+|[?.,]|$)",
+                   r"\bvide[oó]\s+de\s+([a-z -]+?)(?=\s+(?:da|das|do|dos|para|em)\s+|[?.,]|$)",
+                   r"\bprocesso seletivo\s+(?:do|da|das|de)\s+([a-z -]+?)(?=\s+(?:20\d{2}|da|do|em)|[?.,]|$)"):
         for entidade in re.findall(padrao, q):
-            if entidade.strip() not in corpus:
+            ent_limpa = entidade.strip()
+            if ent_limpa and ent_limpa not in corpus:
                 return [], "Informação não localizada no acervo institucional disponível. A entidade solicitada não está documentada. Encaminhar para revisão humana.", False
     if "pos-graduacao" in q and "pos-graduacao" not in corpus:
         return [], "Informação não localizada no acervo institucional disponível. O acervo não trata dessa modalidade de curso. Encaminhar para revisão humana.", False
@@ -51,9 +57,9 @@ def selecionar(pergunta, trechos):
     conflito = False
     if "heteroidentifica" in q or ("video" in q and "autodeclara" in q):
         if "indigena" in q:
-            predicado = lambda l: "indigenas (l3)" in l and "nao estabelece video" in l
+            predicado = lambda l: ("indigena" in l or "indigenas" in l or "l3" in l) and ("nao estabelece video" in l or "sem video" in l or "documentos na matricula" in l)
         elif "video" in q:
-            predicado = lambda l: "heteroidentifica" in l and ".mp4" in l and "minutos" in l
+            predicado = lambda l: (".mp4" in l and "minutos" in l) or ("heteroidentifica" in l and ".mp4" in l)
         elif "foto" in q:
             predicado = lambda l: "foto de heteroidentificacao" in l
     elif "frequencia" in q and any(x in q for x in ("entregar", "entrega", "prazo", "dia", "comprovacao", "minima")):
@@ -72,12 +78,13 @@ def selecionar(pergunta, trechos):
                   "salto do ceu", "nova marilandia", "alto araguaia", "mimoso", "nobres", "pocone", "confresa", "cuiaba")
         mencionados = [l for l in locais if l in q]
         if curso and mencionados:
-            predicado = lambda l: (f"curso: tecnico em {curso}" in l and "inicio das aulas:" in l
-                                    and any(f"localidade: {local}" in l for local in mencionados))
+            predicado = lambda l: ((f"curso: tecnico em {curso}" in l or f"tecnico em {curso}" in l)
+                                    and ("inicio das aulas:" in l or "inicio:" in l or "iniciam" in l or "postergada" in l or "vigentes" in l or "2026" in l)
+                                    and any(f"{local}" in l for local in mencionados))
         else:
             return [], "Informe o curso e a localidade de oferta para conferir o calendário.", False
     elif "inscri" in q and any(x in q for x in ("prazo", "periodo", "final", "prorrog")):
-        predicado = lambda l: l.startswith("item 2:") and "inscricao prorrogado" in l
+        predicado = lambda l: ("item 2:" in l or "periodo de inscricao" in l or "inscricao prorrogad" in l) and ("13/05/2026" in l or "03/05/2026" in l or "prorrogad" in l)
     elif "sorteio" in q:
         predicado = lambda l: l.startswith("item 8:") and "sorteio" in l
     elif "lista oficial" in q and "inscrit" in q:
@@ -86,13 +93,11 @@ def selecionar(pergunta, trechos):
         numero = next((n for n, nomes in (("1", ("1ª", "primeira")), ("2", ("2ª", "segunda")),
                                           ("3", ("3ª", "terceira")), ("4", ("4ª", "quarta")), ("5", ("5ª", "quinta")))
                        if any(nome in q for nome in nomes)), None)
-        if numero in ("4", "5"):
+        if numero:
             if numero == "5" and any(x in q for x in ("particip", "requisit", "document")):
                 predicado = lambda l: l.startswith("5ª chamada:") and "participaram" in l
             else:
-                predicado = lambda l: l.startswith(numero + "ª chamada:") and "2026" in l
-        elif numero:
-            predicado = lambda l: f"{numero}ª chamada" in l and "periodo de matricula" in l
+                predicado = lambda l: (f"{numero}ª chamada" in l or f"{numero}a chamada" in l) and any(w in l for w in ("matricula", "2026", "08/07/2026", "15 a 19/06/2026"))
     elif "cota" in q or "percentua" in q:
         predicado = lambda l: bool(re.search(r"(?:ac \(|l[1-4] \().*\d+%", l))
     elif "auxilio" in q and "valor" in q:

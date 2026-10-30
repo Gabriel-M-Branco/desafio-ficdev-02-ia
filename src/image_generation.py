@@ -422,7 +422,8 @@ class ImageGenerator:
                 "mensagem": mensagem[:1000] or f"Falha no provedor de imagens ({codigo})."}
 
     def montar_template_institucional(
-        self, ilustracao: Image.Image, titulo: str = "ORIENTAÇÃO SOBRE MATRÍCULAS E INGRESSO"
+        self, ilustracao: Image.Image, titulo: str = "ORIENTAÇÃO SOBRE MATRÍCULAS E INGRESSO",
+        orientacoes: Optional[List[str]] = None
     ) -> Image.Image:
         """
         Monta o template oficial do GOV.MT com cabeçalho, brasão oficial, título, moldura e tarja de proveniência (RF10).
@@ -466,10 +467,19 @@ class ImageGenerator:
         draw.rectangle([40, 970, 1040, 985], fill="#004A8F")
         self._texto(draw, (60, 953), "INFORMAÇÕES E ORIENTAÇÕES IMPORTANTES AO ESTUDANTE", "#FFFFFF", 17, 940)
 
-        self._texto(draw, (65, 1000), "• INÍCIO DAS AULAS: 01 de Fevereiro de 2027 | Turno: Noturno (Carga Horária: 1.200h)", "#1E293B", 17, 950)
-        self._texto(draw, (65, 1038), "• DOCUMENTOS: Apresentar RG, CPF e Comprovante de Residência para validação definitiva", "#1E293B", 17, 950)
-        self._texto(draw, (65, 1076), "• FREQUÊNCIA: Presença obrigatória nos 10 primeiros dias letivos para garantia da vaga", "#B91C1C", 17, 950)
-        self._texto(draw, (65, 1114), "• ATENDIMENTO: Secretaria Escolar da ETEC Cuiabá | Portal: seciteci.mt.gov.br", "#004A8F", 17, 950)
+        linhas_padrao = [
+            "• INÍCIO DAS AULAS: 01 de Fevereiro de 2027 | Turno: Noturno (Carga Horária: 1.200h)",
+            "• DOCUMENTOS: Apresentar RG, CPF e Comprovante de Residência para validação definitiva",
+            "• FREQUÊNCIA: Presença obrigatória nos 10 primeiros dias letivos para garantia da vaga",
+            "• ATENDIMENTO: Secretaria Escolar da ETEC Cuiabá | Portal: seciteci.mt.gov.br",
+        ]
+        linhas = [l for l in orientacoes if l.strip()] if orientacoes else linhas_padrao
+        cores = ["#1E293B", "#1E293B", "#B91C1C", "#004A8F"]
+        y_pos = 1000
+        for i, linha in enumerate(linhas[:4]):
+            cor = cores[i % len(cores)]
+            self._texto(draw, (65, y_pos), linha, cor, 17, 950)
+            y_pos += 38
         assunto = re.sub(r"^COMUNICADO OFICIAL:\s*", "", titulo, flags=re.IGNORECASE).strip()
         self._texto(draw, (60, 1152), f"ASSUNTO: {assunto}", self.cor_azul, 18, 960)
 
@@ -501,6 +511,7 @@ class ImageGenerator:
         titulo: str = "COMUNICADO OFICIAL: MATRÍCULAS E INGRESSO ETEC 2026",
         nome_arquivo: str = "comunicado_institucional_govmt.png",
         audit_logger=None,
+        orientacoes: Optional[List[str]] = None,
     ) -> Dict[str, Any]:
         """IA produz a arte; Pillow apenas compõe a peça. Erros são persistidos."""
         from src.audit import AuditLogger
@@ -542,7 +553,7 @@ class ImageGenerator:
             metadados.update(arquivo_arte_ia=caminho_relativo(caminho_arte),
                              dimensoes_arte=f"{arte.width}x{arte.height}",
                              sha256_arte_ia=hashlib.sha256(caminho_arte.read_bytes()).hexdigest())
-            peca = self.montar_template_institucional(arte, titulo)
+            peca = self.montar_template_institucional(arte, titulo, orientacoes=orientacoes)
             fonte_path = Path(self._fonte(22).path)
             metadados["composicao"] = {
                 "origem_textos": "Pillow / fonte TrueType Unicode; nunca renderizados pela IA",

@@ -11,14 +11,14 @@
 - **Operação sem Chave (`.env`):** Na ausência de chaves, o sistema não simula conexão externa; opera em modo local por regras determinísticas e adaptador simulado identificado (`RF21`).
 
 ### 2. Base de Conhecimento e RAG
-- **Acervo Delimitado:** O RAG consulta exclusivamente os 6 documentos institucionais fictícios indexados (`DOC-SECITECI-001` a `006`). Não há busca em fontes externas.
+- **Acervo Delimitado:** O RAG consulta exclusivamente os 7 documentos institucionais fictícios e adaptados indexados (`DOC-SECITECI-001` a `007`). Não há busca em fontes externas.
 - **Abstenção Obrigatória:** Se a evidência for insuficiente (`P6`, `P7`), o sistema declara a falta de dados e transfere a demanda para atendimento humano.
 - **Conflitos Normativos:** Havendo divergência entre normas (`P8`), o sistema não decide a prevalência; cita ambas as regras e solicita decisão de um servidor.
 
 ### 3. Guardrails e Parâmetros Operacionais
 - **Entrada Textual:** Máximo de 8.000 caracteres por solicitação.
 - **Arquivos:** Máximo de 10 MB nos formatos `.txt`, `.pdf`, `.png`, `.jpg`, `.jpeg`, `.mp3`, `.wav` e `.m4a`.
-- **Controle de Custo e Execução:** Limite de 8 chamadas a modelos por execução e até 2.048 tokens por chamada.
+- **Controle de Custo e Execução:** Limite de 3 chamadas a modelos por execução (`MAX_CHAMADAS_POR_EXECUCAO`), com até 2 tentativas no retry de esquema e teto de até 6.000 tokens globais por execução (`MAX_TOKENS_POR_EXECUCAO`), com saída de até 2.500 tokens configurada em `config.json`.
 - **Escopo e Segurança:** Bloqueio de temas fora do escopo educacional/institucional e neutralização de tentativas de injeção de instruções e exfiltração de chaves (`ADV-01` a `ADV-03`).
 
 ### 4. Governança e Autonomia
@@ -38,7 +38,7 @@
 | Área | Limitação | Mitigação Adotada |
 |---|---|---|
 | **Texto / LLM** | Sem LLM pesado local | Modo local determinístico explícito e chave configurável |
-| **RAG** | Acervo de 6 documentos | Citação estrita, abstenção declarada e detecção de conflitos |
+| **RAG** | Acervo de 7 documentos | Citação estrita, abstenção declarada e detecção de conflitos |
 | **Segurança** | Injeção e estouro de cota | Guardrails de tamanho, escopo e envelopes XML |
 | **Decisão** | Sem autoridade pública | Validação humana obrigatória (*Human-in-the-Loop*) |
 | **Dados** | Omissões pelo cidadão | Marcação de "não localizado", sem preenchimento fictício |

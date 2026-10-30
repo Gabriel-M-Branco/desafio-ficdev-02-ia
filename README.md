@@ -56,7 +56,7 @@ desafio-ficdev-02-ia/
 ├── config.json               # Caminhos, modelos, parâmetros RAG/chunking (v2.0.0)
 ├── dados/
 │   ├── originais/            # IMUTÁVEL: casos de texto, áudio, imagem, editais e brasão GOV.MT
-│   ├── acervo/               # 6 documentos institucionais fictícios (3 .txt + 3 .pdf) para RAG
+│   ├── acervo/               # 7 documentos institucionais fictícios/adaptados (4 .txt + 3 .pdf) para RAG
 │   ├── solicitacoes/         # 6 solicitações fictícias (4 completas, 1 incompleta, 1 ambígua)
 │   ├── avaliacoes/           # 12 avaliações de atendimento (3 pos, 3 neg, 3 neu, 3 indet)
 │   ├── gabaritos/            # Gabaritos oficiais para avaliação automatizada (D01 e D02)
@@ -89,7 +89,7 @@ desafio-ficdev-02-ia/
 │   ├── imagens/              # Comunicados oficiais gerados (.png e .json)
 │   ├── logs/                 # Trilha de auditoria estruturada (JSON e JSONL)
 │   └── metricas/             # Relatório consolidado da matriz T01 a T15 (relatorio_avaliacao_d02.json)
-├── testes/                   # Suíte de testes automatizados com pytest (316+ testes)
+├── testes/                   # Suíte de testes automatizados com pytest (346+ testes)
 └── documentacao/             # Relatório técnico, Matriz de Rastreabilidade, LGPD e registro de IA
 ```
 

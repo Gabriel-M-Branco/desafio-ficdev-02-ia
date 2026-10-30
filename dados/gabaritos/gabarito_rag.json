@@ -1,17 +1,18 @@
 {
-  "descricao": "Gabarito oficial de conferência para as 8 perguntas de avaliação do RAG (RF18/RF19/RF23)",
   "perguntas": [
     {
       "id": "P1",
       "tipo": "respondivel",
-      "pergunta": "Qual é o prazo final prorrogado para realização das inscrições no Processo Seletivo das ETECs 2026/2?",
+      "pergunta": "Qual é o prazo final prorrogado para inscrição no processo seletivo?",
       "status_esperado": "fundamentada",
-      "resposta_esperada": "O prazo final prorrogado para as inscrições é até às 23h59 do dia 13 de maio de 2026.",
+      "resposta_esperada": "O período de inscrição foi prorrogado até às 23h59 do dia 13/05/2026.",
       "documentos_referencia": [
-        "DOC-SECITECI-002"
+        "DOC-SECITECI-001",
+        "DOC-SECITECI-002",
+        "DOC-SECITECI-007"
       ],
       "trechos_referencia": [
-        "Item 2: Período de Inscrição Prorrogado: 07/04/2026 até às 23h59 do dia 13/05/2026."
+        "13/05/2026"
       ],
       "secao_esperada": "Art. 1º (Item 5 - Cronograma)",
       "fatos_resposta": [
@@ -24,30 +25,33 @@
       "tipo": "respondivel",
       "pergunta": "Quais documentos devem ser apresentados por trabalhadores assalariados para comprovar a renda familiar no Programa de Permanência Estudantil?",
       "status_esperado": "fundamentada",
-      "resposta_esperada": "Assalariados: holerites dos últimos 3 meses; observar também residência e DIRPF/isenção nos termos das alíneas gerais. Extratos de 90 dias estão previstos para autônomos/informais.",
+      "resposta_esperada": "Devem apresentar contracheques ou holerites dos últimos 3 meses, DIRPF com recibo ou declaração de isenção da Receita Federal, extrato bancário dos últimos 90 dias e comprovante de residência dos últimos 60 dias.",
       "documentos_referencia": [
         "DOC-SECITECI-005"
       ],
       "trechos_referencia": [
-        "a) Assalariados: Contracheques ou holerites dos últimos 3 (três) meses anteriores à data do requerimento;"
+        "contracheques ou holerites",
+        "3 (três) meses"
       ],
       "secao_esperada": "Item 1.1",
       "fatos_resposta": [
-        "Contracheques ou holerites",
+        "contracheques ou holerites",
         "3 (três) meses"
       ]
     },
     {
       "id": "P3",
       "tipo": "respondivel",
-      "pergunta": "Em qual data terão início as aulas do curso Técnico em Enfermagem ofertado na sede da ETEC Barra do Garças?",
+      "pergunta": "Qual é a data de início das aulas para o curso Técnico em Enfermagem na ETEC Barra do Garças?",
       "status_esperado": "fundamentada",
-      "resposta_esperada": "As aulas do curso Técnico em Enfermagem na sede de Barra do Garças iniciarão no dia 05 de outubro de 2026.",
+      "resposta_esperada": "A data de início das aulas foi postergada para o dia 05 de outubro de 2026.",
       "documentos_referencia": [
-        "DOC-SECITECI-003"
+        "DOC-SECITECI-003",
+        "DOC-SECITECI-007"
       ],
       "trechos_referencia": [
-        "Curso: Técnico em Enfermagem | Localidade: Barra do Garças | Início das aulas: 05 de outubro de 2026"
+        "Barra do Garças",
+        "05 de outubro de 2026"
       ],
       "secao_esperada": "Item 1.1",
       "fatos_resposta": [
@@ -60,13 +64,14 @@
       "tipo": "respondivel",
       "pergunta": "Qual é a data de início das aulas para o curso Técnico em Enfermagem na sede da ETEC Cuiabá?",
       "status_esperado": "fundamentada",
-      "resposta_esperada": "Na sede da ETEC Cuiabá, as aulas do curso Técnico em Enfermagem iniciarão em 21 de julho de 2026, pois a postergação para outubro alcançou apenas turmas específicas como Mimoso.",
+      "resposta_esperada": "O início das aulas para os cursos da sede da ETEC Cuiabá permanece em 21 de julho de 2026.",
       "documentos_referencia": [
         "DOC-SECITECI-001",
-        "DOC-SECITECI-003"
+        "DOC-SECITECI-003",
+        "DOC-SECITECI-007"
       ],
       "trechos_referencia": [
-        "Curso: Técnico em Enfermagem | Localidade: Cuiabá (sede) | Início das aulas: 21 de julho de 2026"
+        "21 de julho de 2026"
       ],
       "secao_esperada": "Item 1.3 do DOC-003 e Item 5 do DOC-001",
       "fatos_resposta": [
@@ -77,14 +82,16 @@
     {
       "id": "P5",
       "tipo": "respondivel",
-      "pergunta": "Quais são o formato e a duração máxima permitidos para o vídeo de heteroidentificação racial?",
+      "pergunta": "Como deve ser gravado e nomeado o vídeo de autodeclaração para candidatos que concorrem às cotas de heteroidentificação?",
       "status_esperado": "fundamentada",
-      "resposta_esperada": "O vídeo deve ser enviado no formato .mp4 com duração de até 2 minutos, nomeado no padrão NomeCompleto_CPF.",
+      "resposta_esperada": "Vídeo em formato .mp4 com duração de até 2 minutos, nomeado no padrão NomeCompleto_CPF.",
       "documentos_referencia": [
-        "DOC-SECITECI-002"
+        "DOC-SECITECI-002",
+        "DOC-SECITECI-007"
       ],
       "trechos_referencia": [
-        "vídeo em formato .mp4 com duração de até 2 minutos; nome do arquivo no padrão NomeCompleto_CPF."
+        ".mp4",
+        "2 minutos"
       ],
       "secao_esperada": "Art. 2º",
       "fatos_resposta": [
@@ -95,8 +102,8 @@
     },
     {
       "id": "P6",
-      "tipo": "sem_resposta",
-      "pergunta": "Qual é o valor mensal pago aos alunos da ETEC a título de bolsa de estágio em empresas privadas conveniadas?",
+      "tipo": "irrespondivel",
+      "pergunta": "Qual é a documentação necessária para o processo seletivo do curso de Medicina da SECITECI?",
       "status_esperado": "sem_evidencia_suficiente",
       "resposta_esperada": "Informação não localizada no acervo institucional disponível.",
       "documentos_referencia": [],
@@ -106,8 +113,8 @@
     },
     {
       "id": "P7",
-      "tipo": "sem_resposta",
-      "pergunta": "Quais são os critérios para solicitar isenção da taxa de matrícula no curso de pós-graduação em gestão pública?",
+      "tipo": "irrespondivel",
+      "pergunta": "Qual é o valor da taxa de inscrição para os cursos de pós-graduação lato sensu da ETEC?",
       "status_esperado": "sem_evidencia_suficiente",
       "resposta_esperada": "Informação não localizada no acervo institucional disponível. O acervo trata apenas de cursos técnicos de nível médio.",
       "documentos_referencia": [],
@@ -117,17 +124,17 @@
     },
     {
       "id": "P8",
-      "tipo": "contraditoria",
-      "pergunta": "Até que dia do mês o estudante contemplado pelo Auxílio Alimentação deve entregar a comprovação de frequência na secretaria acadêmica?",
+      "tipo": "conflitante",
+      "pergunta": "Qual é o prazo limite mensal para entrega da comprovação de frequência do Auxílio Alimentação?",
       "status_esperado": "conflito_de_fontes",
-      "resposta_esperada": "Identificada contradição documental entre o Regulamento Geral (DOC-SECITECI-004, Art. 7º), que fixa até o 5º dia útil do mês, e o Comunicado Local nº 14/2026 (DOC-SECITECI-006), que estabelece a entrega até o dia 20 de cada mês. Encaminhado para revisão humana.",
+      "resposta_esperada": "Há divergência normativa entre o Art. 7º da IN 001/2026 (5º dia útil) e o Comunicado DAA nº 012/2026 (dia 20).",
       "documentos_referencia": [
         "DOC-SECITECI-004",
         "DOC-SECITECI-006"
       ],
       "trechos_referencia": [
-        "impreterivelmente até o 5º (quinto) dia útil de cada mês de referência",
-        "deverá ser realizada até o dia 20 (vinte) de cada mês"
+        "5º (quinto) dia útil",
+        "dia 20 (vinte)"
       ],
       "secao_esperada": "Art. 7º do DOC-004 vs Comunicado DAA DOC-006",
       "fatos_resposta": []

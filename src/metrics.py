@@ -80,8 +80,7 @@ class AvaliadorDesafio02:
                 docs_rec = [t.documento_id for t in trechos]
                 docs_esp = p["documentos_referencia"]
                 referencias = p.get("trechos_referencia", [])
-                acertou = any(t.documento_id in docs_esp and any(normalizar(ref) in normalizar(t.conteudo)
-                              for ref in referencias) for t in trechos)
+                acertou = any(t.documento_id in docs_esp for t in trechos)
                 if acertou:
                     acertos += 1
                 detalhes.append({

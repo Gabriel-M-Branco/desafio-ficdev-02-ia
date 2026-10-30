@@ -40,7 +40,7 @@ desafio-ficdev-02-ia/
 ├── config.json
 ├── dados/
 │   ├── originais/        # IMUTÁVEL: casos D01 (texto, áudio, imagem, injection, logo) e editais/
-│   ├── acervo/           # 6 documentos institucionais fictícios (DOC-SECITECI-001 a 006 em .txt/.pdf)
+│   ├── acervo/           # 7 documentos institucionais fictícios/adaptados (DOC-SECITECI-001 a 007 em .txt/.pdf)
 │   ├── solicitacoes/     # 6 solicitações fictícias (4 completas, 1 incompleta, 1 ambígua)
 │   ├── avaliacoes/       # 12 avaliações de atendimento (positivas, negativas, neutras, ambíguas)
 │   ├── gabaritos/        # Gabaritos oficiais D01 e D02 (texto, áudio, visão, solicitações, RAG, sentimento, adversarial)
