@@ -29,7 +29,7 @@ No processo de desenvolvimento assistido dos Desafios Práticos 01 e 02, foram u
   - `openai/whisper-large-v3-turbo` / `faster-whisper` para transcrição de fala (STT);
   - `black-forest-labs/FLUX.1-schnell` + `Pillow` para geração híbrida de peça visual institucional;
   - `edge-tts` (`pt-BR-AntonioNeural`) e `SAPI5` para síntese de voz acessível condicionada à aprovação humana.
-- **Stack de Dados, Validação, RAG e Testes:** Python 3.11+, Streamlit, FastAPI, Pydantic v2, scikit-learn, PyMuPDF, Tesseract OCR, Pytest (316+ testes automatizados).
+- **Stack de Dados, Validação, RAG e Testes:** Python 3.11+, Streamlit, FastAPI, Pydantic v2, scikit-learn, PyMuPDF, Tesseract OCR, Pytest (351 testes automatizados).
 
 ---
 
@@ -37,7 +37,7 @@ No processo de desenvolvimento assistido dos Desafios Práticos 01 e 02, foram u
 
 ### Solicitação 1: Auditoria de Artefatos e Correção de Truncamento em PDFs do Acervo (`RF17`, `RF18`)
 * **Contexto:** Durante a auditoria técnica inicial do Desafio 02, identificou-se que os PDFs gerados em `dados/acervo/` (`DOC-SECITECI-002`, `004` e `006`) haviam sido criados com `page.insert_text` sem quebra automática de linha, truncando horizontalmente prazos e regras críticas.
-* **Solução Implementada e Validada:** Regeneração controlada dos 3 PDFs em `dados/acervo/` utilizando `page.insert_textbox` no `PyMuPDF` (preservando `dados/originais/` 100% intocado) e reconstrução completa de `indice/indice_vetorial.json` com 49 fragmentos íntegros.
+* **Solução Implementada e Validada:** Regeneração controlada dos 3 PDFs em `dados/acervo/` utilizando `page.insert_textbox` no `PyMuPDF` (preservando `dados/originais/` 100% intocado) e reconstrução completa de `indice/indice_vetorial.json` com 66 fragmentos íntegros (Config A) e 32 fragmentos (Config B).
 
 ### Solicitação 2: Contratos Pydantic v2 Estritos e Separação Literal vs. Inferido (`RF14`, `RF15`)
 * **Contexto:** Necessidade de impedir chaves extras inventadas pelo modelo, validar coerência factual com o texto da solicitação e separar o que foi extraído literalmente do que foi inferido pela triagem.
@@ -52,7 +52,7 @@ No processo de desenvolvimento assistido dos Desafios Práticos 01 e 02, foram u
 ## 3. Forma de Validação do Código e dos Artefatos Gerados
 
 1. **Matriz Automatizada `T01` a `T15` (`python -m src.metrics`):** 15/15 testes aprovados, validando extração estruturada, sumarização, guardrails, deduplicação vetorial, comparativo de chunking (`Config A` vs `Config B`), RAG respondível/abstenção/conflito, atendimento integrado, troca de provedor sem reindexar, sentimentos, expurgo de documento e ausência de regressão.
-2. **Suíte Completa `pytest testes/ -v`:** Mais de 315 testes automatizados cobrindo todos os requisitos `RF01` a `RF24`.
+2. **Suíte Completa `pytest testes/ -v`:** Mais de 350 testes automatizados (351 aprovados) cobrindo todos os requisitos `RF01` a `RF24`.
 
 ---
 

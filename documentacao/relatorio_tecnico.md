@@ -1,8 +1,9 @@
 # Relatório Técnico — Central Inteligente de Atendimento e Consulta Institucional (GOV.MT)
 
-> **Atualização após auditoria:** as afirmações e taxas abaixo pertencem ao relatório
-> anterior. O comportamento corrigido, suas limitações e as evidências atuais estão
-> em [CORRECOES_D02.md](CORRECOES_D02.md) e em `evidencias/validacao_d02.json`.
+> **Versão Consolidada Pós-Auditoria:** Este relatório reflete integralmente a arquitetura,
+> as medições empíricas e os artefatos vigentes da versão 2.0.0. O histórico de conformidade e
+> decisões técnicas encontram-se documentados em [CORRECOES_D02.md](CORRECOES_D02.md) e comprovados
+> em `evidencias/validacao_d02.json`.
 
 **Programa:** FIC_DEV — Programador de Sistemas com IA (2026)  
 **Projeto:** Desafios Práticos 01 (`RF01–RF13`) e 02 (`RF14–RF24`) — Central Inteligente de Atendimento e Consulta Institucional  
@@ -16,7 +17,7 @@
 O sistema evoluiu de uma central multimodal de triagem (Desafio 01) para uma **Central Integrada de Atendimento, Extração Estruturada Validada, Consulta Documental Fundamentada (RAG) e Análise de Sentimentos** (Desafio 02), tendo o **Streamlit (`src/app.py`)** como única interface oficial consolidada.
 
 ### Princípios Arquiteturais Centrais:
-1. **Interface Oficial Única em Streamlit (`RF20`):** Consolida todos os 9 módulos operacionais em uma única experiência interativa para o servidor público, eliminando interfaces paralelas legadas.
+1. **Interface Oficial Única em Streamlit (`RF20`):** Consolida todos os 10 módulos operacionais em uma única experiência interativa para o servidor público, eliminando interfaces paralelas legadas.
 2. **Contratos de Dados Estritos com Pydantic v2 (`RF14`, `RF15`):** Todos os modelos (`ExtracaoFicha`, `TrechoRecuperado`, `RespostaRAG`, `ClassificacaoSentimento`, `DecisaoOperador`) utilizam `ConfigDict(extra="forbid")`, representam ausências como `null` no schema (convertendo para `"não localizado"` na camada de apresentação), validam coerência factual contra o texto de origem e separam **extração literal** de **informação inferida**.
 3. **RAG Fundamentado com Precedência e Detecção de Conflitos (`RF17`, `RF18`, `RF19`):** Indexação persistente de 7 documentos institucionais (`4 .txt` e `3 .pdf` em `dados/acervo/`, contemplando os 6 documentos originais mais o edital retificador consolidado `DOC-SECITECI-007`), recuperação híbrida (`tfidf-bm25-hibrido-pt`) `top-k` com similaridade e distância, sanitização contra injeção indireta no corpus (`ADV-02`), citação obrigatória de metadados e separação explícita entre fatos relatados pelo cidadão e regras do acervo na geração de minutas.
 4. **Provedores de IA Configuráveis sem Reconstrução do Índice (`RF04`, `RF21`):** Suporte a `OpenAI API` (`gpt-4o-mini`), `OpenRouter API`, `Hugging Face Serverless API` e `Adaptador Simulado Identificado` (`adaptador_simulado`), permitindo alternar a camada de geração preservando intacta a base vetorial (`indice/indice_vetorial.json`).

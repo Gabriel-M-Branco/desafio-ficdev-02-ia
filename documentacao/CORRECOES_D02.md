@@ -18,7 +18,7 @@ descrevem execuções históricas; não demonstram aprovação da versão atual.
   As chamadas reais e a qualidade de provedores externos não foram certificadas.
 - Simulação: a segunda configuração continua explicitamente identificada; sua
   resposta institucional usa seleção extrativa local, sem alegar qualidade de LLM.
-- Fontes: DOC-001/002/003 são adaptações didáticas; DOC-004/005/006 são fictícios.
+- Fontes: DOC-001/002/003/007 são adaptações didáticas e retificações; DOC-004/005/006 são fictícios.
   As citações mostram natureza, origem, página da adaptação e identificador do
   trecho. A adaptação não é apresentada como cópia integral do original.
 - DOC-002 separa referências às Retificações 03, 04 e 05, corrige calendário e
