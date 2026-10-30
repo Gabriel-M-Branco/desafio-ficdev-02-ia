@@ -1,5 +1,9 @@
 # Relatório Técnico — Central Inteligente de Atendimento e Consulta Institucional (GOV.MT)
 
+> **Atualização após auditoria:** as afirmações e taxas abaixo pertencem ao relatório
+> anterior. O comportamento corrigido, suas limitações e as evidências atuais estão
+> em [CORRECOES_D02.md](CORRECOES_D02.md) e em `evidencias/validacao_d02.json`.
+
 **Programa:** FIC_DEV — Programador de Sistemas com IA (2026)  
 **Projeto:** Desafios Práticos 01 (`RF01–RF13`) e 02 (`RF14–RF24`) — Central Inteligente de Atendimento e Consulta Institucional  
 **Órgão Atendido (Fictício):** Governo do Estado de Mato Grosso / SECITECI-MT / ETEC Cuiabá  
@@ -14,7 +18,7 @@ O sistema evoluiu de uma central multimodal de triagem (Desafio 01) para uma **C
 ### Princípios Arquiteturais Centrais:
 1. **Interface Oficial Única em Streamlit (`RF20`):** Consolida todos os 9 módulos operacionais em uma única experiência interativa para o servidor público, eliminando interfaces paralelas legadas.
 2. **Contratos de Dados Estritos com Pydantic v2 (`RF14`, `RF15`):** Todos os modelos (`ExtracaoFicha`, `TrechoRecuperado`, `RespostaRAG`, `ClassificacaoSentimento`, `DecisaoOperador`) utilizam `ConfigDict(extra="forbid")`, representam ausências como `null` no schema (convertendo para `"não localizado"` na camada de apresentação), validam coerência factual contra o texto de origem e separam **extração literal** de **informação inferida**.
-3. **RAG Fundamentado com Precedência e Detecção de Conflitos (`RF17`, `RF18`, `RF19`):** Indexação persistente de 6 documentos institucionais (`3 .txt` e `3 .pdf` em `dados/acervo/`), recuperação `top-k` com similaridade e distância, sanitização contra injeção indireta no corpus (`ADV-02`), citação obrigatória de metadados e separação explícita entre fatos relatados pelo cidadão e regras do acervo na geração de minutas.
+3. **RAG Fundamentado com Precedência e Detecção de Conflitos (`RF17`, `RF18`, `RF19`):** Indexação persistente de 7 documentos institucionais (`4 .txt` e `3 .pdf` em `dados/acervo/`, contemplando os 6 documentos originais mais o edital retificador consolidado `DOC-SECITECI-007`), recuperação híbrida (`tfidf-bm25-hibrido-pt`) `top-k` com similaridade e distância, sanitização contra injeção indireta no corpus (`ADV-02`), citação obrigatória de metadados e separação explícita entre fatos relatados pelo cidadão e regras do acervo na geração de minutas.
 4. **Provedores de IA Configuráveis sem Reconstrução do Índice (`RF04`, `RF21`):** Suporte a `OpenAI API` (`gpt-4o-mini`), `OpenRouter API`, `Hugging Face Serverless API` e `Adaptador Simulado Identificado` (`adaptador_simulado`), permitindo alternar a camada de geração preservando intacta a base vetorial (`indice/indice_vetorial.json`).
 5. **Governança Humana (*Human-in-the-Loop*) e LGPD (`RF11`–`RF13`, `RF21`, `RF24`):** Nenhuma resposta oficial, síntese de áudio (`RF07`) ou peça visual (`RF10`) é publicada sem aprovação humana justificada e auditada, com mascaramento automático de CPF, e-mail e chaves de API nos logs e suporte a expurgo demonstrável de documentos do índice vetorial.
 
@@ -22,12 +26,12 @@ O sistema evoluiu de uma central multimodal de triagem (Desafio 01) para uma **C
 
 ## 2. Experimento Comparativo de Chunking e Recuperação (`RF18` / `T07`)
 
-Foram avaliadas duas configurações distintas de segmentação documental sobre os mesmos 6 documentos do acervo (`DOC-SECITECI-001` a `DOC-SECITECI-006`), mantendo fixos o modelo vetorial (`tfidf-dense-pt`, dimensão `512`) e `top_k = 3`:
+Foram avaliadas duas configurações distintas de segmentação documental sobre os 7 documentos do acervo (`DOC-SECITECI-001` a `DOC-SECITECI-007`), utilizando o modelo vetorial híbrido (`tfidf-bm25-hibrido-pt`) e `top_k = 3`:
 
 | Configuração | Tamanho do Chunk | Sobreposição (Overlap) | Total de Chunks Gerados | Acerto Top-3 (`P1` a `P5`) | Taxa de Acerto |
 |---|---|---|---|---|---|
-| **Configuração A (Adotada)** | `400` caracteres | `80` caracteres | `49` fragmentos | `5 / 5` | **100.0%** |
-| **Configuração B (Comparativa)** | `800` caracteres | `150` caracteres | `24` fragmentos | `5 / 5` | **100.0%** |
+| **Configuração A (Adotada)** | `400` caracteres | `80` caracteres | `66` fragmentos | `5 / 5` | **100.0%** |
+| **Configuração B (Comparativa)** | `800` caracteres | `150` caracteres | `32` fragmentos | `5 / 5` | **100.0%** |
 
 **Justificativa Técnica da Escolha (`Configuração A`):** A Configuração A (`400` caracteres com sobreposição de `80`) isola com maior precisão artigos normativos individuais (como o Art. 2º do `DOC-SECITECI-002` sobre o formato `.mp4` e duração de até 2 minutos do vídeo de heteroidentificação, e o Art. 7º do `DOC-SECITECI-004` sobre o 5º dia útil), reduzindo o ruído lexical nas citações apresentadas ao operador humano e mantendo 100% de revocação no `top-3`.
 
@@ -65,7 +69,7 @@ A execução automatizada (`python -m src.metrics` e `pytest testes/ -v`) compro
 
 A seleção de modelos e a arquitetura de inferência encontram-se integralmente detalhadas em [JUSTIFICATIVA_MODELOS_E_CUSTOS.md](JUSTIFICATIVA_MODELOS_E_CUSTOS.md), pautadas em eficiência orçamentária para o serviço público estadual:
 - **Camada Textual e RAG:** Adoção de `gpt-4o-mini` como modelo comercial padrão (~US$ 0,15/1M input tokens e US$ 0,60/1M output tokens), com suporte a `Qwen2.5-72B` (open-weights) e adaptador simulado local identificado para testes sem custo de API (`T12`).
-- **Base Vetorial Soberana:** TF-IDF denso de 512 dimensões com persistência JSON local, eliminando tarifas recorrentes de APIs de embedding e desacoplando o índice do provedor LLM (`RF21`).
+- **Base Vetorial Soberana:** Busca híbrida TF-IDF denso + BM25 (`tfidf-bm25-hibrido-pt`) com persistência JSON local, eliminando tarifas recorrentes de APIs de embedding e desacoplando o índice do provedor LLM (`RF21`).
 - **Multimodalidade Híbrida e Soberana:** Visão de alta fidelidade via `gpt-4o` Vision com fallback para `Tesseract` e `PyMuPDF` local; transcrição de voz com `whisper-1` ou `faster-whisper` local em CPU; síntese acessível com trava humana prévia; e geração híbrida de artes institucionais (`FLUX` ou `DALL-E` para ilustração central + `Pillow` para diagramação oficial do GOV.MT).
 - **Projeção Orçamentária:** A simulação de 1.000 atendimentos mensais projeta custo entre R$ 12,50 e R$ 30,00 na modalidade comercial, ou R$ 0,00 na modalidade totalmente local/soberana.
 

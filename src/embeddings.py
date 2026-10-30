@@ -1,13 +1,15 @@
 """
 embeddings.py - Base Vetorial Persistente, Similaridade e Exclusão (RF17/RF18/RF21)
 Central Inteligente de Atendimento - GOV.MT / SECITECI-MT
-Implementa índice vetorial persistente em disco com metadados, versão do índice,
-deduplicação na reindexação, busca top-k explicada e exclusão por id_documento.
+Implementa índice vetorial híbrido persistente em disco com metadados, versão do índice,
+deduplicação na reindexação, busca híbrida explicada (TF-IDF denso + BM25 léxico) e exclusão por id_documento.
 """
 
 import os
+import re
 import json
 import hashlib
+import collections
 import numpy as np
 from typing import List, Dict, Any, Optional
 from sklearn.feature_extraction.text import TfidfVectorizer
@@ -20,12 +22,12 @@ CAMINHO_INDICE_PADRAO = "indice/indice_vetorial.json"
 
 
 class IndiceVetorial:
-    """Índice vetorial persistente com suporte a metadados, deduplicação e exclusão."""
+    """Índice vetorial persistente híbrido com suporte a metadados, deduplicação e exclusão."""
 
     def __init__(
         self,
         caminho_indice: Optional[str] = CAMINHO_INDICE_PADRAO,
-        nome_modelo: str = "tfidf-dense-pt",
+        nome_modelo: str = "tfidf-bm25-hibrido-pt",
         dimensao: int = 512,
         persistir: bool = True,
     ):
@@ -37,6 +39,11 @@ class IndiceVetorial:
         self.chunks: List[Dict[str, Any]] = []
         self.vectorizer: Optional[TfidfVectorizer] = None
         self.matriz_vetores: Optional[np.ndarray] = None
+        self.doc_tokens: List[List[str]] = []
+        self.doc_lens: List[int] = []
+        self.avg_doc_len: float = 0.0
+        self.doc_term_freqs: List[Dict[str, int]] = []
+        self.doc_freqs: Dict[str, int] = collections.defaultdict(int)
 
         if self.persistir and self.caminho_indice:
             os.makedirs(os.path.dirname(self.caminho_indice) or ".", exist_ok=True)
@@ -71,11 +78,16 @@ class IndiceVetorial:
         return adicionados
 
     def _reconstruir_matriz(self) -> None:
-        """Reconstrói a matriz vetorial e o modelo de embedding a partir dos chunks atuais."""
+        """Reconstrói a matriz vetorial e o modelo híbrido (TF-IDF denso + BM25 léxico) a partir dos chunks atuais."""
         self._atualizar_versao_indice()
         if not self.chunks:
             self.vectorizer = None
             self.matriz_vetores = None
+            self.doc_tokens = []
+            self.doc_lens = []
+            self.avg_doc_len = 0.0
+            self.doc_term_freqs = []
+            self.doc_freqs = collections.defaultdict(int)
             return
 
         textos = [c["conteudo"] for c in self.chunks]
@@ -86,30 +98,76 @@ class IndiceVetorial:
         )
         self.matriz_vetores = self.vectorizer.fit_transform(textos).toarray()
 
+        # Configuração do Modelo BM25 Léxico Estrito
+        self.doc_tokens = [re.findall(r"\b[a-záéíóúâêôãõç0-9]{3,}\b", c["conteudo"].lower()) for c in self.chunks]
+        self.doc_lens = [len(toks) for toks in self.doc_tokens]
+        self.avg_doc_len = sum(self.doc_lens) / max(1, len(self.doc_lens))
+        self.doc_term_freqs = [collections.Counter(toks) for toks in self.doc_tokens]
+        self.doc_freqs = collections.defaultdict(int)
+        for tf in self.doc_term_freqs:
+            for term in tf:
+                self.doc_freqs[term] += 1
+
     def buscar_top_k(self, consulta: str, top_k: int = 3, limiar_minimo: float = 0.05) -> List[TrechoRecuperado]:
         """
-        Executa busca por similaridade de cosseno top-k com re-ranking lexical para termos normativos.
+        Executa busca híbrida (TF-IDF denso + BM25 léxico estrito) top-k com re-ranking lexical.
+        Penaliza chunks que não contêm os termos específicos da consulta para mitigar alucinações.
         Retorna trechos com score de similaridade e distância (1 - similaridade).
         """
         if not self.chunks or self.vectorizer is None or self.matriz_vetores is None:
             return []
 
-        import re
         vetor_consulta = self.vectorizer.transform([consulta]).toarray()
         similaridades = cosine_similarity(vetor_consulta, self.matriz_vetores)[0]
 
+        # Cálculo do BM25 Léxico Estrito
+        k1 = 1.5
+        b = 0.75
+        N = len(self.chunks)
+        tokens_consulta = re.findall(r"\b[a-záéíóúâêôãõç0-9]{3,}\b", consulta.lower())
+        bm25_scores = np.zeros(N)
+        doc_freqs = getattr(self, "doc_freqs", {})
+        doc_term_freqs = getattr(self, "doc_term_freqs", [])
+        doc_lens = getattr(self, "doc_lens", [1] * N)
+        avg_doc_len = getattr(self, "avg_doc_len", 1.0)
+
+        for t in tokens_consulta:
+            df = doc_freqs.get(t, 0)
+            if df > 0:
+                idf = np.log((N - df + 0.5) / (df + 0.5) + 1.0)
+                for idx_chk in range(N):
+                    freq = doc_term_freqs[idx_chk].get(t, 0) if idx_chk < len(doc_term_freqs) else 0
+                    if freq > 0:
+                        denom = freq + k1 * (1.0 - b + b * (doc_lens[idx_chk] / max(1.0, avg_doc_len)))
+                        bm25_scores[idx_chk] += idf * (freq * (k1 + 1.0)) / denom
+
+        max_bm25 = float(np.max(bm25_scores)) if len(bm25_scores) > 0 and np.max(bm25_scores) > 0 else 1.0
+        bm25_norm = bm25_scores / max_bm25
+
         termos_consulta = set(re.findall(r"\b[a-záéíóúâêôãõç]{4,}\b", consulta.lower()))
         scores_ponderados = []
-        for idx_chk, sim in enumerate(similaridades):
+        for idx_chk in range(N):
+            sim = float(similaridades[idx_chk])
+            bm25_s = float(bm25_norm[idx_chk])
             texto_lower = self.chunks[idx_chk]["conteudo"].lower()
             bonus = 0.0
+            termos_encontrados = 0
             for t in termos_consulta:
                 raiz = t[:7] if len(t) >= 7 else t
                 if t in texto_lower or (len(raiz) >= 6 and raiz in texto_lower):
                     bonus += 0.03
+                    termos_encontrados += 1
                     if any(k in t for k in ["prorrog", "retifica", "adiad", "heteroidentifica"]):
                         bonus += 0.35
-            scores_ponderados.append(min(1.0, sim + bonus))
+
+            # Penalidade se a consulta tem termos substantivos específicos e o chunk não contém nenhum deles
+            penalidade = 0.0
+            if len(termos_consulta) >= 2 and termos_encontrados == 0:
+                penalidade = 0.25
+
+            # Fusão Híbrida Balanceada: 50% Cosseno Denso + 50% BM25 Léxico Estrito + Bônus - Penalidade
+            score_final = max(0.0, min(1.0, (0.5 * sim + 0.5 * bm25_s) + bonus - penalidade))
+            scores_ponderados.append(score_final)
 
         indices_ordenados = np.argsort(scores_ponderados)[::-1]
         resultados: List[TrechoRecuperado] = []
@@ -134,6 +192,9 @@ class IndiceVetorial:
                     conteudo=chk["conteudo"],
                     score_similaridade=round(sim_final, 4),
                     score_distancia=round(distancia, 4),
+                    natureza=chk.get("natureza", "nao_classificado"),
+                    fonte_original=chk.get("fonte_original", ""),
+                    hash_arquivo=chk.get("hash_arquivo"),
                 )
             )
 

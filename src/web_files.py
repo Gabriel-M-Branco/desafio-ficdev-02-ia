@@ -19,5 +19,6 @@ def arquivo_publico(base, caminho):
         return False
     if arquivo.suffix.lower() not in {".png", ".jpg", ".jpeg", ".pdf", ".mp3", ".wav", ".json", ".jsonl", ".txt"}:
         return False
-    return (partes[:1] == ("resultados",) or
-            partes[:2] in {("dados", "originais"), ("dados", "processados")})
+    # Downloads de minutas/áudio são explícitos na UI local. Logs e fontes não
+    # pertencem à área pública, mesmo quando usados em uma demonstração fictícia.
+    return partes[:2] in {("resultados", "minutas"), ("resultados", "audios")} and arquivo.suffix.lower() not in {".json", ".jsonl"}

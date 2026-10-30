@@ -1,5 +1,9 @@
 # Central Inteligente de Atendimento e Consulta Institucional (GOV.MT)
 
+> **Estado atual:** consulte [correções, limites e validação D02](documentacao/CORRECOES_D02.md).
+> Execute os testes em cópia descartável com `python -B testes/executar_isolado.py testes/ -v`.
+> Para recriar o índice após atualizar o acervo: `python -m src.ingestion` ou módulo 9.
+
 > **Desafios Práticos 01 e 02 — FIC_DEV: Programador de Sistemas com IA (2026)**  
 > **Órgão Atendido (Cenário Fictício):** Governo do Estado de Mato Grosso — Secretaria de Estado de Ciência, Tecnologia e Inovação (SECITECI/MT) e Escola Técnica Estadual de Cuiabá (ETEC).
 
@@ -52,7 +56,7 @@ desafio-ficdev-02-ia/
 ├── config.json               # Caminhos, modelos, parâmetros RAG/chunking (v2.0.0)
 ├── dados/
 │   ├── originais/            # IMUTÁVEL: casos de texto, áudio, imagem, editais e brasão GOV.MT
-│   ├── acervo/               # 6 documentos institucionais fictícios (3 .txt + 3 .pdf) para RAG
+│   ├── acervo/               # 7 documentos institucionais fictícios/adaptados (4 .txt + 3 .pdf) para RAG
 │   ├── solicitacoes/         # 6 solicitações fictícias (4 completas, 1 incompleta, 1 ambígua)
 │   ├── avaliacoes/           # 12 avaliações de atendimento (3 pos, 3 neg, 3 neu, 3 indet)
 │   ├── gabaritos/            # Gabaritos oficiais para avaliação automatizada (D01 e D02)
@@ -85,7 +89,7 @@ desafio-ficdev-02-ia/
 │   ├── imagens/              # Comunicados oficiais gerados (.png e .json)
 │   ├── logs/                 # Trilha de auditoria estruturada (JSON e JSONL)
 │   └── metricas/             # Relatório consolidado da matriz T01 a T15 (relatorio_avaliacao_d02.json)
-├── testes/                   # Suíte de testes automatizados com pytest (316+ testes)
+├── testes/                   # Suíte de testes automatizados com pytest (346+ testes)
 └── documentacao/             # Relatório técnico, Matriz de Rastreabilidade, LGPD e registro de IA
 ```
 

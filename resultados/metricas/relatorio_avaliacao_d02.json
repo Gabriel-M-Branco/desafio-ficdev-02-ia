@@ -1,8 +1,8 @@
 {
-  "timestamp": "2026-10-29T16:37:29.541006",
+  "timestamp": "2026-10-30T12:06:47.994714",
   "total_testes": 15,
   "aprovados": 15,
-  "duracao_total_ms": 175.19,
+  "duracao_total_ms": 8071.02,
   "resumo_metricas": {
     "nlp_solicitacoes": {
       "acuracia_categoria": 1.0,
@@ -15,9 +15,9 @@
           "tamanho_chunk": 400,
           "sobreposicao": 80,
           "top_k": 3,
-          "modelo": "tfidf-dense-pt"
+          "modelo": "tfidf-bm25-hibrido-pt"
         },
-        "total_chunks": 49,
+        "total_chunks": 66,
         "numerador": 5,
         "denominador": 5,
         "taxa_acerto": 1.0,
@@ -25,21 +25,76 @@
         "detalhes": [
           {
             "id": "P1",
-            "pergunta": "Qual é o prazo final prorrogado para realização das inscrições no Processo Seletivo das ETECs 2026/2?",
+            "pergunta": "Qual é o prazo final prorrogado para inscrição no processo seletivo?",
             "docs_esperados": [
-              "DOC-SECITECI-002"
+              "DOC-SECITECI-001",
+              "DOC-SECITECI-002",
+              "DOC-SECITECI-007"
             ],
             "docs_recuperados": [
               "DOC-SECITECI-002",
-              "DOC-SECITECI-001",
-              "DOC-SECITECI-002"
+              "DOC-SECITECI-002",
+              "DOC-SECITECI-001"
             ],
             "scores": [
-              0.5828,
-              0.4883,
-              0.4718
+              0.7672,
+              0.7596,
+              0.7429
             ],
-            "recuperado_com_sucesso": true
+            "recuperado_com_sucesso": true,
+            "trechos_recuperados": [
+              {
+                "documento_id": "DOC-SECITECI-002",
+                "titulo": "Edital Retificador nº 03 ao Edital nº 006/2026/GS/SECITECI-MT",
+                "versao": "1.3 (Retificador 03)",
+                "trecho_id": "DOC-SECITECI-002-p1-c002",
+                "pagina": 1,
+                "secao": "Art. 1º",
+                "conteudo": "[DOC-SECITECI-002 - Edital Retificador nº 03 ao Edital nº 006/2026/GS/SECITECI-MT]\nCNOLOGIA E INOVAÇÃO (SECITECI-MT) torna pública a RETIFICAÇÃO Nº 03 ao Edital nº 006/2026/GS/SECITECI-MT, alterando o Item 5 (Cronograma) e detalhando os requisitos de envio do vídeo de heteroidentificação racial:\nArt. 1º. Fica alterado o Item 5 (Do Cronograma) do Edital nº 006/2026/GS/SECITECI-MT, passando a vigorar com as seguintes datas prorrogadas:\n- Item 2: Período de Inscrição Prorrogado:",
+                "score_similaridade": 0.7672,
+                "score_distancia": 0.9382,
+                "hash_arquivo": "3d24320e696388b21e836fad78799c4460a50f1e0891b35c5723581871d8e1e0",
+                "configuracao": null,
+                "chunk_hash": null,
+                "natureza": "adaptado",
+                "fonte_original": "Retificações 03 (cronograma), 04 (heteroidentificação) e 05 (chamadas) do Edital 006/2026; síntese didática"
+              },
+              {
+                "documento_id": "DOC-SECITECI-002",
+                "titulo": "Edital Retificador nº 03 ao Edital nº 006/2026/GS/SECITECI-MT",
+                "versao": "1.3 (Retificador 03)",
+                "trecho_id": "DOC-SECITECI-002-p1-c003",
+                "pagina": 1,
+                "secao": null,
+                "conteudo": "[DOC-SECITECI-002 - Edital Retificador nº 03 ao Edital nº 006/2026/GS/SECITECI-MT]\nr com as seguintes datas prorrogadas:\n- Item 2: Período de Inscrição Prorrogado: das 08h00 do dia 07/04/2026 até às 23h59 do dia 13/05/2026.\n- Item 3: Solicitação de atendimento especializado e validação de autodeclaração étnico-racial: até 13/05/2026.\n- Item 6: Divulgação preliminar das inscrições homologadas: 18/05/2026.\n- Item 9: Realização do Sorteio Público Eletrônico: 26/05/2026 às 14h00.\n-",
+                "score_similaridade": 0.7596,
+                "score_distancia": 0.9418,
+                "hash_arquivo": "3d24320e696388b21e836fad78799c4460a50f1e0891b35c5723581871d8e1e0",
+                "configuracao": null,
+                "chunk_hash": null,
+                "natureza": "adaptado",
+                "fonte_original": "Retificações 03 (cronograma), 04 (heteroidentificação) e 05 (chamadas) do Edital 006/2026; síntese didática"
+              },
+              {
+                "documento_id": "DOC-SECITECI-001",
+                "titulo": "EDITAL Nº 006/2026/SECITECI-MT - PROCESSO SELETIVO DE ALUNOS PARA CURSOS TÉCNICOS NAS ETECS 2026/2",
+                "versao": "1.0",
+                "trecho_id": "DOC-SECITECI-001-p1-c009",
+                "pagina": 1,
+                "secao": "5. DO CRONOGRAMA OFICIAL BASE\r\nI",
+                "conteudo": "[DOC-SECITECI-001 - EDITAL Nº 006/2026/SECITECI-MT - PROCESSO SELETIVO DE ALUNOS PARA CURSOS TÉCNICOS NAS ETECS 2026/2]\nES\r\n4.1. As inscrições serão realizadas exclusivamente pela internet no endereço eletrônico oficial da SECITECI.\r\n4.2. Período original de inscrição: das 08h00 do dia 07/04/2026 até às 23h59 do dia 03/05/2026.\r\n\r\n5. DO CRONOGRAMA OFICIAL BASE\r\nItem 1: Publicação do Edital - 31/03/2026\r\nItem 2: Período de Inscrição - 07/04 a 03/05/2026\r\nItem 3: Prazo para envio de documentos da autodeclaração",
+                "score_similaridade": 0.7429,
+                "score_distancia": 0.7403,
+                "hash_arquivo": "92f5881886a589533a3c7e3b34cb15bf29907213a5356be1eb8167cb2f535342",
+                "configuracao": null,
+                "chunk_hash": null,
+                "natureza": "adaptado",
+                "fonte_original": "Edital SECITECI-MT 006/2026; recorte didático, não reprodução integral"
+              }
+            ],
+            "trechos_referencia": [
+              "13/05/2026"
+            ]
           },
           {
             "id": "P2",
@@ -53,66 +108,284 @@
               "DOC-SECITECI-004"
             ],
             "scores": [
-              0.6824,
-              0.5495,
-              0.427
+              0.9854,
+              0.8453,
+              0.6307
             ],
-            "recuperado_com_sucesso": true
+            "recuperado_com_sucesso": true,
+            "trechos_recuperados": [
+              {
+                "documento_id": "DOC-SECITECI-005",
+                "titulo": "INSTRUÇÃO NORMATIVA SECITECI Nº 02/2026 - DOCUMENTAÇÃO COMPROBATÓRIA DE RENDA",
+                "versao": "1.0",
+                "trecho_id": "DOC-SECITECI-005-p1-c002",
+                "pagina": 1,
+                "secao": "1. DA COMPROVAÇÃO DE RENDA FAMILIAR PER CAPITA",
+                "conteudo": "[DOC-SECITECI-005 - INSTRUÇÃO NORMATIVA SECITECI Nº 02/2026 - DOCUMENTAÇÃO COMPROBATÓRIA DE RENDA]\nSECITECI/MT estabelece os procedimentos para comprovação documental da situação socioeconômica no Programa de Permanência Estudantil.\r\n\r\n1. DA COMPROVAÇÃO DE RENDA FAMILIAR PER CAPITA (ATÉ 1,5 SALÁRIO MÍNIMO)\r\n1.1. Para fins de apuração da renda familiar bruta per capita, o solicitante deverá apresentar obrigatoriamente a documentação de todos os integrantes da família que residam no mesmo",
+                "score_similaridade": 0.9854,
+                "score_distancia": 0.5693,
+                "hash_arquivo": "66eda57f956a618a2a02c8cf0d81e9fbd9714e53157096ac812f1c2a2f33afea",
+                "configuracao": null,
+                "chunk_hash": null,
+                "natureza": "ficticio",
+                "fonte_original": "Documento criado exclusivamente para o exercício; não é norma oficial"
+              },
+              {
+                "documento_id": "DOC-SECITECI-004",
+                "titulo": "Regulamento do Programa de Assistência e Permanência Estudantil das ETECs (Portaria Normativa nº 042/2026/SECITECI-MT)",
+                "versao": "2.0 (Vigente)",
+                "trecho_id": "DOC-SECITECI-004-p1-c004",
+                "pagina": 1,
+                "secao": "Art. 2º",
+                "conteudo": "[DOC-SECITECI-004 - Regulamento do Programa de Assistência e Permanência Estudantil das ETECs (Portaria Normativa nº 042/2026/SECITECI-MT)]\nvinte reais).\nArt. 2º. São requisitos cumulativos para habilitação do estudante aos auxílios:\nI - Estar regularmente matriculado e frequente em curso técnico presencial de uma ETEC da rede SECITECI-MT;\nII - Comprovar renda familiar bruta mensal per capita de até 1,5 (um vírgula cinco) salário mínimo nacional vigente;\nIII - Não possuir vínculo empregatício com remuneração superior a 2 (dois)",
+                "score_similaridade": 0.8453,
+                "score_distancia": 0.6521,
+                "hash_arquivo": "1f671825891d20879e7f7852f0a49d5a999362a463f7596a0facbc641be2b1f1",
+                "configuracao": null,
+                "chunk_hash": null,
+                "natureza": "ficticio",
+                "fonte_original": "Documento criado exclusivamente para o exercício; não é norma oficial"
+              },
+              {
+                "documento_id": "DOC-SECITECI-004",
+                "titulo": "Regulamento do Programa de Assistência e Permanência Estudantil das ETECs (Portaria Normativa nº 042/2026/SECITECI-MT)",
+                "versao": "2.0 (Vigente)",
+                "trecho_id": "DOC-SECITECI-004-p1-c006",
+                "pagina": 1,
+                "secao": "Art. 7º",
+                "conteudo": "[DOC-SECITECI-004 - Regulamento do Programa de Assistência e Permanência Estudantil das ETECs (Portaria Normativa nº 042/2026/SECITECI-MT)]\no mensal dos auxílios, o estudante beneficiário deverá manter frequência escolar mínima de 85% (oitenta e cinco por cento) da carga horária mensal ofertada no período letivo, salvo afastamento médico devidamente comprovado por atestado.\nArt. 7º. Para manutenção do pagamento mensal dos auxílios de permanência, o estudante contemplado deve apresentar na Secretaria Acadêmica o formulário de",
+                "score_similaridade": 0.6307,
+                "score_distancia": 0.7257,
+                "hash_arquivo": "1f671825891d20879e7f7852f0a49d5a999362a463f7596a0facbc641be2b1f1",
+                "configuracao": null,
+                "chunk_hash": null,
+                "natureza": "ficticio",
+                "fonte_original": "Documento criado exclusivamente para o exercício; não é norma oficial"
+              }
+            ],
+            "trechos_referencia": [
+              "contracheques ou holerites",
+              "3 (três) meses"
+            ]
           },
           {
             "id": "P3",
-            "pergunta": "Em qual data terão início as aulas do curso Técnico em Enfermagem ofertado na sede da ETEC Barra do Garças?",
+            "pergunta": "Qual é a data de início das aulas para o curso Técnico em Enfermagem na ETEC Barra do Garças?",
             "docs_esperados": [
-              "DOC-SECITECI-003"
+              "DOC-SECITECI-003",
+              "DOC-SECITECI-007"
             ],
             "docs_recuperados": [
               "DOC-SECITECI-003",
-              "DOC-SECITECI-001",
+              "DOC-SECITECI-007",
               "DOC-SECITECI-001"
             ],
             "scores": [
-              0.8403,
-              0.6962,
-              0.6725
+              1.0,
+              1.0,
+              0.7101
             ],
-            "recuperado_com_sucesso": true
+            "recuperado_com_sucesso": true,
+            "trechos_recuperados": [
+              {
+                "documento_id": "DOC-SECITECI-003",
+                "titulo": "EDITAL RETIFICADOR Nº 06/2026/SECITECI-MT - ALTERAÇÃO PONTUAL DE CALENDÁRIO",
+                "versao": "1.2",
+                "trecho_id": "DOC-SECITECI-003-p1-c003",
+                "pagina": 1,
+                "secao": null,
+                "conteudo": "[DOC-SECITECI-003 - EDITAL RETIFICADOR Nº 06/2026/SECITECI-MT - ALTERAÇÃO PONTUAL DE CALENDÁRIO]\nS AULAS (ESCOPO RESTRITO)\r\n1.1. Fica postergada para o dia 05 de outubro de 2026 a data de início das aulas exclusivamente para os seguintes cursos e localidades:\r\n  - ETEC Barra do Garças: Técnico em Enfermagem (Sede Barra do Garças)\r\n  - ETEC Água Boa: Técnico em Agropecuária (Santa Terezinha)\r\n  - ETEC Cuiabá: Técnico em Agropecuária (Turma Descentralizada do Distrito de Mimoso / Santo Antônio",
+                "score_similaridade": 1.0,
+                "score_distancia": 0.4376,
+                "hash_arquivo": "dd3d8c31f894c5aab05ca450362f77721eafda1170ea870f3502e62c16b0d6c7",
+                "configuracao": null,
+                "chunk_hash": null,
+                "natureza": "adaptado",
+                "fonte_original": "Retificação 06 do Edital 006/2026, itens 1.1 a 1.3; calendário pontual da Retificação 05"
+              },
+              {
+                "documento_id": "DOC-SECITECI-007",
+                "titulo": "EDITAL RETIFICADOR Nº 07/2026/SECITECI-MT - CONSOLIDAÇÃO DE CALENDÁRIO, LOCALIDADES E DATAS DE INÍCIO",
+                "versao": "1.0",
+                "trecho_id": "DOC-SECITECI-007-p1-c004",
+                "pagina": 1,
+                "secao": null,
+                "conteudo": "[DOC-SECITECI-007 - EDITAL RETIFICADOR Nº 07/2026/SECITECI-MT - CONSOLIDAÇÃO DE CALENDÁRIO, LOCALIDADES E DATAS DE INÍCIO]\nro de 2026 (05/10/2026) a data de início das aulas exclusivamente para os cursos técnicos e localidades individualizados a seguir:\n  - ETEC Barra do Garças | Curso: Técnico em Enfermagem | Localidade: Barra do Garças (Sede Barra do Garças) | Início das aulas: 05 de outubro de 2026 (05/10/2026).\n  - ETEC Água Boa | Curso: Técnico em Agropecuária | Localidade: Santa Terezinha | Início das aulas: 05",
+                "score_similaridade": 1.0,
+                "score_distancia": 0.3427,
+                "hash_arquivo": "a204a5b07a40453092a5dcd6e06a93cb9f82f1a445c6e0efbf613637ed142316",
+                "configuracao": null,
+                "chunk_hash": null,
+                "natureza": "adaptado",
+                "fonte_original": "Edital Retificador nº 07/2026/SECITECI-MT; consolidação das 14 ofertas descentralizadas e calendário da Retificação 06"
+              },
+              {
+                "documento_id": "DOC-SECITECI-001",
+                "titulo": "EDITAL Nº 006/2026/SECITECI-MT - PROCESSO SELETIVO DE ALUNOS PARA CURSOS TÉCNICOS NAS ETECS 2026/2",
+                "versao": "1.0",
+                "trecho_id": "DOC-SECITECI-001-p1-c008",
+                "pagina": 1,
+                "secao": "4. DAS INSCRIÇÕES",
+                "conteudo": "[DOC-SECITECI-001 - EDITAL Nº 006/2026/SECITECI-MT - PROCESSO SELETIVO DE ALUNOS PARA CURSOS TÉCNICOS NAS ETECS 2026/2]\nm Agropecuária (1200h, Noturno, 40 vagas).\r\n  - ETEC Barra do Garças (Sede Barra do Garças): Técnico em Guia de Turismo (800h, Noturno, 40 vagas).\r\n  - ETEC Cáceres (Sede Cáceres): Técnico em Segurança do Trabalho (1200h, Noturno, 40 vagas), Técnico em Enfermagem (1600h, Noturno, 40 vagas).\r\n\r\n4. DAS INSCRIÇÕES\r\n4.1. As inscrições serão realizadas exclusivamente pela internet no endereço",
+                "score_similaridade": 0.7101,
+                "score_distancia": 0.6035,
+                "hash_arquivo": "92f5881886a589533a3c7e3b34cb15bf29907213a5356be1eb8167cb2f535342",
+                "configuracao": null,
+                "chunk_hash": null,
+                "natureza": "adaptado",
+                "fonte_original": "Edital SECITECI-MT 006/2026; recorte didático, não reprodução integral"
+              }
+            ],
+            "trechos_referencia": [
+              "Barra do Garças",
+              "05 de outubro de 2026"
+            ]
           },
           {
             "id": "P4",
             "pergunta": "Qual é a data de início das aulas para o curso Técnico em Enfermagem na sede da ETEC Cuiabá?",
             "docs_esperados": [
               "DOC-SECITECI-001",
-              "DOC-SECITECI-003"
+              "DOC-SECITECI-003",
+              "DOC-SECITECI-007"
             ],
             "docs_recuperados": [
+              "DOC-SECITECI-007",
               "DOC-SECITECI-003",
-              "DOC-SECITECI-003",
-              "DOC-SECITECI-001"
+              "DOC-SECITECI-007"
             ],
             "scores": [
-              0.8255,
-              0.7359,
-              0.5669
+              0.9943,
+              0.9289,
+              0.9132
             ],
-            "recuperado_com_sucesso": true
+            "recuperado_com_sucesso": true,
+            "trechos_recuperados": [
+              {
+                "documento_id": "DOC-SECITECI-007",
+                "titulo": "EDITAL RETIFICADOR Nº 07/2026/SECITECI-MT - CONSOLIDAÇÃO DE CALENDÁRIO, LOCALIDADES E DATAS DE INÍCIO",
+                "versao": "1.0",
+                "trecho_id": "DOC-SECITECI-007-p1-c011",
+                "pagina": 1,
+                "secao": null,
+                "conteudo": "[DOC-SECITECI-007 - EDITAL RETIFICADOR Nº 07/2026/SECITECI-MT - CONSOLIDAÇÃO DE CALENDÁRIO, LOCALIDADES E DATAS DE INÍCIO]\nedes da rede ETEC do Estado de Mato Grosso não constantes no item 1.1, permanece integralmente vigente a data de início das aulas fixada em 21 de julho de 2026 (21/07/2026):\n  - Curso: Técnico em Enfermagem | Localidade: Cuiabá (sede) | Início das aulas: 21 de julho de 2026 (21/07/2026).\n  - Curso: Técnico em Recursos Humanos | Localidade: Cuiabá (sede) | Início das aulas: 21 de julho de 2026",
+                "score_similaridade": 0.9943,
+                "score_distancia": 0.5515,
+                "hash_arquivo": "a204a5b07a40453092a5dcd6e06a93cb9f82f1a445c6e0efbf613637ed142316",
+                "configuracao": null,
+                "chunk_hash": null,
+                "natureza": "adaptado",
+                "fonte_original": "Edital Retificador nº 07/2026/SECITECI-MT; consolidação das 14 ofertas descentralizadas e calendário da Retificação 06"
+              },
+              {
+                "documento_id": "DOC-SECITECI-003",
+                "titulo": "EDITAL RETIFICADOR Nº 06/2026/SECITECI-MT - ALTERAÇÃO PONTUAL DE CALENDÁRIO",
+                "versao": "1.2",
+                "trecho_id": "DOC-SECITECI-003-p1-c003",
+                "pagina": 1,
+                "secao": null,
+                "conteudo": "[DOC-SECITECI-003 - EDITAL RETIFICADOR Nº 06/2026/SECITECI-MT - ALTERAÇÃO PONTUAL DE CALENDÁRIO]\nS AULAS (ESCOPO RESTRITO)\r\n1.1. Fica postergada para o dia 05 de outubro de 2026 a data de início das aulas exclusivamente para os seguintes cursos e localidades:\r\n  - ETEC Barra do Garças: Técnico em Enfermagem (Sede Barra do Garças)\r\n  - ETEC Água Boa: Técnico em Agropecuária (Santa Terezinha)\r\n  - ETEC Cuiabá: Técnico em Agropecuária (Turma Descentralizada do Distrito de Mimoso / Santo Antônio",
+                "score_similaridade": 0.9289,
+                "score_distancia": 0.582,
+                "hash_arquivo": "dd3d8c31f894c5aab05ca450362f77721eafda1170ea870f3502e62c16b0d6c7",
+                "configuracao": null,
+                "chunk_hash": null,
+                "natureza": "adaptado",
+                "fonte_original": "Retificação 06 do Edital 006/2026, itens 1.1 a 1.3; calendário pontual da Retificação 05"
+              },
+              {
+                "documento_id": "DOC-SECITECI-007",
+                "titulo": "EDITAL RETIFICADOR Nº 07/2026/SECITECI-MT - CONSOLIDAÇÃO DE CALENDÁRIO, LOCALIDADES E DATAS DE INÍCIO",
+                "versao": "1.0",
+                "trecho_id": "DOC-SECITECI-007-p1-c004",
+                "pagina": 1,
+                "secao": null,
+                "conteudo": "[DOC-SECITECI-007 - EDITAL RETIFICADOR Nº 07/2026/SECITECI-MT - CONSOLIDAÇÃO DE CALENDÁRIO, LOCALIDADES E DATAS DE INÍCIO]\nro de 2026 (05/10/2026) a data de início das aulas exclusivamente para os cursos técnicos e localidades individualizados a seguir:\n  - ETEC Barra do Garças | Curso: Técnico em Enfermagem | Localidade: Barra do Garças (Sede Barra do Garças) | Início das aulas: 05 de outubro de 2026 (05/10/2026).\n  - ETEC Água Boa | Curso: Técnico em Agropecuária | Localidade: Santa Terezinha | Início das aulas: 05",
+                "score_similaridade": 0.9132,
+                "score_distancia": 0.5696,
+                "hash_arquivo": "a204a5b07a40453092a5dcd6e06a93cb9f82f1a445c6e0efbf613637ed142316",
+                "configuracao": null,
+                "chunk_hash": null,
+                "natureza": "adaptado",
+                "fonte_original": "Edital Retificador nº 07/2026/SECITECI-MT; consolidação das 14 ofertas descentralizadas e calendário da Retificação 06"
+              }
+            ],
+            "trechos_referencia": [
+              "21 de julho de 2026"
+            ]
           },
           {
             "id": "P5",
-            "pergunta": "Quais são o formato e a duração máxima permitidos para o vídeo de heteroidentificação racial?",
+            "pergunta": "Como deve ser gravado e nomeado o vídeo de autodeclaração para candidatos que concorrem às cotas de heteroidentificação?",
             "docs_esperados": [
-              "DOC-SECITECI-002"
+              "DOC-SECITECI-002",
+              "DOC-SECITECI-007"
             ],
             "docs_recuperados": [
+              "DOC-SECITECI-007",
               "DOC-SECITECI-002",
-              "DOC-SECITECI-002",
-              "DOC-SECITECI-002"
+              "DOC-SECITECI-007"
             ],
             "scores": [
-              0.6984,
-              0.6649,
-              0.455
+              1.0,
+              1.0,
+              0.9659
             ],
-            "recuperado_com_sucesso": true
+            "recuperado_com_sucesso": true,
+            "trechos_recuperados": [
+              {
+                "documento_id": "DOC-SECITECI-007",
+                "titulo": "EDITAL RETIFICADOR Nº 07/2026/SECITECI-MT - CONSOLIDAÇÃO DE CALENDÁRIO, LOCALIDADES E DATAS DE INÍCIO",
+                "versao": "1.0",
+                "trecho_id": "DOC-SECITECI-007-p1-c016",
+                "pagina": 1,
+                "secao": "4. DISPOSIÇÕES FINAIS",
+                "conteudo": "[DOC-SECITECI-007 - EDITAL RETIFICADOR Nº 07/2026/SECITECI-MT - CONSOLIDAÇÃO DE CALENDÁRIO, LOCALIDADES E DATAS DE INÍCIO]\narquivo no padrão NomeCompleto_CPF, aplica-se exclusivamente aos candidatos que optarem pela autodeclaração de heteroidentificação racial nas cotas de Estudantes Negros (L1 - pretos ou pardos).\n\n4. DISPOSIÇÕES FINAIS\n4.1. Este Edital Retificador nº 07 complementa e consolida as disposições dos Editais nº 006/2026 e Retificadores nº 03, 04, 05 e 06, preservando a imutabilidade histórica de seus",
+                "score_similaridade": 1.0,
+                "score_distancia": 0.7147,
+                "hash_arquivo": "a204a5b07a40453092a5dcd6e06a93cb9f82f1a445c6e0efbf613637ed142316",
+                "configuracao": null,
+                "chunk_hash": null,
+                "natureza": "adaptado",
+                "fonte_original": "Edital Retificador nº 07/2026/SECITECI-MT; consolidação das 14 ofertas descentralizadas e calendário da Retificação 06"
+              },
+              {
+                "documento_id": "DOC-SECITECI-002",
+                "titulo": "Edital Retificador nº 03 ao Edital nº 006/2026/GS/SECITECI-MT",
+                "versao": "1.3 (Retificador 03)",
+                "trecho_id": "DOC-SECITECI-002-p1-c005",
+                "pagina": 1,
+                "secao": null,
+                "conteudo": "[DOC-SECITECI-002 - Edital Retificador nº 03 ao Edital nº 006/2026/GS/SECITECI-MT]\ns candidatos inscritos na reserva de vagas para pretos, pardos e indígenas (Item 3.10.3), o procedimento de heteroidentificação exige o envio eletrônico, no ato da inscrição até 13/05/2026, de:\na) Vídeo comprobatório gravado pelo candidato com breve apresentação confirmando sua autodeclaração, em formato .mp4 com duração de até 2 minutos.\nb) Fotografia frontal recente, colorida, com fundo branco",
+                "score_similaridade": 1.0,
+                "score_distancia": 0.7136,
+                "hash_arquivo": "3d24320e696388b21e836fad78799c4460a50f1e0891b35c5723581871d8e1e0",
+                "configuracao": null,
+                "chunk_hash": null,
+                "natureza": "adaptado",
+                "fonte_original": "Retificações 03 (cronograma), 04 (heteroidentificação) e 05 (chamadas) do Edital 006/2026; síntese didática"
+              },
+              {
+                "documento_id": "DOC-SECITECI-007",
+                "titulo": "EDITAL RETIFICADOR Nº 07/2026/SECITECI-MT - CONSOLIDAÇÃO DE CALENDÁRIO, LOCALIDADES E DATAS DE INÍCIO",
+                "versao": "1.0",
+                "trecho_id": "DOC-SECITECI-007-p1-c015",
+                "pagina": 1,
+                "secao": null,
+                "conteudo": "[DOC-SECITECI-007 - EDITAL RETIFICADOR Nº 07/2026/SECITECI-MT - CONSOLIDAÇÃO DE CALENDÁRIO, LOCALIDADES E DATAS DE INÍCIO]\nÇÃO\n3.1. A comprovação de estudantes indígenas (L3) e candidatos com deficiência (L4) não estabelece vídeo de heteroidentificação; a apresentação e validação documental ocorrem no ato formal de matrícula.\n3.2. A exigência de envio de vídeo em formato .mp4 com duração de até 2 minutos, com nomeação obrigatória do arquivo no padrão NomeCompleto_CPF, aplica-se exclusivamente aos candidatos que",
+                "score_similaridade": 0.9659,
+                "score_distancia": 0.7126,
+                "hash_arquivo": "a204a5b07a40453092a5dcd6e06a93cb9f82f1a445c6e0efbf613637ed142316",
+                "configuracao": null,
+                "chunk_hash": null,
+                "natureza": "adaptado",
+                "fonte_original": "Edital Retificador nº 07/2026/SECITECI-MT; consolidação das 14 ofertas descentralizadas e calendário da Retificação 06"
+              }
+            ],
+            "trechos_referencia": [
+              ".mp4",
+              "2 minutos"
+            ]
           }
         ]
       },
@@ -121,9 +394,9 @@
           "tamanho_chunk": 800,
           "sobreposicao": 150,
           "top_k": 3,
-          "modelo": "tfidf-dense-pt"
+          "modelo": "tfidf-bm25-hibrido-pt"
         },
-        "total_chunks": 24,
+        "total_chunks": 32,
         "numerador": 5,
         "denominador": 5,
         "taxa_acerto": 1.0,
@@ -131,21 +404,76 @@
         "detalhes": [
           {
             "id": "P1",
-            "pergunta": "Qual é o prazo final prorrogado para realização das inscrições no Processo Seletivo das ETECs 2026/2?",
+            "pergunta": "Qual é o prazo final prorrogado para inscrição no processo seletivo?",
             "docs_esperados": [
-              "DOC-SECITECI-002"
+              "DOC-SECITECI-001",
+              "DOC-SECITECI-002",
+              "DOC-SECITECI-007"
             ],
             "docs_recuperados": [
               "DOC-SECITECI-002",
-              "DOC-SECITECI-002",
-              "DOC-SECITECI-001"
+              "DOC-SECITECI-007",
+              "DOC-SECITECI-002"
             ],
             "scores": [
-              0.6889,
-              0.4682,
-              0.446
+              1.0,
+              0.718,
+              0.6929
             ],
-            "recuperado_com_sucesso": true
+            "recuperado_com_sucesso": true,
+            "trechos_recuperados": [
+              {
+                "documento_id": "DOC-SECITECI-002",
+                "titulo": "Edital Retificador nº 03 ao Edital nº 006/2026/GS/SECITECI-MT",
+                "versao": "1.3 (Retificador 03)",
+                "trecho_id": "DOC-SECITECI-002-p1-c002",
+                "pagina": 1,
+                "secao": "Art. 2º",
+                "conteudo": "[DOC-SECITECI-002 - Edital Retificador nº 03 ao Edital nº 006/2026/GS/SECITECI-MT]\nuintes datas prorrogadas:\n- Item 2: Período de Inscrição Prorrogado: das 08h00 do dia 07/04/2026 até às 23h59 do dia 13/05/2026.\n- Item 3: Solicitação de atendimento especializado e validação de autodeclaração étnico-racial: até 13/05/2026.\n- Item 6: Divulgação preliminar das inscrições homologadas: 18/05/2026.\n- Item 9: Realização do Sorteio Público Eletrônico: 26/05/2026 às 14h00.\n- Item 10: Publicação do Resultado Preliminar do Processo Seletivo: 27/05/2026.\n- Item 12: Publicação do Resultado Definitivo da 1ª Chamada: 29/05/2026.\n- Item 13: Período de Matrícula da 1ª Chamada: 01/06/2026 a 08/06/2026.\nArt. 2º. Para os candidatos inscritos na reserva de vagas para pretos, pardos e indígenas (Item 3.10.3), o procedimento de heteroidentificação exige o envio eletrônico, no ato da inscrição",
+                "score_similaridade": 1.0,
+                "score_distancia": 0.834,
+                "hash_arquivo": "3d24320e696388b21e836fad78799c4460a50f1e0891b35c5723581871d8e1e0",
+                "configuracao": null,
+                "chunk_hash": null,
+                "natureza": "adaptado",
+                "fonte_original": "Retificações 03 (cronograma), 04 (heteroidentificação) e 05 (chamadas) do Edital 006/2026; síntese didática"
+              },
+              {
+                "documento_id": "DOC-SECITECI-007",
+                "titulo": "EDITAL RETIFICADOR Nº 07/2026/SECITECI-MT - CONSOLIDAÇÃO DE CALENDÁRIO, LOCALIDADES E DATAS DE INÍCIO",
+                "versao": "1.0",
+                "trecho_id": "DOC-SECITECI-007-p1-c007",
+                "pagina": 1,
+                "secao": "3. DA COMPROVAÇÃO DE COTAS E AUTODECLARAÇÃO",
+                "conteudo": "[DOC-SECITECI-007 - EDITAL RETIFICADOR Nº 07/2026/SECITECI-MT - CONSOLIDAÇÃO DE CALENDÁRIO, LOCALIDADES E DATAS DE INÍCIO]\n.1. Fica ratificado o cronograma oficial de matrículas e chamadas regulares e remanescentes:\n  - 1ª Chamada: convocação e período de matrícula de 15 a 19/06/2026 (15 a 19 de junho de 2026).\n  - 4ª Chamada: convocação em 03/07/2026 e período de matrícula de 03 a 08/07/2026 (08/07/2026 prazo final de matrícula da 4ª chamada).\n  - 5ª Chamada: convocação para preenchimento de vagas remanescentes presenciais no balcão da secretaria, inclusive para interessados que não participaram do processo seletivo inicial.\n\n3. DA COMPROVAÇÃO DE COTAS E AUTODECLARAÇÃO\n3.1. A comprovação de estudantes indígenas (L3) e candidatos com deficiência (L4) não estabelece vídeo de heteroidentificação; a apresentação e validação documental ocorrem no ato formal de matrícula.\n3.2. A exigência de envio de vídeo em",
+                "score_similaridade": 0.718,
+                "score_distancia": 0.864,
+                "hash_arquivo": "a204a5b07a40453092a5dcd6e06a93cb9f82f1a445c6e0efbf613637ed142316",
+                "configuracao": null,
+                "chunk_hash": null,
+                "natureza": "adaptado",
+                "fonte_original": "Edital Retificador nº 07/2026/SECITECI-MT; consolidação das 14 ofertas descentralizadas e calendário da Retificação 06"
+              },
+              {
+                "documento_id": "DOC-SECITECI-002",
+                "titulo": "Edital Retificador nº 03 ao Edital nº 006/2026/GS/SECITECI-MT",
+                "versao": "1.3 (Retificador 03)",
+                "trecho_id": "DOC-SECITECI-002-p1-c001",
+                "pagina": 1,
+                "secao": "Art. 1º",
+                "conteudo": "[DOC-SECITECI-002 - Edital Retificador nº 03 ao Edital nº 006/2026/GS/SECITECI-MT]\nIDENTIFICADOR: DOC-SECITECI-002\nTITULO: Edital Retificador nº 03 ao Edital nº 006/2026/GS/SECITECI-MT\nVERSAO: 1.3 (Retificador 03)\nDATA_PUBLICACAO: 30/04/2026\nDOCUMENTO_PAI: DOC-SECITECI-001\nTEMAS: retificação, prorrogação de inscrições, cronograma atualizado, heteroidentificação\nA SECRETARIA DE ESTADO DE CIÊNCIA, TECNOLOGIA E INOVAÇÃO (SECITECI-MT) torna pública a RETIFICAÇÃO Nº 03 ao Edital nº 006/2026/GS/SECITECI-MT, alterando o Item 5 (Cronograma) e detalhando os requisitos de envio do vídeo de heteroidentificação racial:\nArt. 1º. Fica alterado o Item 5 (Do Cronograma) do Edital nº 006/2026/GS/SECITECI-MT, passando a vigorar com as seguintes datas prorrogadas:\n- Item 2: Período de Inscrição Prorrogado: das 08h00 do dia 07/04/2026 até às 23h59 do dia 13/05/2026.\n- Item 3: Solicitação",
+                "score_similaridade": 0.6929,
+                "score_distancia": 0.9564,
+                "hash_arquivo": "3d24320e696388b21e836fad78799c4460a50f1e0891b35c5723581871d8e1e0",
+                "configuracao": null,
+                "chunk_hash": null,
+                "natureza": "adaptado",
+                "fonte_original": "Retificações 03 (cronograma), 04 (heteroidentificação) e 05 (chamadas) do Edital 006/2026; síntese didática"
+              }
+            ],
+            "trechos_referencia": [
+              "13/05/2026"
+            ]
           },
           {
             "id": "P2",
@@ -159,75 +487,688 @@
               "DOC-SECITECI-004"
             ],
             "scores": [
-              0.6477,
-              0.5248,
-              0.4452
+              0.9584,
+              0.817,
+              0.6724
             ],
-            "recuperado_com_sucesso": true
+            "recuperado_com_sucesso": true,
+            "trechos_recuperados": [
+              {
+                "documento_id": "DOC-SECITECI-005",
+                "titulo": "INSTRUÇÃO NORMATIVA SECITECI Nº 02/2026 - DOCUMENTAÇÃO COMPROBATÓRIA DE RENDA",
+                "versao": "1.0",
+                "trecho_id": "DOC-SECITECI-005-p1-c001",
+                "pagina": 1,
+                "secao": "1. DA COMPROVAÇÃO DE RENDA FAMILIAR PER CAPITA",
+                "conteudo": "[DOC-SECITECI-005 - INSTRUÇÃO NORMATIVA SECITECI Nº 02/2026 - DOCUMENTAÇÃO COMPROBATÓRIA DE RENDA]\nIDENTIFICADOR: DOC-SECITECI-005\r\nTITULO: INSTRUÇÃO NORMATIVA SECITECI Nº 02/2026 - DOCUMENTAÇÃO COMPROBATÓRIA DE RENDA\r\nVERSAO: 1.0\r\nDATA_PUBLICACAO: 20/02/2026\r\nAUTORIDADE: COORDENADORIA DE GESTÃO DE BOLSAS E AUXÍLIOS ESTUDANTIS - SECITECI/MT\r\n\r\nA Coordenadoria de Gestão de Bolsas e Auxílios Estudantis da SECITECI/MT estabelece os procedimentos para comprovação documental da situação socioeconômica no Programa de Permanência Estudantil.\r\n\r\n1. DA COMPROVAÇÃO DE RENDA FAMILIAR PER CAPITA (ATÉ 1,5 SALÁRIO MÍNIMO)\r\n1.1. Para fins de apuração da renda familiar bruta per capita, o solicitante deverá apresentar obrigatoriamente a documentação de todos os integrantes da família que residam no mesmo domicílio:\r\n  a) Assalariados: Contracheques ou holerites dos últimos 3 (três) meses anteriores à",
+                "score_similaridade": 0.9584,
+                "score_distancia": 0.6831,
+                "hash_arquivo": "66eda57f956a618a2a02c8cf0d81e9fbd9714e53157096ac812f1c2a2f33afea",
+                "configuracao": null,
+                "chunk_hash": null,
+                "natureza": "ficticio",
+                "fonte_original": "Documento criado exclusivamente para o exercício; não é norma oficial"
+              },
+              {
+                "documento_id": "DOC-SECITECI-004",
+                "titulo": "Regulamento do Programa de Assistência e Permanência Estudantil das ETECs (Portaria Normativa nº 042/2026/SECITECI-MT)",
+                "versao": "2.0 (Vigente)",
+                "trecho_id": "DOC-SECITECI-004-p1-c002",
+                "pagina": 1,
+                "secao": "Art. 2º",
+                "conteudo": "[DOC-SECITECI-004 - Regulamento do Programa de Assistência e Permanência Estudantil das ETECs (Portaria Normativa nº 042/2026/SECITECI-MT)]\nde benefício financeiro mensal:\nI - Auxílio Alimentação: destinado ao custeio parcial de refeições em dias letivos presenciais, no valor mensal de R$ 250,00 (duzentos e cinquenta reais).\nII - Auxílio Transporte: destinado ao custeio de deslocamento casa-escola-casa, no valor mensal de R$ 220,00 (duzentos e vinte reais).\nArt. 2º. São requisitos cumulativos para habilitação do estudante aos auxílios:\nI - Estar regularmente matriculado e frequente em curso técnico presencial de uma ETEC da rede SECITECI-MT;\nII - Comprovar renda familiar bruta mensal per capita de até 1,5 (um vírgula cinco) salário mínimo nacional vigente;\nIII - Não possuir vínculo empregatício com remuneração superior a 2 (dois) salários mínimos;\nIV - Apresentar a documentação comprobatória de renda prevista na Instrução",
+                "score_similaridade": 0.817,
+                "score_distancia": 0.6965,
+                "hash_arquivo": "1f671825891d20879e7f7852f0a49d5a999362a463f7596a0facbc641be2b1f1",
+                "configuracao": null,
+                "chunk_hash": null,
+                "natureza": "ficticio",
+                "fonte_original": "Documento criado exclusivamente para o exercício; não é norma oficial"
+              },
+              {
+                "documento_id": "DOC-SECITECI-004",
+                "titulo": "Regulamento do Programa de Assistência e Permanência Estudantil das ETECs (Portaria Normativa nº 042/2026/SECITECI-MT)",
+                "versao": "2.0 (Vigente)",
+                "trecho_id": "DOC-SECITECI-004-p1-c003",
+                "pagina": 1,
+                "secao": "CAPÍTULO II",
+                "conteudo": "[DOC-SECITECI-004 - Regulamento do Programa de Assistência e Permanência Estudantil das ETECs (Portaria Normativa nº 042/2026/SECITECI-MT)]\nvínculo empregatício com remuneração superior a 2 (dois) salários mínimos;\nIV - Apresentar a documentação comprobatória de renda prevista na Instrução Normativa Complementar nº 008/2026 (DOC-SECITECI-005).\nCAPÍTULO II - DA MANUTENÇÃO, FREQUÊNCIA E PRAZO DE COMPROVAÇÃO\nArt. 6º. Para manutenção mensal dos auxílios, o estudante beneficiário deverá manter frequência escolar mínima de 85% (oitenta e cinco por cento) da carga horária mensal ofertada no período letivo, salvo afastamento médico devidamente comprovado por atestado.\nArt. 7º. Para manutenção do pagamento mensal dos auxílios de permanência, o estudante contemplado deve apresentar na Secretaria Acadêmica o formulário de comprovação de frequência assinado pela coordenação de curso impreterivelmente até o 5º (quinto) dia útil de cada",
+                "score_similaridade": 0.6724,
+                "score_distancia": 0.7518,
+                "hash_arquivo": "1f671825891d20879e7f7852f0a49d5a999362a463f7596a0facbc641be2b1f1",
+                "configuracao": null,
+                "chunk_hash": null,
+                "natureza": "ficticio",
+                "fonte_original": "Documento criado exclusivamente para o exercício; não é norma oficial"
+              }
+            ],
+            "trechos_referencia": [
+              "contracheques ou holerites",
+              "3 (três) meses"
+            ]
           },
           {
             "id": "P3",
-            "pergunta": "Em qual data terão início as aulas do curso Técnico em Enfermagem ofertado na sede da ETEC Barra do Garças?",
+            "pergunta": "Qual é a data de início das aulas para o curso Técnico em Enfermagem na ETEC Barra do Garças?",
             "docs_esperados": [
-              "DOC-SECITECI-003"
+              "DOC-SECITECI-003",
+              "DOC-SECITECI-007"
             ],
             "docs_recuperados": [
+              "DOC-SECITECI-007",
               "DOC-SECITECI-003",
-              "DOC-SECITECI-003",
-              "DOC-SECITECI-001"
+              "DOC-SECITECI-007"
             ],
             "scores": [
-              0.8162,
-              0.6338,
-              0.5822
+              1.0,
+              0.9551,
+              0.7336
             ],
-            "recuperado_com_sucesso": true
+            "recuperado_com_sucesso": true,
+            "trechos_recuperados": [
+              {
+                "documento_id": "DOC-SECITECI-007",
+                "titulo": "EDITAL RETIFICADOR Nº 07/2026/SECITECI-MT - CONSOLIDAÇÃO DE CALENDÁRIO, LOCALIDADES E DATAS DE INÍCIO",
+                "versao": "1.0",
+                "trecho_id": "DOC-SECITECI-007-p1-c002",
+                "pagina": 1,
+                "secao": "1. DA CONSOLIDAÇÃO DO CALENDÁRIO DE INÍCIO DAS AULAS",
+                "conteudo": "[DOC-SECITECI-007 - EDITAL RETIFICADOR Nº 07/2026/SECITECI-MT - CONSOLIDAÇÃO DE CALENDÁRIO, LOCALIDADES E DATAS DE INÍCIO]\nsidade de consolidação normativa integral das ofertas descentralizadas e de explicitação do cronograma de matrícula para todas as chamadas regulares e remanescentes;\n\nRESOLVE:\n\n1. DA CONSOLIDAÇÃO DO CALENDÁRIO DE INÍCIO DAS AULAS (ANO LETIVO 2026/2)\n1.1. Fica consolidada e ratificada para o dia 05 de outubro de 2026 (05/10/2026) a data de início das aulas exclusivamente para os cursos técnicos e localidades individualizados a seguir:\n  - ETEC Barra do Garças | Curso: Técnico em Enfermagem | Localidade: Barra do Garças (Sede Barra do Garças) | Início das aulas: 05 de outubro de 2026 (05/10/2026).\n  - ETEC Água Boa | Curso: Técnico em Agropecuária | Localidade: Santa Terezinha | Início das aulas: 05 de outubro de 2026 (05/10/2026).\n  - ETEC Cuiabá | Curso: Técnico em Agropecuária |",
+                "score_similaridade": 1.0,
+                "score_distancia": 0.4121,
+                "hash_arquivo": "a204a5b07a40453092a5dcd6e06a93cb9f82f1a445c6e0efbf613637ed142316",
+                "configuracao": null,
+                "chunk_hash": null,
+                "natureza": "adaptado",
+                "fonte_original": "Edital Retificador nº 07/2026/SECITECI-MT; consolidação das 14 ofertas descentralizadas e calendário da Retificação 06"
+              },
+              {
+                "documento_id": "DOC-SECITECI-003",
+                "titulo": "EDITAL RETIFICADOR Nº 06/2026/SECITECI-MT - ALTERAÇÃO PONTUAL DE CALENDÁRIO",
+                "versao": "1.2",
+                "trecho_id": "DOC-SECITECI-003-p1-c002",
+                "pagina": 1,
+                "secao": null,
+                "conteudo": "[DOC-SECITECI-003 - EDITAL RETIFICADOR Nº 06/2026/SECITECI-MT - ALTERAÇÃO PONTUAL DE CALENDÁRIO]\nRESTRITO)\r\n1.1. Fica postergada para o dia 05 de outubro de 2026 a data de início das aulas exclusivamente para os seguintes cursos e localidades:\r\n  - ETEC Barra do Garças: Técnico em Enfermagem (Sede Barra do Garças)\r\n  - ETEC Água Boa: Técnico em Agropecuária (Santa Terezinha)\r\n  - ETEC Cuiabá: Técnico em Agropecuária (Turma Descentralizada do Distrito de Mimoso / Santo Antônio de Leverger)\r\n  - ETEC Cáceres: Técnico em Agronegócio (Turma de Conquista D'Oeste)\r\n\r\n1.2. A alteração estabelecida neste Edital Retificador aplica-se estritamente aos cursos e localidades individualizados no item 1.1.\r\n1.3. Para todos os demais cursos da rede ETEC do Estado de Mato Grosso abrangidos pelo Edital nº 006/2026 – incluindo os cursos da sede da ETEC Cuiabá (Técnico em Enfermagem e Técnico em",
+                "score_similaridade": 0.9551,
+                "score_distancia": 0.5153,
+                "hash_arquivo": "dd3d8c31f894c5aab05ca450362f77721eafda1170ea870f3502e62c16b0d6c7",
+                "configuracao": null,
+                "chunk_hash": null,
+                "natureza": "adaptado",
+                "fonte_original": "Retificação 06 do Edital 006/2026, itens 1.1 a 1.3; calendário pontual da Retificação 05"
+              },
+              {
+                "documento_id": "DOC-SECITECI-007",
+                "titulo": "EDITAL RETIFICADOR Nº 07/2026/SECITECI-MT - CONSOLIDAÇÃO DE CALENDÁRIO, LOCALIDADES E DATAS DE INÍCIO",
+                "versao": "1.0",
+                "trecho_id": "DOC-SECITECI-007-p1-c005",
+                "pagina": 1,
+                "secao": null,
+                "conteudo": "[DOC-SECITECI-007 - EDITAL RETIFICADOR Nº 07/2026/SECITECI-MT - CONSOLIDAÇÃO DE CALENDÁRIO, LOCALIDADES E DATAS DE INÍCIO]\nem Agropecuária | Localidade: Comunidade Paraíso do Leste | Início das aulas: 05 de outubro de 2026 (05/10/2026).\n  - ETEC Primavera do Leste | Curso: Técnico em Agropecuária | Localidade: Santo Antônio do Leste | Início das aulas: 05 de outubro de 2026 (05/10/2026).\n  - ETEC Rondonópolis | Curso: Técnico em Agronegócio | Localidade: Alto Araguaia | Início das aulas: 05 de outubro de 2026 (05/10/2026).\n  - ETEC Várzea Grande | Curso: Técnico em Mineração | Localidade: Poconé | Início das aulas: 05 de outubro de 2026 (05/10/2026).\n\n1.2. Para todos os demais cursos e sedes da rede ETEC do Estado de Mato Grosso não constantes no item 1.1, permanece integralmente vigente a data de início das aulas fixada em 21 de julho de 2026 (21/07/2026):\n  - Curso: Técnico em Enfermagem | Localidade:",
+                "score_similaridade": 0.7336,
+                "score_distancia": 0.6565,
+                "hash_arquivo": "a204a5b07a40453092a5dcd6e06a93cb9f82f1a445c6e0efbf613637ed142316",
+                "configuracao": null,
+                "chunk_hash": null,
+                "natureza": "adaptado",
+                "fonte_original": "Edital Retificador nº 07/2026/SECITECI-MT; consolidação das 14 ofertas descentralizadas e calendário da Retificação 06"
+              }
+            ],
+            "trechos_referencia": [
+              "Barra do Garças",
+              "05 de outubro de 2026"
+            ]
           },
           {
             "id": "P4",
             "pergunta": "Qual é a data de início das aulas para o curso Técnico em Enfermagem na sede da ETEC Cuiabá?",
             "docs_esperados": [
               "DOC-SECITECI-001",
-              "DOC-SECITECI-003"
+              "DOC-SECITECI-003",
+              "DOC-SECITECI-007"
             ],
             "docs_recuperados": [
-              "DOC-SECITECI-003",
-              "DOC-SECITECI-003",
-              "DOC-SECITECI-001"
+              "DOC-SECITECI-007",
+              "DOC-SECITECI-007",
+              "DOC-SECITECI-003"
             ],
             "scores": [
-              0.7858,
-              0.7776,
-              0.4802
+              0.9838,
+              0.9802,
+              0.9401
             ],
-            "recuperado_com_sucesso": true
+            "recuperado_com_sucesso": true,
+            "trechos_recuperados": [
+              {
+                "documento_id": "DOC-SECITECI-007",
+                "titulo": "EDITAL RETIFICADOR Nº 07/2026/SECITECI-MT - CONSOLIDAÇÃO DE CALENDÁRIO, LOCALIDADES E DATAS DE INÍCIO",
+                "versao": "1.0",
+                "trecho_id": "DOC-SECITECI-007-p1-c006",
+                "pagina": 1,
+                "secao": "2. DA CONSOLIDAÇÃO DO CRONOGRAMA DE CHAMADAS E MATRÍCULA",
+                "conteudo": "[DOC-SECITECI-007 - EDITAL RETIFICADOR Nº 07/2026/SECITECI-MT - CONSOLIDAÇÃO DE CALENDÁRIO, LOCALIDADES E DATAS DE INÍCIO]\npermanece integralmente vigente a data de início das aulas fixada em 21 de julho de 2026 (21/07/2026):\n  - Curso: Técnico em Enfermagem | Localidade: Cuiabá (sede) | Início das aulas: 21 de julho de 2026 (21/07/2026).\n  - Curso: Técnico em Recursos Humanos | Localidade: Cuiabá (sede) | Início das aulas: 21 de julho de 2026 (21/07/2026).\n  - Curso: Técnico em Enfermagem | Localidade: Confresa | Início das aulas: 21 de julho de 2026 (21/07/2026).\n  - Demais turmas regulares da sede ETEC Cáceres e demais unidades estaduais: início das aulas em 21 de julho de 2026 (21/07/2026).\n\n2. DA CONSOLIDAÇÃO DO CRONOGRAMA DE CHAMADAS E MATRÍCULA\n2.1. Fica ratificado o cronograma oficial de matrículas e chamadas regulares e remanescentes:\n  - 1ª Chamada: convocação e período de matrícula de 15 a",
+                "score_similaridade": 0.9838,
+                "score_distancia": 0.5723,
+                "hash_arquivo": "a204a5b07a40453092a5dcd6e06a93cb9f82f1a445c6e0efbf613637ed142316",
+                "configuracao": null,
+                "chunk_hash": null,
+                "natureza": "adaptado",
+                "fonte_original": "Edital Retificador nº 07/2026/SECITECI-MT; consolidação das 14 ofertas descentralizadas e calendário da Retificação 06"
+              },
+              {
+                "documento_id": "DOC-SECITECI-007",
+                "titulo": "EDITAL RETIFICADOR Nº 07/2026/SECITECI-MT - CONSOLIDAÇÃO DE CALENDÁRIO, LOCALIDADES E DATAS DE INÍCIO",
+                "versao": "1.0",
+                "trecho_id": "DOC-SECITECI-007-p1-c002",
+                "pagina": 1,
+                "secao": "1. DA CONSOLIDAÇÃO DO CALENDÁRIO DE INÍCIO DAS AULAS",
+                "conteudo": "[DOC-SECITECI-007 - EDITAL RETIFICADOR Nº 07/2026/SECITECI-MT - CONSOLIDAÇÃO DE CALENDÁRIO, LOCALIDADES E DATAS DE INÍCIO]\nsidade de consolidação normativa integral das ofertas descentralizadas e de explicitação do cronograma de matrícula para todas as chamadas regulares e remanescentes;\n\nRESOLVE:\n\n1. DA CONSOLIDAÇÃO DO CALENDÁRIO DE INÍCIO DAS AULAS (ANO LETIVO 2026/2)\n1.1. Fica consolidada e ratificada para o dia 05 de outubro de 2026 (05/10/2026) a data de início das aulas exclusivamente para os cursos técnicos e localidades individualizados a seguir:\n  - ETEC Barra do Garças | Curso: Técnico em Enfermagem | Localidade: Barra do Garças (Sede Barra do Garças) | Início das aulas: 05 de outubro de 2026 (05/10/2026).\n  - ETEC Água Boa | Curso: Técnico em Agropecuária | Localidade: Santa Terezinha | Início das aulas: 05 de outubro de 2026 (05/10/2026).\n  - ETEC Cuiabá | Curso: Técnico em Agropecuária |",
+                "score_similaridade": 0.9802,
+                "score_distancia": 0.5432,
+                "hash_arquivo": "a204a5b07a40453092a5dcd6e06a93cb9f82f1a445c6e0efbf613637ed142316",
+                "configuracao": null,
+                "chunk_hash": null,
+                "natureza": "adaptado",
+                "fonte_original": "Edital Retificador nº 07/2026/SECITECI-MT; consolidação das 14 ofertas descentralizadas e calendário da Retificação 06"
+              },
+              {
+                "documento_id": "DOC-SECITECI-003",
+                "titulo": "EDITAL RETIFICADOR Nº 06/2026/SECITECI-MT - ALTERAÇÃO PONTUAL DE CALENDÁRIO",
+                "versao": "1.2",
+                "trecho_id": "DOC-SECITECI-003-p1-c002",
+                "pagina": 1,
+                "secao": null,
+                "conteudo": "[DOC-SECITECI-003 - EDITAL RETIFICADOR Nº 06/2026/SECITECI-MT - ALTERAÇÃO PONTUAL DE CALENDÁRIO]\nRESTRITO)\r\n1.1. Fica postergada para o dia 05 de outubro de 2026 a data de início das aulas exclusivamente para os seguintes cursos e localidades:\r\n  - ETEC Barra do Garças: Técnico em Enfermagem (Sede Barra do Garças)\r\n  - ETEC Água Boa: Técnico em Agropecuária (Santa Terezinha)\r\n  - ETEC Cuiabá: Técnico em Agropecuária (Turma Descentralizada do Distrito de Mimoso / Santo Antônio de Leverger)\r\n  - ETEC Cáceres: Técnico em Agronegócio (Turma de Conquista D'Oeste)\r\n\r\n1.2. A alteração estabelecida neste Edital Retificador aplica-se estritamente aos cursos e localidades individualizados no item 1.1.\r\n1.3. Para todos os demais cursos da rede ETEC do Estado de Mato Grosso abrangidos pelo Edital nº 006/2026 – incluindo os cursos da sede da ETEC Cuiabá (Técnico em Enfermagem e Técnico em",
+                "score_similaridade": 0.9401,
+                "score_distancia": 0.5628,
+                "hash_arquivo": "dd3d8c31f894c5aab05ca450362f77721eafda1170ea870f3502e62c16b0d6c7",
+                "configuracao": null,
+                "chunk_hash": null,
+                "natureza": "adaptado",
+                "fonte_original": "Retificação 06 do Edital 006/2026, itens 1.1 a 1.3; calendário pontual da Retificação 05"
+              }
+            ],
+            "trechos_referencia": [
+              "21 de julho de 2026"
+            ]
           },
           {
             "id": "P5",
-            "pergunta": "Quais são o formato e a duração máxima permitidos para o vídeo de heteroidentificação racial?",
+            "pergunta": "Como deve ser gravado e nomeado o vídeo de autodeclaração para candidatos que concorrem às cotas de heteroidentificação?",
             "docs_esperados": [
-              "DOC-SECITECI-002"
+              "DOC-SECITECI-002",
+              "DOC-SECITECI-007"
             ],
             "docs_recuperados": [
-              "DOC-SECITECI-002",
-              "DOC-SECITECI-002",
+              "DOC-SECITECI-007",
+              "DOC-SECITECI-007",
               "DOC-SECITECI-002"
             ],
             "scores": [
-              0.6654,
-              0.6155,
-              0.5932
+              1.0,
+              1.0,
+              1.0
             ],
-            "recuperado_com_sucesso": true
+            "recuperado_com_sucesso": true,
+            "trechos_recuperados": [
+              {
+                "documento_id": "DOC-SECITECI-007",
+                "titulo": "EDITAL RETIFICADOR Nº 07/2026/SECITECI-MT - CONSOLIDAÇÃO DE CALENDÁRIO, LOCALIDADES E DATAS DE INÍCIO",
+                "versao": "1.0",
+                "trecho_id": "DOC-SECITECI-007-p1-c008",
+                "pagina": 1,
+                "secao": "4. DISPOSIÇÕES FINAIS",
+                "conteudo": "[DOC-SECITECI-007 - EDITAL RETIFICADOR Nº 07/2026/SECITECI-MT - CONSOLIDAÇÃO DE CALENDÁRIO, LOCALIDADES E DATAS DE INÍCIO]\ntabelece vídeo de heteroidentificação; a apresentação e validação documental ocorrem no ato formal de matrícula.\n3.2. A exigência de envio de vídeo em formato .mp4 com duração de até 2 minutos, com nomeação obrigatória do arquivo no padrão NomeCompleto_CPF, aplica-se exclusivamente aos candidatos que optarem pela autodeclaração de heteroidentificação racial nas cotas de Estudantes Negros (L1 - pretos ou pardos).\n\n4. DISPOSIÇÕES FINAIS\n4.1. Este Edital Retificador nº 07 complementa e consolida as disposições dos Editais nº 006/2026 e Retificadores nº 03, 04, 05 e 06, preservando a imutabilidade histórica de seus textos.",
+                "score_similaridade": 1.0,
+                "score_distancia": 0.6152,
+                "hash_arquivo": "a204a5b07a40453092a5dcd6e06a93cb9f82f1a445c6e0efbf613637ed142316",
+                "configuracao": null,
+                "chunk_hash": null,
+                "natureza": "adaptado",
+                "fonte_original": "Edital Retificador nº 07/2026/SECITECI-MT; consolidação das 14 ofertas descentralizadas e calendário da Retificação 06"
+              },
+              {
+                "documento_id": "DOC-SECITECI-007",
+                "titulo": "EDITAL RETIFICADOR Nº 07/2026/SECITECI-MT - CONSOLIDAÇÃO DE CALENDÁRIO, LOCALIDADES E DATAS DE INÍCIO",
+                "versao": "1.0",
+                "trecho_id": "DOC-SECITECI-007-p1-c007",
+                "pagina": 1,
+                "secao": "3. DA COMPROVAÇÃO DE COTAS E AUTODECLARAÇÃO",
+                "conteudo": "[DOC-SECITECI-007 - EDITAL RETIFICADOR Nº 07/2026/SECITECI-MT - CONSOLIDAÇÃO DE CALENDÁRIO, LOCALIDADES E DATAS DE INÍCIO]\n.1. Fica ratificado o cronograma oficial de matrículas e chamadas regulares e remanescentes:\n  - 1ª Chamada: convocação e período de matrícula de 15 a 19/06/2026 (15 a 19 de junho de 2026).\n  - 4ª Chamada: convocação em 03/07/2026 e período de matrícula de 03 a 08/07/2026 (08/07/2026 prazo final de matrícula da 4ª chamada).\n  - 5ª Chamada: convocação para preenchimento de vagas remanescentes presenciais no balcão da secretaria, inclusive para interessados que não participaram do processo seletivo inicial.\n\n3. DA COMPROVAÇÃO DE COTAS E AUTODECLARAÇÃO\n3.1. A comprovação de estudantes indígenas (L3) e candidatos com deficiência (L4) não estabelece vídeo de heteroidentificação; a apresentação e validação documental ocorrem no ato formal de matrícula.\n3.2. A exigência de envio de vídeo em",
+                "score_similaridade": 1.0,
+                "score_distancia": 0.7392,
+                "hash_arquivo": "a204a5b07a40453092a5dcd6e06a93cb9f82f1a445c6e0efbf613637ed142316",
+                "configuracao": null,
+                "chunk_hash": null,
+                "natureza": "adaptado",
+                "fonte_original": "Edital Retificador nº 07/2026/SECITECI-MT; consolidação das 14 ofertas descentralizadas e calendário da Retificação 06"
+              },
+              {
+                "documento_id": "DOC-SECITECI-002",
+                "titulo": "Edital Retificador nº 03 ao Edital nº 006/2026/GS/SECITECI-MT",
+                "versao": "1.3 (Retificador 03)",
+                "trecho_id": "DOC-SECITECI-002-p1-c003",
+                "pagina": 1,
+                "secao": "Art. 3º",
+                "conteudo": "[DOC-SECITECI-002 - Edital Retificador nº 03 ao Edital nº 006/2026/GS/SECITECI-MT]\nna reserva de vagas para pretos, pardos e indígenas (Item 3.10.3), o procedimento de heteroidentificação exige o envio eletrônico, no ato da inscrição até 13/05/2026, de:\na) Vídeo comprobatório gravado pelo candidato com breve apresentação confirmando sua autodeclaração, em formato .mp4 com duração de até 2 minutos.\nb) Fotografia frontal recente, colorida, com fundo branco e boa iluminação, da cintura para cima.\nc) Nomeação obrigatória do arquivo no formato NomeCompleto_CPF (exemplo:\nMariaSilva_12345678900.mp4).\nArt. 3º. As demais disposições do Edital nº 006/2026/GS/SECITECI-MT que não colidirem com este Edital Retificador permanecem inalteradas.",
+                "score_similaridade": 1.0,
+                "score_distancia": 0.7723,
+                "hash_arquivo": "3d24320e696388b21e836fad78799c4460a50f1e0891b35c5723581871d8e1e0",
+                "configuracao": null,
+                "chunk_hash": null,
+                "natureza": "adaptado",
+                "fonte_original": "Retificações 03 (cronograma), 04 (heteroidentificação) e 05 (chamadas) do Edital 006/2026; síntese didática"
+              }
+            ],
+            "trechos_referencia": [
+              ".mp4",
+              "2 minutos"
+            ]
           }
         ]
       },
       "configuracao_escolhida": "Config A (400 chars / 80 overlap)",
-      "justificativa_escolha": "A Configuração A (400 caracteres, sobreposição de 80) isola com maior granularidade artigos específicos (como Art. 2º sobre vídeo .mp4 e Art. 7º sobre 5º dia útil), reduzindo ruído lexical em citações e mantendo 100% de taxa de acerto no top-3."
+      "justificativa_escolha": "A Configuração A (400 caracteres, sobreposição de 80) isola com maior granularidade artigos específicos (como Art. 2º sobre vídeo .mp4 e Art. 7º sobre 5º dia útil), O resultado efetivamente medido está nas duas taxas acima; falhas não são ocultadas."
     },
     "rag_8_perguntas": {
       "taxa_acerto_status": 1.0,
-      "taxa_acerto_citacao": 1.0
+      "taxa_acerto_citacao": 1.0,
+      "fundamentacao": {
+        "numerador": 5,
+        "denominador": 5
+      },
+      "consultas": [
+        {
+          "id": "P1",
+          "tipo": "respondivel",
+          "status_esperado": "fundamentada",
+          "status_obtido": "fundamentada",
+          "status_correto": true,
+          "docs_esperados": [
+            "DOC-SECITECI-001",
+            "DOC-SECITECI-002",
+            "DOC-SECITECI-007"
+          ],
+          "docs_citados": [
+            "DOC-SECITECI-002",
+            "DOC-SECITECI-002",
+            "DOC-SECITECI-001"
+          ],
+          "citacao_correta": true,
+          "afirmacoes_sustentadas": true,
+          "resposta_correta": true,
+          "fontes": [
+            {
+              "documento_id": "DOC-SECITECI-002",
+              "titulo": "Edital Retificador nº 03 ao Edital nº 006/2026/GS/SECITECI-MT",
+              "versao": "1.3 (Retificador 03)",
+              "trecho_id": "DOC-SECITECI-002-p1-c002",
+              "pagina": 1,
+              "secao": null,
+              "conteudo": "[DOC-SECITECI-002 - Edital Retificador nº 03 ao Edital nº 006/2026/GS/SECITECI-MT]\nCNOLOGIA E INOVAÇÃO (SECITECI-MT) torna pública a RETIFICAÇÃO Nº 03 ao Edital nº 006/2026/GS/SECITECI-MT, alterando o Item 5 (Cronograma) e detalhando os requisitos de envio do vídeo de heteroidentificação racial:\nArt. 1º. Fica alterado o Item 5 (Do Cronograma) do Edital nº 006/2026/GS/SECITECI-MT, passando a vigorar com as seguintes datas prorrogadas:\n- Item 2: Período de Inscrição Prorrogado:",
+              "score_similaridade": 0.7672,
+              "score_distancia": 0.9382,
+              "hash_arquivo": "3d24320e696388b21e836fad78799c4460a50f1e0891b35c5723581871d8e1e0",
+              "configuracao": null,
+              "chunk_hash": null,
+              "natureza": "adaptado",
+              "fonte_original": "Retificações 03 (cronograma), 04 (heteroidentificação) e 05 (chamadas) do Edital 006/2026; síntese didática"
+            },
+            {
+              "documento_id": "DOC-SECITECI-002",
+              "titulo": "Edital Retificador nº 03 ao Edital nº 006/2026/GS/SECITECI-MT",
+              "versao": "1.3 (Retificador 03)",
+              "trecho_id": "DOC-SECITECI-002-p1-c003",
+              "pagina": 1,
+              "secao": null,
+              "conteudo": "[DOC-SECITECI-002 - Edital Retificador nº 03 ao Edital nº 006/2026/GS/SECITECI-MT]\nr com as seguintes datas prorrogadas:\n- Item 2: Período de Inscrição Prorrogado: das 08h00 do dia 07/04/2026 até às 23h59 do dia 13/05/2026.\n- Item 3: Solicitação de atendimento especializado e validação de autodeclaração étnico-racial: até 13/05/2026.\n- Item 6: Divulgação preliminar das inscrições homologadas: 18/05/2026.\n- Item 9: Realização do Sorteio Público Eletrônico: 26/05/2026 às 14h00.\n-",
+              "score_similaridade": 0.7596,
+              "score_distancia": 0.9418,
+              "hash_arquivo": "3d24320e696388b21e836fad78799c4460a50f1e0891b35c5723581871d8e1e0",
+              "configuracao": null,
+              "chunk_hash": null,
+              "natureza": "adaptado",
+              "fonte_original": "Retificações 03 (cronograma), 04 (heteroidentificação) e 05 (chamadas) do Edital 006/2026; síntese didática"
+            },
+            {
+              "documento_id": "DOC-SECITECI-001",
+              "titulo": "EDITAL Nº 006/2026/SECITECI-MT - PROCESSO SELETIVO DE ALUNOS PARA CURSOS TÉCNICOS NAS ETECS 2026/2",
+              "versao": "1.0",
+              "trecho_id": "DOC-SECITECI-001-p1-c009",
+              "pagina": 1,
+              "secao": "Item 2",
+              "conteudo": "[DOC-SECITECI-001 - EDITAL Nº 006/2026/SECITECI-MT - PROCESSO SELETIVO DE ALUNOS PARA CURSOS TÉCNICOS NAS ETECS 2026/2]\nES\r\n4.1. As inscrições serão realizadas exclusivamente pela internet no endereço eletrônico oficial da SECITECI.\r\n4.2. Período original de inscrição: das 08h00 do dia 07/04/2026 até às 23h59 do dia 03/05/2026.\r\n\r\n5. DO CRONOGRAMA OFICIAL BASE\r\nItem 1: Publicação do Edital - 31/03/2026\r\nItem 2: Período de Inscrição - 07/04 a 03/05/2026\r\nItem 3: Prazo para envio de documentos da autodeclaração",
+              "score_similaridade": 0.7429,
+              "score_distancia": 0.7403,
+              "hash_arquivo": "92f5881886a589533a3c7e3b34cb15bf29907213a5356be1eb8167cb2f535342",
+              "configuracao": null,
+              "chunk_hash": null,
+              "natureza": "adaptado",
+              "fonte_original": "Edital SECITECI-MT 006/2026; recorte didático, não reprodução integral"
+            }
+          ],
+          "necessidade_revisao": true,
+          "resposta": "\"- Item 2: Período de Inscrição Prorrogado:\" [DOC-SECITECI-002, Edital Retificador nº 03 ao Edital nº 006/2026/GS/SECITECI-MT, v1.3 (Retificador 03), p. 1, trecho DOC-SECITECI-002-p1-c002, natureza: adaptado; origem: Retificações 03 (cronograma), 04 (heteroidentificação) e 05 (chamadas) do Edital 006/2026; síntese didática]\n\"- Item 2: Período de Inscrição Prorrogado: das 08h00 do dia 07/04/2026 até às 23h59 do dia 13/05/2026.\" [DOC-SECITECI-002, Edital Retificador nº 03 ao Edital nº 006/2026/GS/SECITECI-MT, v1.3 (Retificador 03), p. 1, trecho DOC-SECITECI-002-p1-c003, natureza: adaptado; origem: Retificações 03 (cronograma), 04 (heteroidentificação) e 05 (chamadas) do Edital 006/2026; síntese didática]\n\"Item 2: Período de Inscrição - 07/04 a 03/05/2026\" [DOC-SECITECI-001, EDITAL Nº 006/2026/SECITECI-MT - PROCESSO SELETIVO DE ALUNOS PARA CURSOS TÉCNICOS NAS ETECS 2026/2, v1.0, Item 2, p. 1, trecho DOC-SECITECI-001-p1-c009, natureza: adaptado; origem: Edital SECITECI-MT 006/2026; recorte didático, não reprodução integral]"
+        },
+        {
+          "id": "P2",
+          "tipo": "respondivel",
+          "status_esperado": "fundamentada",
+          "status_obtido": "fundamentada",
+          "status_correto": true,
+          "docs_esperados": [
+            "DOC-SECITECI-005"
+          ],
+          "docs_citados": [
+            "DOC-SECITECI-005",
+            "DOC-SECITECI-005",
+            "DOC-SECITECI-005"
+          ],
+          "citacao_correta": true,
+          "afirmacoes_sustentadas": true,
+          "resposta_correta": true,
+          "fontes": [
+            {
+              "documento_id": "DOC-SECITECI-005",
+              "titulo": "INSTRUÇÃO NORMATIVA SECITECI Nº 02/2026 - DOCUMENTAÇÃO COMPROBATÓRIA DE RENDA",
+              "versao": "1.0",
+              "trecho_id": "DOC-SECITECI-005-p1-c003",
+              "pagina": 1,
+              "secao": null,
+              "conteudo": "[DOC-SECITECI-005 - INSTRUÇÃO NORMATIVA SECITECI Nº 02/2026 - DOCUMENTAÇÃO COMPROBATÓRIA DE RENDA]\noriamente a documentação de todos os integrantes da família que residam no mesmo domicílio:\r\n  a) Assalariados: Contracheques ou holerites dos últimos 3 (três) meses anteriores à data do requerimento;\r\n  b) Trabalhadores Autônomos ou Informais: Declaração comprobatória de rendimentos com firma reconhecida em cartório ou modelo oficial da SECITECI acompanhado do extrato bancário dos últimos 90",
+              "score_similaridade": 0.4794,
+              "score_distancia": 0.9441,
+              "hash_arquivo": "66eda57f956a618a2a02c8cf0d81e9fbd9714e53157096ac812f1c2a2f33afea",
+              "configuracao": null,
+              "chunk_hash": null,
+              "natureza": "ficticio",
+              "fonte_original": "Documento criado exclusivamente para o exercício; não é norma oficial"
+            },
+            {
+              "documento_id": "DOC-SECITECI-005",
+              "titulo": "INSTRUÇÃO NORMATIVA SECITECI Nº 02/2026 - DOCUMENTAÇÃO COMPROBATÓRIA DE RENDA",
+              "versao": "1.0",
+              "trecho_id": "DOC-SECITECI-005-p1-c005",
+              "pagina": 1,
+              "secao": null,
+              "conteudo": "[DOC-SECITECI-005 - INSTRUÇÃO NORMATIVA SECITECI Nº 02/2026 - DOCUMENTAÇÃO COMPROBATÓRIA DE RENDA]\ntimos 60 (sessenta) dias (fatura de energia, água ou telefone fixo);\r\n  e) Cópia da Declaração de Imposto de Renda Pessoa Física (DIRPF) do último exercício acompanhada do respectivo recibo de entrega, ou Comprovante de Situação de Isenção da Receita Federal para todos os maiores de 18 anos.\r\n\r\n2. DAS GLOSAS E INDEFERIMENTOS\r\n2.1. O não envio de qualquer dos documentos obrigatórios listados no",
+              "score_similaridade": 0.4081,
+              "score_distancia": 0.8376,
+              "hash_arquivo": "66eda57f956a618a2a02c8cf0d81e9fbd9714e53157096ac812f1c2a2f33afea",
+              "configuracao": null,
+              "chunk_hash": null,
+              "natureza": "ficticio",
+              "fonte_original": "Documento criado exclusivamente para o exercício; não é norma oficial"
+            },
+            {
+              "documento_id": "DOC-SECITECI-005",
+              "titulo": "INSTRUÇÃO NORMATIVA SECITECI Nº 02/2026 - DOCUMENTAÇÃO COMPROBATÓRIA DE RENDA",
+              "versao": "1.0",
+              "trecho_id": "DOC-SECITECI-005-p1-c004",
+              "pagina": 1,
+              "secao": null,
+              "conteudo": "[DOC-SECITECI-005 - INSTRUÇÃO NORMATIVA SECITECI Nº 02/2026 - DOCUMENTAÇÃO COMPROBATÓRIA DE RENDA]\nrio ou modelo oficial da SECITECI acompanhado do extrato bancário dos últimos 90 dias de todas as contas mantidas pelo declarante;\r\n  c) Aposentados ou Pensionistas: Extrato do benefício previdenciário emitido pelo INSS referente ao último mês de pagamento;\r\n  d) Comprovante de Residência atualizado, expedido nos últimos 60 (sessenta) dias (fatura de energia, água ou telefone fixo);\r\n  e) Cópia",
+              "score_similaridade": 0.1809,
+              "score_distancia": 0.9548,
+              "hash_arquivo": "66eda57f956a618a2a02c8cf0d81e9fbd9714e53157096ac812f1c2a2f33afea",
+              "configuracao": null,
+              "chunk_hash": null,
+              "natureza": "ficticio",
+              "fonte_original": "Documento criado exclusivamente para o exercício; não é norma oficial"
+            }
+          ],
+          "necessidade_revisao": true,
+          "resposta": "\"a) Assalariados: Contracheques ou holerites dos últimos 3 (três) meses anteriores à data do requerimento;\" [DOC-SECITECI-005, INSTRUÇÃO NORMATIVA SECITECI Nº 02/2026 - DOCUMENTAÇÃO COMPROBATÓRIA DE RENDA, v1.0, p. 1, trecho DOC-SECITECI-005-p1-c003, natureza: ficticio; origem: Documento criado exclusivamente para o exercício; não é norma oficial]\n\"e) Cópia da Declaração de Imposto de Renda Pessoa Física (DIRPF) do último exercício acompanhada do respectivo recibo de entrega, ou Comprovante de Situação de Isenção da Receita Federal para todos os maiores de 18 anos.\" [DOC-SECITECI-005, INSTRUÇÃO NORMATIVA SECITECI Nº 02/2026 - DOCUMENTAÇÃO COMPROBATÓRIA DE RENDA, v1.0, p. 1, trecho DOC-SECITECI-005-p1-c005, natureza: ficticio; origem: Documento criado exclusivamente para o exercício; não é norma oficial]\n\"d) Comprovante de Residência atualizado, expedido nos últimos 60 (sessenta) dias (fatura de energia, água ou telefone fixo);\" [DOC-SECITECI-005, INSTRUÇÃO NORMATIVA SECITECI Nº 02/2026 - DOCUMENTAÇÃO COMPROBATÓRIA DE RENDA, v1.0, p. 1, trecho DOC-SECITECI-005-p1-c004, natureza: ficticio; origem: Documento criado exclusivamente para o exercício; não é norma oficial]"
+        },
+        {
+          "id": "P3",
+          "tipo": "respondivel",
+          "status_esperado": "fundamentada",
+          "status_obtido": "fundamentada",
+          "status_correto": true,
+          "docs_esperados": [
+            "DOC-SECITECI-003",
+            "DOC-SECITECI-007"
+          ],
+          "docs_citados": [
+            "DOC-SECITECI-007"
+          ],
+          "citacao_correta": true,
+          "afirmacoes_sustentadas": true,
+          "resposta_correta": true,
+          "fontes": [
+            {
+              "documento_id": "DOC-SECITECI-007",
+              "titulo": "EDITAL RETIFICADOR Nº 07/2026/SECITECI-MT - CONSOLIDAÇÃO DE CALENDÁRIO, LOCALIDADES E DATAS DE INÍCIO",
+              "versao": "1.0",
+              "trecho_id": "DOC-SECITECI-007-p1-c004",
+              "pagina": 1,
+              "secao": null,
+              "conteudo": "[DOC-SECITECI-007 - EDITAL RETIFICADOR Nº 07/2026/SECITECI-MT - CONSOLIDAÇÃO DE CALENDÁRIO, LOCALIDADES E DATAS DE INÍCIO]\nro de 2026 (05/10/2026) a data de início das aulas exclusivamente para os cursos técnicos e localidades individualizados a seguir:\n  - ETEC Barra do Garças | Curso: Técnico em Enfermagem | Localidade: Barra do Garças (Sede Barra do Garças) | Início das aulas: 05 de outubro de 2026 (05/10/2026).\n  - ETEC Água Boa | Curso: Técnico em Agropecuária | Localidade: Santa Terezinha | Início das aulas: 05",
+              "score_similaridade": 1.0,
+              "score_distancia": 0.3427,
+              "hash_arquivo": "a204a5b07a40453092a5dcd6e06a93cb9f82f1a445c6e0efbf613637ed142316",
+              "configuracao": null,
+              "chunk_hash": null,
+              "natureza": "adaptado",
+              "fonte_original": "Edital Retificador nº 07/2026/SECITECI-MT; consolidação das 14 ofertas descentralizadas e calendário da Retificação 06"
+            }
+          ],
+          "necessidade_revisao": true,
+          "resposta": "\"- ETEC Barra do Garças | Curso: Técnico em Enfermagem | Localidade: Barra do Garças (Sede Barra do Garças) | Início das aulas: 05 de outubro de 2026 (05/10/2026).\" [DOC-SECITECI-007, EDITAL RETIFICADOR Nº 07/2026/SECITECI-MT - CONSOLIDAÇÃO DE CALENDÁRIO, LOCALIDADES E DATAS DE INÍCIO, v1.0, p. 1, trecho DOC-SECITECI-007-p1-c004, natureza: adaptado; origem: Edital Retificador nº 07/2026/SECITECI-MT; consolidação das 14 ofertas descentralizadas e calendário da Retificação 06]"
+        },
+        {
+          "id": "P4",
+          "tipo": "respondivel",
+          "status_esperado": "fundamentada",
+          "status_obtido": "fundamentada",
+          "status_correto": true,
+          "docs_esperados": [
+            "DOC-SECITECI-001",
+            "DOC-SECITECI-003",
+            "DOC-SECITECI-007"
+          ],
+          "docs_citados": [
+            "DOC-SECITECI-007",
+            "DOC-SECITECI-003"
+          ],
+          "citacao_correta": true,
+          "afirmacoes_sustentadas": true,
+          "resposta_correta": true,
+          "fontes": [
+            {
+              "documento_id": "DOC-SECITECI-007",
+              "titulo": "EDITAL RETIFICADOR Nº 07/2026/SECITECI-MT - CONSOLIDAÇÃO DE CALENDÁRIO, LOCALIDADES E DATAS DE INÍCIO",
+              "versao": "1.0",
+              "trecho_id": "DOC-SECITECI-007-p1-c011",
+              "pagina": 1,
+              "secao": null,
+              "conteudo": "[DOC-SECITECI-007 - EDITAL RETIFICADOR Nº 07/2026/SECITECI-MT - CONSOLIDAÇÃO DE CALENDÁRIO, LOCALIDADES E DATAS DE INÍCIO]\nedes da rede ETEC do Estado de Mato Grosso não constantes no item 1.1, permanece integralmente vigente a data de início das aulas fixada em 21 de julho de 2026 (21/07/2026):\n  - Curso: Técnico em Enfermagem | Localidade: Cuiabá (sede) | Início das aulas: 21 de julho de 2026 (21/07/2026).\n  - Curso: Técnico em Recursos Humanos | Localidade: Cuiabá (sede) | Início das aulas: 21 de julho de 2026",
+              "score_similaridade": 0.9943,
+              "score_distancia": 0.5515,
+              "hash_arquivo": "a204a5b07a40453092a5dcd6e06a93cb9f82f1a445c6e0efbf613637ed142316",
+              "configuracao": null,
+              "chunk_hash": null,
+              "natureza": "adaptado",
+              "fonte_original": "Edital Retificador nº 07/2026/SECITECI-MT; consolidação das 14 ofertas descentralizadas e calendário da Retificação 06"
+            },
+            {
+              "documento_id": "DOC-SECITECI-003",
+              "titulo": "EDITAL RETIFICADOR Nº 06/2026/SECITECI-MT - ALTERAÇÃO PONTUAL DE CALENDÁRIO",
+              "versao": "1.2",
+              "trecho_id": "DOC-SECITECI-003-p1-c005",
+              "pagina": 1,
+              "secao": null,
+              "conteudo": "[DOC-SECITECI-003 - EDITAL RETIFICADOR Nº 06/2026/SECITECI-MT - ALTERAÇÃO PONTUAL DE CALENDÁRIO]\nos demais cursos da rede ETEC do Estado de Mato Grosso abrangidos pelo Edital nº 006/2026 – incluindo os cursos da sede da ETEC Cuiabá (Técnico em Enfermagem e Técnico em Recursos Humanos) e da sede da ETEC Cáceres (Técnico em Enfermagem) –, permanecem integralmente vigentes as datas anteriormente fixadas, com início das aulas em 21 de julho de 2026.\r\n1.4. Distinção Institucional entre Escola",
+              "score_similaridade": 0.8609,
+              "score_distancia": 0.5781,
+              "hash_arquivo": "dd3d8c31f894c5aab05ca450362f77721eafda1170ea870f3502e62c16b0d6c7",
+              "configuracao": null,
+              "chunk_hash": null,
+              "natureza": "adaptado",
+              "fonte_original": "Retificação 06 do Edital 006/2026, itens 1.1 a 1.3; calendário pontual da Retificação 05"
+            }
+          ],
+          "necessidade_revisao": true,
+          "resposta": "\"- Curso: Técnico em Enfermagem | Localidade: Cuiabá (sede) | Início das aulas: 21 de julho de 2026 (21/07/2026).\" [DOC-SECITECI-007, EDITAL RETIFICADOR Nº 07/2026/SECITECI-MT - CONSOLIDAÇÃO DE CALENDÁRIO, LOCALIDADES E DATAS DE INÍCIO, v1.0, p. 1, trecho DOC-SECITECI-007-p1-c011, natureza: adaptado; origem: Edital Retificador nº 07/2026/SECITECI-MT; consolidação das 14 ofertas descentralizadas e calendário da Retificação 06]\n\"os demais cursos da rede ETEC do Estado de Mato Grosso abrangidos pelo Edital nº 006/2026 – incluindo os cursos da sede da ETEC Cuiabá (Técnico em Enfermagem e Técnico em Recursos Humanos) e da sede da ETEC Cáceres (Técnico em Enfermagem) –, permanecem integralmente vigentes as datas anteriormente fixadas, com início das aulas em 21 de julho de 2026.\" [DOC-SECITECI-003, EDITAL RETIFICADOR Nº 06/2026/SECITECI-MT - ALTERAÇÃO PONTUAL DE CALENDÁRIO, v1.2, p. 1, trecho DOC-SECITECI-003-p1-c005, natureza: adaptado; origem: Retificação 06 do Edital 006/2026, itens 1.1 a 1.3; calendário pontual da Retificação 05]"
+        },
+        {
+          "id": "P5",
+          "tipo": "respondivel",
+          "status_esperado": "fundamentada",
+          "status_obtido": "fundamentada",
+          "status_correto": true,
+          "docs_esperados": [
+            "DOC-SECITECI-002",
+            "DOC-SECITECI-007"
+          ],
+          "docs_citados": [
+            "DOC-SECITECI-002",
+            "DOC-SECITECI-007"
+          ],
+          "citacao_correta": true,
+          "afirmacoes_sustentadas": true,
+          "resposta_correta": true,
+          "fontes": [
+            {
+              "documento_id": "DOC-SECITECI-002",
+              "titulo": "Edital Retificador nº 03 ao Edital nº 006/2026/GS/SECITECI-MT",
+              "versao": "1.3 (Retificador 03)",
+              "trecho_id": "DOC-SECITECI-002-p1-c005",
+              "pagina": 1,
+              "secao": null,
+              "conteudo": "[DOC-SECITECI-002 - Edital Retificador nº 03 ao Edital nº 006/2026/GS/SECITECI-MT]\ns candidatos inscritos na reserva de vagas para pretos, pardos e indígenas (Item 3.10.3), o procedimento de heteroidentificação exige o envio eletrônico, no ato da inscrição até 13/05/2026, de:\na) Vídeo comprobatório gravado pelo candidato com breve apresentação confirmando sua autodeclaração, em formato .mp4 com duração de até 2 minutos.\nb) Fotografia frontal recente, colorida, com fundo branco",
+              "score_similaridade": 1.0,
+              "score_distancia": 0.7136,
+              "hash_arquivo": "3d24320e696388b21e836fad78799c4460a50f1e0891b35c5723581871d8e1e0",
+              "configuracao": null,
+              "chunk_hash": null,
+              "natureza": "adaptado",
+              "fonte_original": "Retificações 03 (cronograma), 04 (heteroidentificação) e 05 (chamadas) do Edital 006/2026; síntese didática"
+            },
+            {
+              "documento_id": "DOC-SECITECI-007",
+              "titulo": "EDITAL RETIFICADOR Nº 07/2026/SECITECI-MT - CONSOLIDAÇÃO DE CALENDÁRIO, LOCALIDADES E DATAS DE INÍCIO",
+              "versao": "1.0",
+              "trecho_id": "DOC-SECITECI-007-p1-c015",
+              "pagina": 1,
+              "secao": null,
+              "conteudo": "[DOC-SECITECI-007 - EDITAL RETIFICADOR Nº 07/2026/SECITECI-MT - CONSOLIDAÇÃO DE CALENDÁRIO, LOCALIDADES E DATAS DE INÍCIO]\nÇÃO\n3.1. A comprovação de estudantes indígenas (L3) e candidatos com deficiência (L4) não estabelece vídeo de heteroidentificação; a apresentação e validação documental ocorrem no ato formal de matrícula.\n3.2. A exigência de envio de vídeo em formato .mp4 com duração de até 2 minutos, com nomeação obrigatória do arquivo no padrão NomeCompleto_CPF, aplica-se exclusivamente aos candidatos que",
+              "score_similaridade": 0.9659,
+              "score_distancia": 0.7126,
+              "hash_arquivo": "a204a5b07a40453092a5dcd6e06a93cb9f82f1a445c6e0efbf613637ed142316",
+              "configuracao": null,
+              "chunk_hash": null,
+              "natureza": "adaptado",
+              "fonte_original": "Edital Retificador nº 07/2026/SECITECI-MT; consolidação das 14 ofertas descentralizadas e calendário da Retificação 06"
+            }
+          ],
+          "necessidade_revisao": true,
+          "resposta": "\"a) Vídeo comprobatório gravado pelo candidato com breve apresentação confirmando sua autodeclaração, em formato .mp4 com duração de até 2 minutos.\" [DOC-SECITECI-002, Edital Retificador nº 03 ao Edital nº 006/2026/GS/SECITECI-MT, v1.3 (Retificador 03), p. 1, trecho DOC-SECITECI-002-p1-c005, natureza: adaptado; origem: Retificações 03 (cronograma), 04 (heteroidentificação) e 05 (chamadas) do Edital 006/2026; síntese didática]\n\"3.2. A exigência de envio de vídeo em formato .mp4 com duração de até 2 minutos, com nomeação obrigatória do arquivo no padrão NomeCompleto_CPF, aplica-se exclusivamente aos candidatos que\" [DOC-SECITECI-007, EDITAL RETIFICADOR Nº 07/2026/SECITECI-MT - CONSOLIDAÇÃO DE CALENDÁRIO, LOCALIDADES E DATAS DE INÍCIO, v1.0, p. 1, trecho DOC-SECITECI-007-p1-c015, natureza: adaptado; origem: Edital Retificador nº 07/2026/SECITECI-MT; consolidação das 14 ofertas descentralizadas e calendário da Retificação 06]"
+        },
+        {
+          "id": "P6",
+          "tipo": "irrespondivel",
+          "status_esperado": "sem_evidencia_suficiente",
+          "status_obtido": "sem_evidencia_suficiente",
+          "status_correto": true,
+          "docs_esperados": [],
+          "docs_citados": [],
+          "citacao_correta": true,
+          "afirmacoes_sustentadas": false,
+          "resposta_correta": true,
+          "fontes": [],
+          "necessidade_revisao": true,
+          "resposta": "Informação não localizada no acervo institucional disponível. O acervo institucional não contempla o termo ou entidade: medicina. Encaminhar para revisão humana."
+        },
+        {
+          "id": "P7",
+          "tipo": "irrespondivel",
+          "status_esperado": "sem_evidencia_suficiente",
+          "status_obtido": "sem_evidencia_suficiente",
+          "status_correto": true,
+          "docs_esperados": [],
+          "docs_citados": [],
+          "citacao_correta": true,
+          "afirmacoes_sustentadas": false,
+          "resposta_correta": true,
+          "fontes": [],
+          "necessidade_revisao": true,
+          "resposta": "Informação não localizada no acervo institucional disponível. O acervo institucional não contempla o termo ou entidade: graduação, lato, sensu, taxa. Encaminhar para revisão humana."
+        },
+        {
+          "id": "P8",
+          "tipo": "conflitante",
+          "status_esperado": "conflito_de_fontes",
+          "status_obtido": "conflito_de_fontes",
+          "status_correto": true,
+          "docs_esperados": [
+            "DOC-SECITECI-004",
+            "DOC-SECITECI-006"
+          ],
+          "docs_citados": [
+            "DOC-SECITECI-006",
+            "DOC-SECITECI-004",
+            "DOC-SECITECI-006"
+          ],
+          "citacao_correta": true,
+          "afirmacoes_sustentadas": true,
+          "resposta_correta": true,
+          "fontes": [
+            {
+              "documento_id": "DOC-SECITECI-006",
+              "titulo": "Comunicado Interno nº 014/2026/DAA-ETEC - Orientações Operacionais sobre Entrega de Frequência e Matrícula Tardias",
+              "versao": "1.0 (Comunicado Setorial Local)",
+              "trecho_id": "DOC-SECITECI-006-p1-c003",
+              "pagina": 1,
+              "secao": null,
+              "conteudo": "[DOC-SECITECI-006 - Comunicado Interno nº 014/2026/DAA-ETEC - Orientações Operacionais sobre Entrega de Frequência e Matrícula Tardias]\nil que, em razão de reformas no sistema acadêmico local, a entrega do formulário mensal de comprovação de frequência na secretaria acadêmica deverá ser realizada até o dia 20 (vinte) de cada mês, bastando frequência mínima mensal de 70% (setenta por cento) das aulas dadas para manutenção do Auxílio Alimentação e do Auxílio Transporte.\n2. Adicionalmente, este comunicado informa que candidatos",
+              "score_similaridade": 0.9495,
+              "score_distancia": 0.5211,
+              "hash_arquivo": "9fece3fd8f1c7ac9cadf7e80ee7c940d7cfc40208fa558e44a500719bae998d7",
+              "configuracao": null,
+              "chunk_hash": null,
+              "natureza": "ficticio",
+              "fonte_original": "Cenário contraditório criado para revisão humana; não é norma oficial"
+            },
+            {
+              "documento_id": "DOC-SECITECI-004",
+              "titulo": "Regulamento do Programa de Assistência e Permanência Estudantil das ETECs (Portaria Normativa nº 042/2026/SECITECI-MT)",
+              "versao": "2.0 (Vigente)",
+              "trecho_id": "DOC-SECITECI-004-p1-c007",
+              "pagina": 1,
+              "secao": null,
+              "conteudo": "[DOC-SECITECI-004 - Regulamento do Programa de Assistência e Permanência Estudantil das ETECs (Portaria Normativa nº 042/2026/SECITECI-MT)]\no estudante contemplado deve apresentar na Secretaria Acadêmica o formulário de comprovação de frequência assinado pela coordenação de curso impreterivelmente até o 5º (quinto) dia útil de cada mês de referência.\nArt. 8º. O descumprimento do prazo previsto no Art. 7º ou a frequência inferior a 85% sem justificativa médica acarretará a suspensão cautelar do benefício no mês subsequente.",
+              "score_similaridade": 0.3897,
+              "score_distancia": 0.7821,
+              "hash_arquivo": "1f671825891d20879e7f7852f0a49d5a999362a463f7596a0facbc641be2b1f1",
+              "configuracao": null,
+              "chunk_hash": null,
+              "natureza": "ficticio",
+              "fonte_original": "Documento criado exclusivamente para o exercício; não é norma oficial"
+            },
+            {
+              "documento_id": "DOC-SECITECI-006",
+              "titulo": "Comunicado Interno nº 014/2026/DAA-ETEC - Orientações Operacionais sobre Entrega de Frequência e Matrícula Tardias",
+              "versao": "1.0 (Comunicado Setorial Local)",
+              "trecho_id": "DOC-SECITECI-006-p1-c006",
+              "pagina": 1,
+              "secao": null,
+              "conteudo": "[DOC-SECITECI-006 - Comunicado Interno nº 014/2026/DAA-ETEC - Orientações Operacionais sobre Entrega de Frequência e Matrícula Tardias]\na Normativa nº 042/2026/GS/SECITECI-MT (DOC-SECITECI-004, Art. 6º e Art. 7º, que exigem entrega até o 5º dia útil de cada mês e frequência mínima de 85%) e ao Edital nº 006/2026 (DOC-SECITECI-001, Item\n11.5). Qualquer consulta sobre esses temas deve sinalizar o conflito normativo entre as fontes e encaminhar o caso para revisão humana.",
+              "score_similaridade": 0.3727,
+              "score_distancia": 0.8491,
+              "hash_arquivo": "9fece3fd8f1c7ac9cadf7e80ee7c940d7cfc40208fa558e44a500719bae998d7",
+              "configuracao": null,
+              "chunk_hash": null,
+              "natureza": "ficticio",
+              "fonte_original": "Cenário contraditório criado para revisão humana; não é norma oficial"
+            }
+          ],
+          "necessidade_revisao": true,
+          "resposta": "Divergência entre passagens sobre o mesmo assunto; conferir vigência com o operador.\n\"il que, em razão de reformas no sistema acadêmico local, a entrega do formulário mensal de comprovação de frequência na secretaria acadêmica deverá ser realizada até o dia 20 (vinte) de cada mês, bastando frequência mínima mensal de 70% (setenta por cento) das aulas dadas para manutenção do Auxílio Alimentação e do Auxílio Transporte.\" [DOC-SECITECI-006, Comunicado Interno nº 014/2026/DAA-ETEC - Orientações Operacionais sobre Entrega de Frequência e Matrícula Tardias, v1.0 (Comunicado Setorial Local), p. 1, trecho DOC-SECITECI-006-p1-c003, natureza: ficticio; origem: Cenário contraditório criado para revisão humana; não é norma oficial]\n\"o estudante contemplado deve apresentar na Secretaria Acadêmica o formulário de comprovação de frequência assinado pela coordenação de curso impreterivelmente até o 5º (quinto) dia útil de cada mês de referência.\" [DOC-SECITECI-004, Regulamento do Programa de Assistência e Permanência Estudantil das ETECs (Portaria Normativa nº 042/2026/SECITECI-MT), v2.0 (Vigente), p. 1, trecho DOC-SECITECI-004-p1-c007, natureza: ficticio; origem: Documento criado exclusivamente para o exercício; não é norma oficial]\n\"a Normativa nº 042/2026/GS/SECITECI-MT (DOC-SECITECI-004, Art. 6º e Art. 7º, que exigem entrega até o 5º dia útil de cada mês e frequência mínima de 85%) e ao Edital nº 006/2026 (DOC-SECITECI-001, Item\" [DOC-SECITECI-006, Comunicado Interno nº 014/2026/DAA-ETEC - Orientações Operacionais sobre Entrega de Frequência e Matrícula Tardias, v1.0 (Comunicado Setorial Local), p. 1, trecho DOC-SECITECI-006-p1-c006, natureza: ficticio; origem: Cenário contraditório criado para revisão humana; não é norma oficial]"
+        }
+      ]
     },
     "sentimentos_12_avaliacoes": {
       "taxa_acerto": 1.0,
@@ -245,7 +1186,7 @@
       "requisito": "RF14",
       "cenario": "Saída válida, tipo incorreto, campo obrigatório ausente e chave extra",
       "status": "APROVADO",
-      "duracao_ms": 0.16,
+      "duracao_ms": 0.26,
       "evidencia": {
         "chaves_extras_detectadas": [
           "chave_intrusa_nao_prevista"
@@ -264,7 +1205,7 @@
       "requisito": "RF14",
       "cenario": "Data inválida, categoria fora da lista e dado não presente no original",
       "status": "APROVADO",
-      "duracao_ms": 0.11,
+      "duracao_ms": 0.39,
       "evidencia": "Bloqueados com sucesso: ['data_invalida', 'categoria_invalida', 'dado_ausente_no_original']"
     },
     {
@@ -272,7 +1213,7 @@
       "requisito": "RF15",
       "cenario": "Seis solicitações (4 completas, 1 incompleta, 1 ambígua) contra gabarito",
       "status": "APROVADO",
-      "duracao_ms": 20.32,
+      "duracao_ms": 17.98,
       "evidencia": "Acurácia categoria: 100.0% (6/6), Omissões: 0, Fatos sem suporte: 0"
     },
     {
@@ -280,7 +1221,7 @@
       "requisito": "RF16",
       "cenario": "Três entradas adversariais (solicitação, documento do corpus e extração de segredo)",
       "status": "APROVADO",
-      "duracao_ms": 2.49,
+      "duracao_ms": 7.02,
       "evidencia": {
         "adv1_solicitacao": "bloquear",
         "adv2_corpus_alerta": "Instrução maliciosa indireta neutralizada no documento DOC-ADV-02 (ADV-02).",
@@ -292,7 +1233,7 @@
       "requisito": "RF16",
       "cenario": "Entrada fora de escopo, arquivo/texto excessivo e limite máximo de chamadas",
       "status": "APROVADO",
-      "duracao_ms": 0.06,
+      "duracao_ms": 0.09,
       "evidencia": {
         "fora_de_escopo": "revisar",
         "arquivo_invalido_bloqueado": true,
@@ -305,20 +1246,20 @@
       "requisito": "RF17",
       "cenario": "Indexação dos 6 documentos, recarga em disco e reindexação do mesmo acervo sem duplicação",
       "status": "APROVADO",
-      "duracao_ms": 12.78,
-      "evidencia": "Docs: 6, Chunks: 49, Duplicados adicionados: 0"
+      "duracao_ms": 42.98,
+      "evidencia": "Docs: 7, Chunks: 66, Duplicados adicionados: 0"
     },
     {
       "teste": "T07",
       "requisito": "RF18",
       "cenario": "Cinco perguntas respondíveis comparadas em duas configurações de chunking (A: 400/80 vs B: 800/150)",
       "status": "APROVADO",
-      "duracao_ms": 21.24,
+      "duracao_ms": 35.91,
       "evidencia": {
         "config_a_hit_rate": "100.0%",
-        "config_a_chunks": 49,
+        "config_a_chunks": 66,
         "config_b_hit_rate": "100.0%",
-        "config_b_chunks": 24
+        "config_b_chunks": 32
       }
     },
     {
@@ -326,13 +1267,13 @@
       "requisito": "RF19",
       "cenario": "Cinco perguntas respondíveis pelo corpus (P1 a P5) com resposta fundamentada e citação",
       "status": "APROVADO",
-      "duracao_ms": 10.41,
+      "duracao_ms": 44.55,
       "evidencia": [
-        "P1: ['DOC-SECITECI-002', 'DOC-SECITECI-001', 'DOC-SECITECI-002']",
-        "P2: ['DOC-SECITECI-005', 'DOC-SECITECI-004', 'DOC-SECITECI-004']",
-        "P3: ['DOC-SECITECI-003', 'DOC-SECITECI-001', 'DOC-SECITECI-001']",
-        "P4: ['DOC-SECITECI-003', 'DOC-SECITECI-003', 'DOC-SECITECI-001']",
-        "P5: ['DOC-SECITECI-002', 'DOC-SECITECI-002', 'DOC-SECITECI-002']"
+        "P1: ['DOC-SECITECI-002', 'DOC-SECITECI-002', 'DOC-SECITECI-001']",
+        "P2: ['DOC-SECITECI-005', 'DOC-SECITECI-005', 'DOC-SECITECI-005']",
+        "P3: ['DOC-SECITECI-007']",
+        "P4: ['DOC-SECITECI-007', 'DOC-SECITECI-003']",
+        "P5: ['DOC-SECITECI-002', 'DOC-SECITECI-007']"
       ]
     },
     {
@@ -340,7 +1281,7 @@
       "requisito": "RF19",
       "cenario": "Duas perguntas sem resposta no corpus (P6 e P7) com abstenção explícita",
       "status": "APROVADO",
-      "duracao_ms": 9.0,
+      "duracao_ms": 38.36,
       "evidencia": [
         "P6: sem_evidencia_suficiente",
         "P7: sem_evidencia_suficiente"
@@ -351,11 +1292,11 @@
       "requisito": "RF19",
       "cenario": "Pergunta com fontes contraditórias (P8) sinalizando conflito entre DOC-004 e DOC-006",
       "status": "APROVADO",
-      "duracao_ms": 8.6,
+      "duracao_ms": 39.06,
       "evidencia": [
         "DOC-SECITECI-006",
         "DOC-SECITECI-004",
-        "DOC-SECITECI-004"
+        "DOC-SECITECI-006"
       ]
     },
     {
@@ -363,18 +1304,18 @@
       "requisito": "RF20",
       "cenario": "Fluxo completo do assistente (solicitação, fontes, minuta fundamentada e revisão humana)",
       "status": "APROVADO",
-      "duracao_ms": 29.0,
-      "evidencia": "Minuta gerada (2929 chars) | Decisões: ['pendente', 'aprovada', 'rejeitada', 'revisar']"
+      "duracao_ms": 69.7,
+      "evidencia": "Minuta gerada (1474 chars) | Decisões: ['pendente', 'aprovada', 'rejeitada', 'revisar']"
     },
     {
       "teste": "T12",
       "requisito": "RF21",
       "cenario": "Segunda configuração de geração compatível e falha controlada sem reconstruir o índice",
       "status": "APROVADO",
-      "duracao_ms": 29.75,
+      "duracao_ms": 5.95,
       "evidencia": {
-        "modo_geracao_2": "Adaptador_Simulado_Identificado:simulador-institucional-govmt-v2",
-        "versao_indice_preservada": "v2.0-49c-5167d33347",
+        "modo_geracao_2": "Adaptador_Simulado_Identificado:simulador-institucional-govmt-v2:demonstracao_simulada_com_extracao_local",
+        "versao_indice_preservada": "v2.0-66c-c77b766fdc",
         "falha_controlada": "remote_disabled"
       }
     },
@@ -383,7 +1324,7 @@
       "requisito": "RF22/RF23",
       "cenario": "12 avaliações, filtro por categoria, deduplicação por ID e conjunto vazio sem divisão por zero",
       "status": "APROVADO",
-      "duracao_ms": 0.9,
+      "duracao_ms": 1.18,
       "evidencia": {
         "taxa_acerto_12_casos": "100.0%",
         "duplicatas_removidas": 2,
@@ -396,19 +1337,19 @@
       "requisito": "RF17/RF21",
       "cenario": "Indexar documento, consultar, excluir por id_documento e confirmar ausência na busca",
       "status": "APROVADO",
-      "duracao_ms": 25.21,
+      "duracao_ms": 17.78,
       "evidencia": "Recuperado antes: True, Chunks removidos: 1, Ausente após exclusão: True"
     },
     {
       "teste": "T15",
       "requisito": "RF23",
-      "cenario": "Regressão dos fluxos herdados do Desafio 01 (caso textual + acessibilidade de áudio/OCR)",
+      "cenario": "Texto e OCR reais até minuta, revisão e auditoria; sem chamadas remotas",
       "status": "APROVADO",
-      "duracao_ms": 5.16,
+      "duracao_ms": 7749.81,
       "evidencia": {
-        "protocolo_d01": "2026-000142",
-        "fidelidade_d01_percentual": 100.0,
-        "acessibilidade_rf07_ativa": true
+        "texto_ate_revisao": true,
+        "ocr_ate_revisao": true,
+        "limitacao": null
       }
     }
   ]

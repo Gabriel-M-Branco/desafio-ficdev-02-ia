@@ -7,6 +7,7 @@ import uuid
 import hashlib
 import re
 import unicodedata
+import os
 from datetime import datetime as _datetime
 from pathlib import Path
 from datetime import datetime
@@ -43,6 +44,7 @@ class AuditLogger:
         limpo = re.sub(r"\bhf_[A-Za-z0-9]{12,}\b", "[REDACTED_HF_TOKEN]", texto)
         limpo = re.sub(r"\bsk-[A-Za-z0-9_\-]{12,}\b", "[REDACTED_API_KEY]", limpo)
         limpo = re.sub(r"\b(\d{3})\.(\d{3})\.(\d{3})-(\d{2})\b", r"***. \2.***-**".replace(" ", ""), limpo)
+        limpo = re.sub(r"\b\d{11}\b", "[CPF_MASCARADO]", limpo)
         limpo = re.sub(
             r"\b([a-zA-Z0-9_.+-]+)@([a-zA-Z0-9-]+\.[a-zA-Z0-9-.]+)\b",
             lambda m: f"{m.group(1)[0]}***@{m.group(2)}" if m.group(1) else f"***@{m.group(2)}",
@@ -147,6 +149,7 @@ class AuditLogger:
             ),
         }
 
+        registro = self._mascarar_estrutura(registro)
         # Grava no log cumulativo JSON Lines
         with open(self.trail_file, "a", encoding="utf-8") as f:
             f.write(json.dumps(registro, ensure_ascii=False) + "\n")
@@ -171,7 +174,7 @@ class AuditLogger:
             dado = json.loads((self.log_dir / f"{exec_id}.json").read_text(encoding="utf-8"))
             decisao = dado.get("decisao_humana", {})
             if (decisao.get("status") == "APROVADO" and decisao.get("id_aprovacao")
-                    and dado.get("texto_final") == texto
+                    and dado.get("texto_final") in {texto, self._mascarar_texto_pii_e_segredos(texto)}
                     and decisao.get("hash_texto_aprovado") == self.hash_texto(texto)):
                 return decisao
         except (OSError, ValueError, AttributeError, TypeError):
@@ -183,48 +186,39 @@ class AuditLogger:
         Atualiza o status de Human-in-the-Loop de uma execução (RF13, RF20).
         decisao: 'APROVADO', 'REJEITADO', 'CORRIGIDO'
         """
-        if (not re.fullmatch(r"[A-Za-z0-9_-]+", exec_id) or decisao not in {"APROVADO", "CORRIGIDO", "REJEITADO"}
+        decisao = {"APROVADA": "APROVADO", "REJEITADA": "REJEITADO", "REVISAR": "CORRIGIDO",
+                   "PENDENTE": "pendente_revisao"}.get(decisao.upper(), decisao.upper())
+        if (not re.fullmatch(r"[A-Za-z0-9_-]+", exec_id) or decisao not in {"APROVADO", "CORRIGIDO", "REJEITADO", "pendente_revisao"}
                 or not justificativa.strip() or not operador.strip()
                 or (decisao == "APROVADO" and (not isinstance(texto_final, str) or not texto_final.strip()))):
             return False
         individual_file = self.log_dir / f"{exec_id}.json"
         if not individual_file.exists():
-            dado = {
-                "id_execucao": exec_id,
-                "timestamp": datetime.now().isoformat(),
-                "modalidade": "texto",
-                "arquivo_origem": "dados/originais/entrada_texto.txt",
-                "provedor": "revisao_operador",
-                "modelo": "N/A",
-                "versao_prompt": "PRODUCAO",
-                "versao_esquema": "2.0.0",
-                "parametros": {},
-                "duracao_segundos": 0.0,
-                "erros": [],
-                "resultado_resumo": {"sucesso": True, "campos_extraidos": 0},
-                "decisao_humana": {"status": "pendente_revisao"}
-            }
-        else:
+            return False
+        try:
             with open(individual_file, "r", encoding="utf-8") as f:
                 dado = json.load(f)
+        except (OSError, ValueError):
+            return False
 
         dado["decisao_humana"] = {
             "status": decisao,
-            "operador": operador,
-            "justificativa": justificativa,
+            "estado": {"APROVADO": "aprovada", "REJEITADO": "rejeitada", "CORRIGIDO": "revisar",
+                       "pendente_revisao": "pendente"}[decisao],
+            "operador": self._mascarar_texto_pii_e_segredos(operador),
+            "justificativa": self._mascarar_texto_pii_e_segredos(justificativa),
             "data_decisao": datetime.now().isoformat(),
         }
         if texto_final is not None:
-            dado["texto_final"] = texto_final
+            dado["texto_final"] = self._mascarar_texto_pii_e_segredos(texto_final)
         if decisao == "APROVADO":
             dado["decisao_humana"].update(
                 id_aprovacao=uuid.uuid4().hex, hash_texto_aprovado=self.hash_texto(texto_final))
 
-        with open(individual_file, "w", encoding="utf-8") as f:
-            json.dump(dado, f, ensure_ascii=False, indent=2)
-
         # Atualiza trilha de auditoria cumulativa
+        temporario = individual_file.with_suffix(".tmp")
         try:
+            temporario.write_text(json.dumps(dado, ensure_ascii=False, indent=2), encoding="utf-8")
             with open(self.trail_file, "a", encoding="utf-8") as f:
                 f.write(json.dumps({
                     "id_execucao": exec_id,
@@ -245,8 +239,13 @@ class AuditLogger:
                     "decisao_humana": dado["decisao_humana"],
                     "texto_final": dado.get("texto_final")
                 }, ensure_ascii=False) + "\n")
-        except Exception:
-            pass
+            os.replace(temporario, individual_file)
+        except OSError:
+            try:
+                temporario.unlink(missing_ok=True)
+            except OSError:
+                pass
+            return False
 
         return True
 
@@ -259,7 +258,7 @@ class AuditLogger:
             for line in f:
                 if line.strip():
                     try:
-                        execucoes.append(json.loads(line))
+                        execucoes.append(self._mascarar_estrutura(json.loads(line)))
                     except Exception:
                         pass
         return execucoes

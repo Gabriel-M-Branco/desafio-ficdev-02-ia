@@ -8,6 +8,8 @@ comparáveis (Config A: 400/80 e Config B: 800/150).
 import os
 import hashlib
 import re
+import json
+from pathlib import Path
 from typing import List, Dict, Any, Optional
 import pymupdf
 
@@ -24,6 +26,8 @@ class ChunkDocumento:
         secao: Optional[str] = None,
         hash_arquivo: str = "",
         configuracao: str = "A",
+        natureza: str = "nao_classificado",
+        fonte_original: str = "",
     ):
         self.documento_id = documento_id
         self.versao = versao
@@ -34,6 +38,8 @@ class ChunkDocumento:
         self.secao = secao
         self.hash_arquivo = hash_arquivo
         self.configuracao = configuracao
+        self.natureza = natureza
+        self.fonte_original = fonte_original
         self.chunk_hash = hashlib.sha256(
             f"{documento_id}_{configuracao}_{trecho_id}_{self.conteudo}".encode("utf-8")
         ).hexdigest()[:16]
@@ -49,6 +55,8 @@ class ChunkDocumento:
             "secao": self.secao,
             "hash_arquivo": self.hash_arquivo,
             "configuracao": self.configuracao,
+            "natureza": self.natureza,
+            "fonte_original": self.fonte_original,
             "chunk_hash": self.chunk_hash,
         }
 
@@ -163,6 +171,10 @@ def ler_arquivo(caminho_arquivo: str) -> List[Dict[str, Any]]:
     else:
         raise ValueError(f"Formato não suportado para ingestão de acervo: {caminho_arquivo}")
 
+    oficiais = Path(__file__).resolve().parents[1] / "dados" / "originais" / "editais"
+    if Path(caminho_arquivo).resolve().is_relative_to(oficiais):
+        for pag in paginas:
+            pag.update(natureza="oficial", fonte_original=nome_base)
     return paginas
 
 
@@ -201,6 +213,9 @@ def dividir_em_chunks(
         titulo = pag["titulo"]
         num_pag = pag["pagina"]
         hash_arq = pag["hash_arquivo"]
+        catalogo_path = os.path.join(os.path.dirname(__file__), "..", "dados", "acervo", "catalogo.json")
+        with open(catalogo_path, encoding="utf-8") as f:
+            origem = json.load(f).get(doc_id, {})
 
         inicio = 0
         idx_trecho = 1
@@ -230,13 +245,15 @@ def dividir_em_chunks(
                     secao=secao,
                     hash_arquivo=hash_arq,
                     configuracao=cfg_label,
+                    natureza=pag.get("natureza", origem.get("natureza", "nao_classificado")),
+                    fonte_original=pag.get("fonte_original", origem.get("fonte_original", "")),
                 )
                 chunks_resultado.append(chunk_obj)
                 idx_trecho += 1
 
             if fim >= tamanho_texto:
                 break
-            inicio += (tamanho_chunk - sobreposicao)
+            inicio = max(inicio + 1, fim - sobreposicao)
 
     return chunks_resultado
 
@@ -255,3 +272,13 @@ def carregar_acervo_completo(diretorio: str = "dados/acervo", configuracao: str 
         pags = ler_arquivo(arq)
         todos_chunks.extend(dividir_em_chunks(pags, configuracao=configuracao))
     return todos_chunks
+
+
+if __name__ == "__main__":
+    # Recriação explícita; a troca de provedor nunca invoca este comando.
+    from src.embeddings import IndiceVetorial
+    indice = IndiceVetorial(caminho_indice=None, persistir=False)
+    indice.adicionar_chunks(carregar_acervo_completo())
+    indice.caminho_indice = "indice/indice_vetorial.json"
+    indice.salvar()
+    print(json.dumps({"chunks": len(indice.chunks), "versao": indice.versao_indice}))
