@@ -13,6 +13,7 @@ load_dotenv()
 import json
 import uuid
 import re
+import hashlib
 from datetime import datetime, date
 from pathlib import Path
 from typing import Dict, Any, List, Optional
@@ -66,6 +67,17 @@ st.set_page_config(
     layout="wide",
     initial_sidebar_state="expanded"
 )
+
+# A tradução automática pode substituir nós de texto controlados pelo React,
+# corrompendo rótulos e causando removeChild durante a navegação. A interface
+# já está em português; alteramos apenas atributos, nunca os filhos do DOM.
+from streamlit.components.v1 import html as componente_html
+getattr(st, "iframe", componente_html)("""<script>
+const raiz = window.parent.document.documentElement;
+raiz.setAttribute('lang', 'pt-BR');
+raiz.setAttribute('translate', 'no');
+raiz.classList.add('notranslate');
+</script>""", height=1)
 
 # ==============================================================================
 # Singletons de Serviços Centrais
@@ -196,6 +208,89 @@ st.markdown(
         margin-top: 0.45rem !important;
         margin-bottom: 0.45rem !important;
     }
+    [data-testid="stAppViewContainer"] { background-color: #f8fafc; }
+    [data-testid="stSidebar"] { background-color: #eef4fa; }
+    h1, h2, h3 { color: #004a8f; }
+    [data-testid="stVerticalBlockBorderWrapper"] { border-radius: 10px; }
+    [data-testid="stMetricValue"] {
+        white-space: normal;
+        overflow-wrap: anywhere;
+        font-size: clamp(1.2rem, 2.2vw, 2rem);
+    }
+    [data-testid="stMetricLabel"] p { white-space: normal; }
+    div[data-baseweb="select"] [role="combobox"] {
+        min-height: 2.5rem;
+        line-height: 1.5;
+    }
+    /* Acabamento institucional com componentes nativos e sem alterar o DOM. */
+    [data-testid="stMainBlockContainer"] { max-width: 1480px; }
+    h2 { font-size: 1.7rem; line-height: 1.25; }
+    h3 { font-size: 1.35rem; margin-top: 0.5rem; }
+    h4, h5, h6 { color: #263f58; }
+    [data-testid="stHeadingWithActionElements"] { padding-bottom: 0.35rem; }
+    [data-testid="stVerticalBlockBorderWrapper"] > div {
+        border-color: #dbe4ee;
+        background-color: #ffffff;
+    }
+    [data-testid="stMetric"] {
+        background: #ffffff;
+        border: 1px solid #dbe4ee;
+        border-top: 3px solid #004a8f;
+        border-radius: 8px;
+        padding: 0.85rem 1rem;
+        height: 100%;
+    }
+    [data-testid="stMetricLabel"] { color: #475569; }
+    [data-testid="stBaseButton-primary"] {
+        background-color: #004a8f;
+        border-color: #004a8f;
+        color: #ffffff;
+    }
+    [data-testid="stBaseButton-primary"]:hover { background-color: #003c73; }
+    [data-testid="stBaseButton-secondary"], [data-testid="stDownloadButton"] button {
+        border-color: #c5d3e1;
+        color: #004a8f;
+    }
+    [data-testid="stButton"] button, [data-testid="stDownloadButton"] button {
+        border-radius: 8px;
+        min-height: 2.6rem;
+        font-weight: 600;
+    }
+    [data-testid="stButton"] button:disabled { opacity: 0.55; }
+    div[data-baseweb="input"], div[data-baseweb="select"] > div,
+    div[data-baseweb="textarea"] { border-radius: 8px; }
+    [data-testid="stAlert"] { border-radius: 8px; line-height: 1.5; }
+    [data-testid="stExpander"] { border-color: #dbe4ee; border-radius: 8px; }
+    [data-baseweb="tab-list"] { gap: 0.5rem; border-bottom: 1px solid #dbe4ee; }
+    [data-baseweb="tab"] { padding: 0.65rem 0.8rem; height: auto; }
+    [data-baseweb="tab"][aria-selected="true"] {
+        color: #004a8f; background: #e8f0f9; border-radius: 6px 6px 0 0;
+    }
+    [data-testid="stSidebar"] [role="radiogroup"] { gap: 0.35rem; align-items: stretch; }
+    [data-testid="stSidebar"] [role="radiogroup"] > div { width: 100%; }
+    [data-testid="stSidebar"] [role="radiogroup"] label {
+        align-items: center;
+        padding: 0.5rem 0.55rem;
+        margin: 0;
+        border: 1px solid transparent;
+        border-left: 3px solid transparent;
+        border-radius: 7px;
+        width: 100%;
+        box-sizing: border-box;
+    }
+    [data-testid="stSidebar"] [role="radiogroup"] label:hover { background: #e2ebf5; }
+    [data-testid="stSidebar"] [role="radiogroup"] label:has(input:checked) {
+        background: #ffffff; border-color: #cbdbea; border-left-color: #004a8f;
+    }
+    [data-testid="stSidebar"] [role="radiogroup"] p {
+        font-size: 0.88rem; line-height: 1.3; margin-bottom: 0;
+    }
+    [data-testid="stSidebar"] [role="radiogroup"] [data-testid="stCaptionContainer"] p {
+        font-size: 0.72rem; color: #52677c; margin-top: 0.18rem;
+    }
+    [data-testid="stSidebar"] [role="radiogroup"] small { color: #52677c; opacity: 1; }
+    [data-testid="stSidebar"] [data-testid="stExpander"] { background: #ffffff; }
+    [data-testid="stSidebar"] hr { border-color: #cfdae6; margin: 1rem 0 !important; }
     </style>
     """,
     unsafe_allow_html=True
@@ -413,11 +508,31 @@ menu = st.sidebar.radio(
         "9. Gestao do Acervo e Expurgo (RF24)",
         "10. Matriz de Testes Automatizados T01-T15",
     ],
-    index=0
+    index=0,
+    format_func=lambda valor: {
+        "1": "1. Atendimento ao cidadão",
+        "2": "2. Experimento de prompts",
+        "3": "3. Áudio e leitura visual",
+        "4": "4. Comunicação visual",
+        "5": "5. Auditoria e LGPD",
+        "6": "6. Assistente documental",
+        "7": "7. Triagem e ficha",
+        "8": "8. Painel de sentimentos",
+        "9": "9. Gestão do acervo",
+        "10": "10. Matriz de testes",
+    }[valor.split(".")[0]],
+    captions=[
+        "RF01–RF13 · Revisão humana", "RF02 · Comparação A/B/C",
+        "RF06 / RF08 · STT e OCR", "RF10 · Peças institucionais",
+        "RF11–RF13 / RF21 · Rastreabilidade", "RF18–RF21 · RAG",
+        "RF14 / RF15 · Compreensão", "RF22 · Avaliações",
+        "RF24 · Expurgo", "RF23 / RF24 · T01–T15",
+    ],
 )
 
 st.sidebar.divider()
-st.sidebar.markdown("##### Status Real dos Motores de IA")
+st.sidebar.markdown("##### Motores de IA")
+st.sidebar.caption("Status real · Abra uma seção para conferir o provedor e o modelo.")
 
 status_motores = obter_status_todos_motores()
 
@@ -457,7 +572,7 @@ with st.sidebar.expander("Base RAG / Vetorial", expanded=False):
     st.caption(f"Versão: `{status_motores['rag']['versao']}`")
 
 st.sidebar.divider()
-st.sidebar.markdown("**Governança:** `[Human-in-the-Loop Ativo]`")
+st.sidebar.caption("Governança · Revisão humana obrigatória")
 
 # ==============================================================================
 # Cabeçalho Principal (Banner com Alto Contraste Institucional)
@@ -477,7 +592,7 @@ st.markdown("")
 # MÓDULO 1: Central de Atendimento & HITL (RF03, RF05, RF07, RF09, RF13)
 # ==============================================================================
 if menu.startswith("1."):
-    st.subheader("1. Atendimento e Redação de Minuta Oficial")
+    st.subheader("1. Atendimento e redação de minuta")
     st.markdown("Selecione um caso pré-definido ou insira o texto livre. A IA isola o conteúdo não confiável via envelope XML, extrai dados em JSON estrito e redige a minuta institucional.")
 
     col_in, col_out = st.columns([1, 1.3], gap="large")
@@ -537,7 +652,7 @@ if menu.startswith("1."):
 
         c_btn1, c_btn2 = st.columns([1.5, 1])
         with c_btn1:
-            btn_processar = st.button("Processar Solicitacao", type="primary", width='stretch')
+            btn_processar = st.button("Processar Solicitação", type="primary", width='stretch')
         with c_btn2:
             if st.button("Limpar Tudo", width='stretch'):
                 st.session_state.solicitacao_texto = ""
@@ -553,7 +668,7 @@ if menu.startswith("1."):
         if not st.session_state.solicitacao_texto.strip():
             st.warning("Por favor, informe o texto da manifestação.")
         else:
-            with st.spinner("Processando com IA soberana e isolamento de segurança XML..."):
+            with st.spinner("Processando a solicitação com validação e isolamento de segurança XML..."):
                 texto_sanitizado = sanitizar_entrada_usuario(st.session_state.solicitacao_texto)
                 prompt_completo = montar_prompt(texto_sanitizado, "PRODUCAO")
                 limite_json = max(llm_client.default_max_tokens, 4096)
@@ -661,9 +776,9 @@ if menu.startswith("1."):
 
             tab_minuta, tab_conf, tab_json, tab_met = st.tabs([
                 "Minuta Oficial (RF09)",
-                "Painel de Conferencia (RF13)",
+                "Painel de Conferência (RF13)",
                 "JSON Estruturado (RF05)",
-                "Metricas e Qualidade"
+                "Métricas e qualidade"
             ])
 
             with tab_minuta:
@@ -672,7 +787,7 @@ if menu.startswith("1."):
                     erros = [c for c in (aval.get("erros_encontrados") or []) if c.get("status") != "PENDENCIA" and not c.get("eh_pendencia")]
                     pends = [c for c in (aval.get("comparativo_campos") or []) if c.get("eh_pendencia") or c.get("status") == "PENDENCIA"]
                     if erros:
-                        st.error(f"Atencao Operador: Foram detectadas {len(erros)} divergência(s) em relação aos padrões oficiais.")
+                        st.error(f"Atenção, operador: Foram detectadas {len(erros)} divergência(s) em relação aos padrões oficiais.")
                     elif pends:
                         st.warning(f"Dados pendentes na fonte: {len(pends)} campo(s) assinalados estritamente como *'não localizado'*.")
                     else:
@@ -698,7 +813,7 @@ if menu.startswith("1."):
                         )
 
                 with act2:
-                    if st.button("Sintetizar Voz Acessivel (RF07)", width='stretch'):
+                    if st.button("Sintetizar Voz Acessível (RF07)", width='stretch'):
                         with st.spinner("Verificando aprovação humana e sintetizando voz neural com aviso sonoro..."):
                             res_tts = audio_processor.sintetizar_minuta_audio(
                                 texto_minuta=st.session_state.minuta_editavel,
@@ -718,7 +833,7 @@ if menu.startswith("1."):
                     st.audio(st.session_state.audio_tts_bytes, format="audio/mp3")
 
                 st.divider()
-                st.markdown("###### Deliberacao do Servidor Responsável (RF13)")
+                st.markdown("###### Deliberação do Servidor Responsável (RF13)")
                 just_input = st.text_input(
                     "Justificativa da Decisão (Obrigatória para auditoria):",
                     value=st.session_state.justificativa_minuta,
@@ -732,12 +847,15 @@ if menu.startswith("1."):
                         if not st.session_state.justificativa_minuta.strip():
                             st.warning("Preencha a justificativa antes de aprovar.")
                         else:
-                            audit_logger.atualizar_decisao_humana(
+                            salvo = audit_logger.atualizar_decisao_humana(
                                 exec_id=exec_atual["id_execucao"],
                                 decisao="APROVADO",
                                 justificativa=st.session_state.justificativa_minuta,
                                 texto_final=st.session_state.minuta_editavel
                             )
+                            if not salvo:
+                                st.error("Não foi possível persistir a decisão. Tente novamente; a minuta continua pendente.")
+                                st.stop()
                             st.session_state.decisao_minuta = "APROVADO"
                             st.success("Resposta APROVADA e homologada no log de auditoria!")
                             st.rerun()
@@ -746,12 +864,15 @@ if menu.startswith("1."):
                         if not st.session_state.justificativa_minuta.strip():
                             st.warning("Preencha a justificativa da correção.")
                         else:
-                            audit_logger.atualizar_decisao_humana(
+                            salvo = audit_logger.atualizar_decisao_humana(
                                 exec_id=exec_atual["id_execucao"],
                                 decisao="CORRIGIDO",
                                 justificativa=st.session_state.justificativa_minuta,
                                 texto_final=st.session_state.minuta_editavel
                             )
+                            if not salvo:
+                                st.error("Não foi possível persistir a correção.")
+                                st.stop()
                             st.session_state.decisao_minuta = "CORRIGIDO"
                             st.warning("Correção salva no log de auditoria.")
                             st.rerun()
@@ -760,12 +881,15 @@ if menu.startswith("1."):
                         if not st.session_state.justificativa_minuta.strip():
                             st.warning("Informe o motivo da rejeição.")
                         else:
-                            audit_logger.atualizar_decisao_humana(
+                            salvo = audit_logger.atualizar_decisao_humana(
                                 exec_id=exec_atual["id_execucao"],
                                 decisao="REJEITADO",
                                 justificativa=st.session_state.justificativa_minuta,
                                 texto_final=st.session_state.minuta_editavel
                             )
+                            if not salvo:
+                                st.error("Não foi possível persistir a rejeição.")
+                                st.stop()
                             st.session_state.decisao_minuta = "REJEITADO"
                             st.error("Resposta REJEITADA.")
                             st.rerun()
@@ -837,7 +961,7 @@ if menu.startswith("1."):
 # MÓDULO 2: Experimento de Prompts (RF02)
 # ==============================================================================
 elif menu.startswith("2."):
-    st.subheader("2. Experimento Controlado de Engenharia de Prompts (RF02)")
+    st.subheader("2. Experimento de prompts (RF02)")
     st.markdown("Comparativo empírico entre os Prompts A (Zero-Shot Curto), B (Estruturado Manual) e C (Metaprompting de Produção com Envelope XML).")
 
     if st.button("Executar Experimento de Prompts", type="primary"):
@@ -869,7 +993,7 @@ elif menu.startswith("2."):
         }
 
     criterios = [
-        {"Critério de Avaliação": "Fidelidade ao Contexto", "Prompt A": "Média (resposta informal)", "Prompt B": "Alta (segue campos)", "Prompt C (Produção)": "Excelente (100% documental)"},
+        {"Critério de Avaliação": "Fidelidade ao Contexto", "Prompt A": "Média (resposta informal)", "Prompt B": "Alta (segue campos)", "Prompt C (Produção)": "Exige conferência documental"},
         {"Critério de Avaliação": "Alucinação de Dados", "Prompt A": "Risco Alto (infere datas/valores)", "Prompt B": "Baixo Risco", "Prompt C (Produção)": "Zero ('não localizado')"},
         {"Critério de Avaliação": "Formato de Saída", "Prompt A": "Texto livre sem padrão", "Prompt B": "Texto estruturado", "Prompt C (Produção)": "JSON estrito + Minuta"},
         {"Critério de Avaliação": "Tom Institucional", "Prompt A": "Informal / Genérico", "Prompt B": "Formal GOV.MT", "Prompt C (Produção)": "Oficial Padrão GOV.MT"},
@@ -879,7 +1003,7 @@ elif menu.startswith("2."):
     ]
     st.dataframe(criterios, width='stretch', hide_index=True)
 
-    st.success("**Prompt Selecionado:** Prompt C (Metaprompting com Blindagem XML). Garante alucinação zero, contrato JSON estrito e imunidade contra injeção.")
+    st.success("**Prompt selecionado:** Prompt C, com estrutura JSON e isolamento XML. A fidelidade dos dados e a resposta exigem conferência humana.")
 
     t1, t2, t3 = st.tabs(["Prompt A (Zero-Shot)", "Prompt B (Estruturado)", "Prompt C (Produção)"])
     with t1:
@@ -894,13 +1018,13 @@ elif menu.startswith("2."):
 # MÓDULO 3: Áudio STT & Visão OCR (RF06, RF08)
 # ==============================================================================
 elif menu.startswith("3."):
-    st.subheader("3. Reconhecimento de Voz (STT) e Leitura Visual (OCR)")
-    st.markdown("Processamento multimodal omnichannel de áudio falado e fichas digitalizadas com conferência de entidades críticas.")
+    st.subheader("3. Áudio e leitura visual (RF06 / RF08)")
+    st.markdown("Transcreva áudios e leia documentos digitalizados. Confira os dados extraídos antes de encaminhar ao atendimento.")
 
     col_a, col_v = st.columns(2, gap="large")
 
     with col_a:
-        st.markdown("##### Mensagem de Audio (RF06)")
+        st.markdown("##### Mensagem de Áudio (RF06)")
         p_audio = resolver_caminho("dados/originais/entrada_audio.mp3")
         if p_audio.exists():
             st.audio(str(p_audio))
@@ -920,10 +1044,10 @@ elif menu.startswith("3."):
                 st.markdown("**Validação de Entidades Críticas:**")
                 for c_nome, c_item in comp.get("detalhes", {}).items():
                     ok = c_item.get("localizado_na_transcricao")
-                    icone = "[OK]" if ok else "[DIVERGENCIA]"
+                    icone = "[OK]" if ok else "[DIVERGÊNCIA]"
                     st.write(f"- {icone} **{c_nome.capitalize()}:** *{c_item.get('valor_esperado')}*")
 
-                if st.button("Enviar Transcricao para Atendimento", width='stretch'):
+                if st.button("Enviar Transcrição para Atendimento", width='stretch'):
                     st.session_state.solicitacao_texto = res_a.get("transcricao_revisada") or ""
                     st.session_state.solicitacao_caso = "audio_transcricao"
                     st.success("Texto transferido para o Módulo 1!")
@@ -969,7 +1093,7 @@ elif menu.startswith("3."):
 # MÓDULO 4: Comunicação Visual Oficial (RF10)
 # ==============================================================================
 elif menu.startswith("4."):
-    st.subheader("4. Comunicação Visual Institucional Padronizada (RF10)")
+    st.subheader("4. Comunicação visual institucional (RF10)")
     st.markdown("Abordagem híbrida: geração de ilustração sem texto por IA combinada com moldura timbrada oficial em Pillow (Brasão do Estado e tarja de proveniência de conteúdo sintético).")
 
     def _obter_ultima_imagem_existente():
@@ -1037,13 +1161,13 @@ elif menu.startswith("4."):
                     )
         with c_v2:
             meta = img_dado.get("metadados", {})
-            st.markdown("##### Metadados da Peça (RF10)")
-            st.write(f"- **Título:** {meta.get('titulo')}")
-            st.write(f"- **Dimensões:** {meta.get('dimensoes', '1080x1350')}")
-            st.write(f"- **Modelo IA:** `{meta.get('modelo_ia_utilizado')}`")
-            st.write(f"- **Provedor:** `{meta.get('provedor_efetivo') or meta.get('provedor_solicitado')}`")
-            st.write(f"- **Tarja:** `{meta.get('declaracao_proveniencia')}`")
-            st.write(f"- **SHA-256:** `{meta.get('sha256_imagem', '')[:20]}...`")
+            st.markdown(f"**{meta.get('titulo') or 'Peça institucional'}**")
+            with st.expander("Metadados e proveniência — RF10"):
+                st.write(f"- **Dimensões:** {meta.get('dimensoes', '1080x1350')}")
+                st.write(f"- **Modelo de IA:** `{meta.get('modelo_ia_utilizado')}`")
+                st.write(f"- **Provedor:** `{meta.get('provedor_efetivo') or meta.get('provedor_solicitado')}`")
+                st.write(f"- **Tarja:** `{meta.get('declaracao_proveniencia')}`")
+                st.write(f"- **SHA-256:** `{meta.get('sha256_imagem', '')}`")
 
             status_rev = meta.get("status_revisao", "pendente_revisao")
             if status_rev in ("aprovada", "APROVADO"):
@@ -1113,7 +1237,7 @@ elif menu.startswith("4."):
 # MÓDULO 5: Auditoria & LGPD (RF11, RF12, RF13, RF21)
 # ==============================================================================
 elif menu.startswith("5."):
-    st.subheader("5. Trilha de Auditoria e Conformidade LGPD (RF11 / RF12 / RF21)")
+    st.subheader("5. Auditoria e conformidade LGPD (RF11 / RF12 / RF13 / RF21)")
     st.markdown("Rastreabilidade de todas as chamadas de IA, versões de esquema/prompt/índice e decisões humanas tomadas pelos operadores.")
 
     t_lgpd, t_logs = st.tabs(["Relatório de Conformidade LGPD", "Histórico de Auditoria"])
@@ -1262,7 +1386,7 @@ elif menu.startswith("5."):
             with f_col1:
                 filtro_dec = st.selectbox(
                     "Filtrar por Status de Decisão:",
-                    ["Todos os Status", "Aprovada", "Pendente de Revisão", "Rejeitada", "Não Aplicável"],
+                    ["Todos os Status", "Aprovada", "Pendente de Revisão", "Revisar", "Rejeitada", "Não Aplicável"],
                     key="filtro_audit_decisao"
                 )
             with f_col2:
@@ -1292,6 +1416,8 @@ elif menu.startswith("5."):
                     if filtro_dec == "Pendente de Revisão" and st_val not in ("PENDENTE", "PENDENTE_REVISAO", "AGUARDANDO_VALIDACAO"):
                         continue
                     if filtro_dec == "Rejeitada" and st_val not in ("REJEITADO", "REJEITADA"):
+                        continue
+                    if filtro_dec == "Revisar" and st_val not in ("REVISAR", "REVISÃO", "CORRIGIDO"):
                         continue
                     if filtro_dec == "Não Aplicável" and st_val not in ("NAO_APLICAVEL", "NÃO APLICÁVEL"):
                         continue
@@ -1352,7 +1478,7 @@ elif menu.startswith("5."):
                         label_curta = "REJEITADA"
                         bg_cor, borda_cor, txt_cor = "#FEE2E2", "#DC2626", "#B91C1C"
                         label_banner = "DECISÃO HUMANA: REJEITADA"
-                    elif st_u in ("REVISAR", "REVISÃO"):
+                    elif st_u in ("REVISAR", "REVISÃO", "CORRIGIDO"):
                         bg_pill, txt_pill, borda_pill = "#2563EB", "#FFFFFF", "#1D4ED8"
                         label_curta = "REVISAR"
                         bg_cor, borda_cor, txt_cor = "#DBEAFE", "#2563EB", "#1D4ED8"
@@ -1440,15 +1566,16 @@ elif menu.startswith("5."):
 # MÓDULO 6: Assistente de Documentos RAG e Atendimento Integrado (RF17 a RF21)
 # ==============================================================================
 elif menu.startswith("6."):
-    st.subheader("6. Assistente de Documentos Institucionais e Atendimento Integrado (RAG — RF18 a RF21)")
+    st.subheader("6. Assistente de documentos e atendimento integrado")
+    st.caption("RAG · RF18 / RF19 / RF20 / RF21")
     st.markdown(
         "Consulta semântica fundamentada nos editais e retificações da ETEC/SECITECI-MT, com citações explícitas, "
         "detecção de conflitos normativos, separação entre fatos do solicitante e regras do acervo, e troca de provedor sem reconstrução do índice."
     )
 
     aba_consulta, aba_integrado = st.tabs([
-        "Consulta Direta ao Acervo (P1 a P8 — RF18/RF19/RF21)",
-        "Atendimento Integrado de Solicitações com Minuta Fundamentada (SOL-01 a SOL-06 — RF20)"
+        "Consulta ao acervo (RF18 / RF19 / RF21)",
+        "Atendimento integrado (RF20)"
     ])
 
     with aba_consulta:
@@ -1465,7 +1592,7 @@ elif menu.startswith("6."):
                 "P7: Quais são os critérios de isenção de pós-graduação?",
                 "P8: Até que dia do mês deve ser entregue a frequência do auxílio alimentação?"
             ]
-            escolha = st.selectbox("Perguntas de Teste do Gabarito:", sugestoes)
+            escolha = st.selectbox("Perguntas do gabarito:", sugestoes)
 
             perguntas_map = {
                 "P1:": "Qual é o prazo final prorrogado para realização das inscrições no Processo Seletivo das ETECs 2026/2?",
@@ -1484,7 +1611,7 @@ elif menu.startswith("6."):
                     pergunta_txt = v_p
                     break
 
-            pergunta_digitada = st.text_input("Pergunta do Cidadão:", value=pergunta_txt, placeholder="Digite a dúvida sobre o edital...")
+            pergunta_digitada = st.text_input("Pergunta do cidadão:", value=pergunta_txt, placeholder="Digite a dúvida sobre o edital...")
 
         with c_cfg1:
             top_k = st.slider("Trechos (Top-K):", min_value=1, max_value=5, value=3)
@@ -1512,7 +1639,7 @@ elif menu.startswith("6."):
         res_c = st.session_state.rag_consulta_resultado
         if res_c:
             resp = res_c["resposta_obj"]
-            st.caption(f"Índice Vetorial preservado: `{res_c['versao_indice']}` | Adaptador utilizado: `{res_c['provedor']}`")
+            st.markdown(f"**Pergunta consultada:** {res_c['pergunta']}")
             if resp.modo_geracao == "guardrail_entrada_bloqueado":
                 st.error("SOLICITAÇÃO BLOQUEADA POR DIRETRIZES DE SEGURANÇA E ESCOPO (GUARDRAIL RF16)")
             elif resp.status == "fundamentada":
@@ -1528,16 +1655,21 @@ elif menu.startswith("6."):
                 st.warning(f"**Divergência Normativa Identificada:** {resp.divergencia_identificada}")
 
             if resp.fontes:
-                st.markdown("##### Trechos Recuperados do Acervo (Sanitizados contra Injeção Indireta)")
+                st.markdown("##### Fontes e trechos recuperados")
+                st.caption(" • ".join(dict.fromkeys(
+                    f"{t.documento_id} · versão {t.versao} · página {t.pagina or 1}" for t in resp.fontes
+                )))
                 for idx, t in enumerate(resp.fontes, start=1):
                     with st.expander(f"Trecho {idx}: {t.documento_id} v{t.versao} (Pág. {t.pagina or '1'}) — Similaridade: {t.score_similaridade:.4f}"):
                         st.caption(f"ID: {t.trecho_id} | Seção: {t.secao or 'Geral'} | Distância: {t.score_distancia:.4f}")
                         st.text_area("Fragmento:", value=t.conteudo, height=calcular_altura_dinamica(t.conteudo, min_height=40), disabled=True, key=f"rag_{t.trecho_id}")
             else:
                 st.caption("Nenhum trecho documental recuperado ou aplicável para esta resposta.")
+            with st.expander("Detalhes da consulta — RF18 / RF21"):
+                st.caption(f"Índice: `{res_c['versao_indice']}` | Adaptador: `{res_c['provedor']}`")
 
     with aba_integrado:
-        st.markdown("##### Fluxo Integrado: Solicitação $\\rightarrow$ Extração Literal/Inferida $\\rightarrow$ Busca RAG $\\rightarrow$ Minuta Fundamentada $\\rightarrow$ Decisão Humana (RF20)")
+        st.caption("Solicitação → Extração e triagem → Evidência RAG → Minuta → Revisão humana → Auditoria")
         p_sol = resolver_caminho("dados/solicitacoes/solicitacoes.json")
         solicitacoes_lista = json.loads(p_sol.read_text(encoding="utf-8")) if p_sol.exists() else []
         opcoes_int = {f"{s['id']} — {s['canal']} ({s['subtipo']})": s for s in solicitacoes_lista}
@@ -1594,6 +1726,7 @@ elif menu.startswith("6."):
                     st.error(f"Entrada bloqueada pelos Guardrails (RF16): {dec_guard.motivo}")
                 else:
                     with st.spinner("Extraindo ficha estruturada, consultando editais e redigindo minuta fundamentada..."):
+                        inicio_atendimento = time.perf_counter()
                         ficha_int = processar_solicitacao(
                             texto_original=texto_int,
                             protocolo_externo=prot_int if prot_int.strip() else None,
@@ -1622,7 +1755,7 @@ elif menu.startswith("6."):
                                 "categoria": ficha_int.categoria,
                                 "necessidade_revisao": pacote_minuta.necessidade_revisao,
                             },
-                            duracao_segundos=0.05,
+                            duracao_segundos=time.perf_counter() - inicio_atendimento,
                         )
                         st.session_state.rag_atendimento_resultado = {
                             "id_execucao": exec_id_int,
@@ -1630,6 +1763,7 @@ elif menu.startswith("6."):
                             "pacote": pacote_minuta,
                             "status_operador": "pendente",
                         }
+                        st.session_state.estado_revisao_integrada = "pendente"
 
         res_int = st.session_state.rag_atendimento_resultado
         if res_int:
@@ -1646,20 +1780,23 @@ elif menu.startswith("6."):
 
             st.info(f"**Resumo Fiel da Solicitação (RF15):** {ficha_i.resumo}")
 
-            c_lit, c_inf = st.columns(2)
-            with c_lit:
-                st.markdown("###### Extração Literal (Sustentada pelo Texto)")
-                st.json(sep_i["extracao_literal"])
-            with c_inf:
-                st.markdown("###### Informação Inferida (Classificação / Triagem)")
-                st.json(sep_i["informacao_inferida"])
+            with st.expander("Extração e triagem — RF14 / RF15"):
+                c_lit, c_inf = st.columns(2)
+                with c_lit:
+                    st.markdown("###### Extração literal")
+                    st.json(sep_i["extracao_literal"])
+                with c_inf:
+                    st.markdown("###### Informação inferida")
+                    st.json(sep_i["informacao_inferida"])
 
-            st.markdown("###### Trechos Recuperados do Acervo Institucional")
+            st.markdown("###### Evidências do acervo")
             for f_item in pacote_i.fontes:
                 st.caption(
-                    f"• `{f_item.documento_id}` (v{f_item.versao}, pág. {f_item.pagina or 1}, trecho `{f_item.trecho_id}`) "
-                    f"— Similaridade: `{f_item.score_similaridade}` | Distância: `{f_item.score_distancia}`"
+                    f"{f_item.documento_id} · versão {f_item.versao} · página {f_item.pagina or 1}"
                 )
+                with st.expander(f"Consultar trecho {f_item.trecho_id}"):
+                    st.write(f_item.conteudo)
+                    st.caption(f"Similaridade: {f_item.score_similaridade} | Distância: {f_item.score_distancia}")
 
             minuta_int_editada = st.text_area(
                 "Minuta Institucional Fundamentada (Fatos do Solicitante + Regras do Acervo):",
@@ -1674,37 +1811,73 @@ elif menu.startswith("6."):
                 novo_status_op = st.selectbox(
                     "Estado da Revisão:",
                     ["pendente", "aprovada", "rejeitada", "revisar"],
-                    index=["pendente", "aprovada", "rejeitada", "revisar"].index(res_int["status_operador"])
+                    key="estado_revisao_integrada",
+                    format_func=lambda valor: {
+                        "pendente": "Pendente", "aprovada": "Aprovar",
+                        "rejeitada": "Rejeitar", "revisar": "Revisar",
+                    }[valor],
                 )
             with c_dec2:
+                operador_int = st.text_input("Identificação do operador:", value="servidor_responsavel")
                 just_op_int = st.text_input(
                     "Justificativa do Operador:",
                     value="Conferência dos trechos normativos e dados da ficha realizada pelo servidor."
                 )
 
-            if st.button("Registrar Decisão Humana (RF20/RF21)", width='stretch'):
-                dec_validada = DecisaoOperador(
-                    solicitacao_id=res_int["id_execucao"],
-                    decisao=novo_status_op,
-                    justificativa=just_op_int,
-                )
-                audit_logger.atualizar_decisao_humana(
-                    exec_id=dec_validada.solicitacao_id,
-                    decisao=dec_validada.decisao.upper(),
-                    justificativa=dec_validada.justificativa,
-                    operador=dec_validada.operador,
-                    texto_final=minuta_int_editada,
-                )
-                st.session_state.rag_atendimento_resultado["status_operador"] = novo_status_op
-                st.success(f"Decisão '{novo_status_op.upper()}' registrada na auditoria com sucesso!")
+            st.caption("RF20 / RF21 · A decisão será registrada na auditoria deste atendimento.")
+            assinatura = hashlib.sha256(json.dumps([
+                res_int["id_execucao"], novo_status_op, operador_int, just_op_int, minuta_int_editada,
+            ], ensure_ascii=False).encode("utf-8")).hexdigest()
+            repetida = res_int.get("decisao_persistida_assinatura") == assinatura
+
+            def solicitar_registro_decisao():
+                st.session_state.registrando_decisao = True
+
+            em_registro = st.session_state.get("registrando_decisao", False)
+            st.button("Registrar decisão humana", width="stretch",
+                      disabled=em_registro or repetida,
+                      on_click=solicitar_registro_decisao)
+            if em_registro:
+                try:
+                    with st.spinner("Registrando decisão..."):
+                        if not repetida:
+                            dec_validada = DecisaoOperador(
+                                solicitacao_id=res_int["id_execucao"],
+                                decisao=novo_status_op,
+                                justificativa=just_op_int,
+                                operador=operador_int,
+                            )
+                            salvo = audit_logger.atualizar_decisao_humana(
+                                exec_id=dec_validada.solicitacao_id,
+                                decisao=dec_validada.decisao.upper(),
+                                justificativa=dec_validada.justificativa,
+                                operador=dec_validada.operador,
+                                texto_final=minuta_int_editada,
+                            )
+                            if not salvo:
+                                raise ValueError("Confira a justificativa e o registro de origem.")
+                            res_int["status_operador"] = novo_status_op
+                            res_int["decisao_persistida_assinatura"] = assinatura
+                            res_int["decisao_erro"] = None
+                except ValueError as erro:
+                    res_int["decisao_erro"] = f"A decisão não foi salva. {erro}"
+                finally:
+                    st.session_state.registrando_decisao = False
+                st.rerun()
+            if res_int.get("decisao_erro"):
+                st.error(res_int["decisao_erro"])
+            if res_int.get("decisao_persistida_assinatura"):
+                st.success(f"Decisão persistida: {res_int['status_operador'].upper()} · Auditoria: {res_int['id_execucao']}")
+                if repetida:
+                    st.caption("Esta decisão já foi registrada. Altere a decisão, o texto ou a justificativa para registrar uma nova revisão.")
 
 
 # ==============================================================================
 # MÓDULO 7: Triagem & Ficha da Solicitação (RF14/RF15)
 # ==============================================================================
 elif menu.startswith("7."):
-    st.subheader("7. Triagem Estruturada e Ficha de Compreensão (RF14 / RF15)")
-    st.markdown("Converte manifestações em esquemas rigorosos Pydantic v2 (`extra='forbid'`) com distinção explícita entre extração literal e informação inferida.")
+    st.subheader("7. Triagem e ficha de compreensão (RF14 / RF15)")
+    st.markdown("Informe a solicitação e confira o resumo, os dados extraídos e a triagem. A validação Pydantic separa os fatos do texto das informações inferidas.")
 
     p_sol = resolver_caminho("dados/solicitacoes/solicitacoes.json")
     if p_sol.exists():
@@ -1717,19 +1890,42 @@ elif menu.startswith("7."):
         caso_sol = opcoes_sol[escolha_sol]
     else:
         caso_sol = None
+        escolha_sol = "Nova Manifestação"
 
-    texto_f = st.text_area("Texto da Manifestação:", value=caso_sol["texto_original"] if caso_sol else "", height=calcular_altura_dinamica(caso_sol["texto_original"] if caso_sol else "", min_height=70))
-    prot_f = st.text_input("Protocolo Externo (opcional):", value=(caso_sol.get("protocolo") or "") if caso_sol else "")
+    if (st.session_state.get("ficha_caso_carregado") != escolha_sol
+            or "ficha_texto" not in st.session_state):
+        st.session_state.ficha_caso_carregado = escolha_sol
+        st.session_state.ficha_texto = caso_sol["texto_original"] if caso_sol else ""
+        st.session_state.ficha_protocolo = (caso_sol.get("protocolo") or "") if caso_sol else ""
+        st.session_state.ficha_data_externa = caso_sol.get("data") if caso_sol else None
+
+    def limpar_envelope_da_ficha():
+        # O envelope do exemplo pertence somente ao texto original carregado.
+        st.session_state.ficha_protocolo = ""
+        st.session_state.ficha_data_externa = None
+
+    texto_f = st.text_area("Texto da Manifestação:", key="ficha_texto",
+                          height=140, on_change=limpar_envelope_da_ficha)
+    prot_f = st.text_input("Protocolo Externo (opcional):", key="ficha_protocolo")
+    if caso_sol and texto_f != caso_sol["texto_original"]:
+        st.caption("Texto editado: protocolo e data do exemplo foram descartados. Informe um novo protocolo apenas se houver.")
 
     if st.button("Processar Ficha Pydantic", type="primary"):
         if not texto_f.strip():
             st.warning("Informe o texto.")
         else:
             with st.spinner("Processando ficha estruturada..."):
+                exemplo_intacto = bool(caso_sol and texto_f == caso_sol["texto_original"])
+                protocolo_atual = prot_f.strip() or None
+                # Valide também na entrada do processamento: um evento tardio
+                # do widget não pode reintroduzir o envelope do exemplo editado.
+                if (caso_sol and not exemplo_intacto
+                        and protocolo_atual == (caso_sol.get("protocolo") or "").strip()):
+                    protocolo_atual = None
                 ficha = processar_solicitacao(
                     texto_f,
-                    protocolo_externo=prot_f if prot_f else None,
-                    data_externa=(caso_sol.get("data") if caso_sol else None),
+                    protocolo_externo=protocolo_atual,
+                    data_externa=(st.session_state.ficha_data_externa if exemplo_intacto else None),
                 )
                 dados_ui = ficha.para_interface_usuario()
                 separado = ficha.separar_literal_e_inferido()
@@ -1741,15 +1937,16 @@ elif menu.startswith("7."):
 
                 st.info(f"**Resumo Fiel (até 100 palavras):**\n\n{ficha.resumo}")
 
-                col_l, col_i = st.columns(2)
-                with col_l:
-                    st.markdown("##### Extração Literal (Dados do Texto)")
-                    st.json(separado["extracao_literal"])
-                with col_i:
-                    st.markdown("##### Informação Inferida (Triagem)")
-                    st.json(separado["informacao_inferida"])
+                with st.expander("Dados extraídos e triagem — RF14 / RF15"):
+                    col_l, col_i = st.columns(2)
+                    with col_l:
+                        st.markdown("##### Extração literal (dados do texto)")
+                        st.json(separado["extracao_literal"])
+                    with col_i:
+                        st.markdown("##### Informação inferida (triagem)")
+                        st.json(separado["informacao_inferida"])
 
-                with st.expander("Visualizar Contrato Completo para Interface ('não localizado')"):
+                with st.expander("Ficha completa para exibição (campos ausentes: 'não localizado')"):
                     st.json(dados_ui)
 
 
@@ -1757,10 +1954,10 @@ elif menu.startswith("7."):
 # MÓDULO 8: Painel de Sentimentos (RF22)
 # ==============================================================================
 elif menu.startswith("8."):
-    st.subheader("8. Painel Analítico de Sentimentos (RF22)")
+    st.subheader("8. Painel de sentimentos (RF22)")
     st.markdown(
-        "Classificação individual em 4 polaridades (`positiva`, `negativa`, `neutra`, `indeterminada`) "
-        "com filtros por categoria e período, deduplicação por `id` e agregação matemática 100% determinística em Python."
+        "Avaliações positivas, negativas, neutras e indeterminadas, "
+        "com filtros por categoria e período. As contagens são calculadas sem duplicar avaliações."
     )
 
     p_av = resolver_caminho("dados/avaliacoes/avaliacoes_atendimento.json")
@@ -1814,7 +2011,7 @@ elif menu.startswith("8."):
         )
 
         if agregacao["denominador"] == 0:
-            st.warning("Nenhuma avaliação encontrada para o filtro selecionado (tratamento seguro de conjunto vazio sem divisão por zero).")
+            st.warning("Nenhuma avaliação encontrada para o período e a categoria selecionados.")
         else:
             col_s1, col_s2, col_s3, col_s4, col_s5 = st.columns(5)
             with col_s1:
@@ -1885,10 +2082,10 @@ elif menu.startswith("8."):
             st.altair_chart(grafico_sentimento, width="stretch")
             st.markdown(f"<div style='color: #475569; font-size: 0.82rem;'><strong>Nota Metodológica:</strong> {agregacao['nota_metodologica']}</div>", unsafe_allow_html=True)
 
-            with st.expander("Inspecionar Prompt Dedicado e Isolado de Sentimento (RF22)"):
+            with st.expander("Detalhes do prompt de sentimento (RF22)"):
                 st.code(montar_prompt_sentimento_isolado(avaliacoes_filtradas[0]["texto"]), language="xml")
 
-            st.markdown("##### Avaliações dos Cidadãos (Estimativa Individual por Item)")
+            st.markdown("##### Avaliações dos cidadãos")
             for av, cl in zip(avaliacoes_filtradas, classificacoes):
                 with st.expander(f"{cl.id} [{av.get('categoria_servico', 'Geral')} | {av.get('data', '')}] — [{cl.polaridade.upper()}] — {av['texto'][:60]}..."):
                     st.write(f"**Texto:** {av['texto']}")
@@ -1900,8 +2097,24 @@ elif menu.startswith("8."):
 # MÓDULO 9: Gestão do Acervo e Expurgo Vetorial (RF24)
 # ==============================================================================
 elif menu.startswith("9."):
-    st.subheader("9. Governança do Acervo e Expurgo Vetorial (RF24)")
-    st.markdown("Demonstração da exclusão definitiva de documentos e fragmentos derivados do índice vetorial, atendendo ao ciclo de vida documental e ao direito ao esquecimento.")
+    st.subheader("9. Gestão do acervo e expurgo (RF24)")
+    st.markdown("Gerencie a seleção de documentos e sua recuperação. As fontes e evidências históricas são preservadas; a exclusão abaixo remove os vetores ativos.")
+    arquivos_acervo = sorted(str(p) for p in resolver_caminho("dados/acervo").iterdir() if p.suffix.lower() in {".txt", ".pdf"})
+    selecionados = st.multiselect("Documentos para recriar o índice:", arquivos_acervo, default=arquivos_acervo,
+                                 format_func=lambda p: Path(p).name)
+    st.caption("Recriar usa somente os documentos selecionados e pode reincluir um documento antes excluído. Nenhum PDF original é alterado.")
+    if st.button("Recriar índice dos documentos selecionados"):
+        if not selecionados:
+            st.warning("Selecione ao menos um documento.")
+        else:
+            novo_indice = IndiceVetorial(caminho_indice=None, persistir=False)
+            for arquivo in selecionados:
+                novo_indice.adicionar_chunks(dividir_em_chunks(ler_arquivo(arquivo), configuracao="A"))
+            novo_indice.caminho_indice = indice_vetorial.caminho_indice
+            novo_indice.salvar()
+            obter_indice_vetorial.clear()
+            st.success("Índice recriado com fontes e metadados atualizados.")
+            st.rerun()
 
     docs_presentes = sorted(list({c["documento_id"] for c in indice_vetorial.chunks}))
     c_m1, c_m2, c_m3 = st.columns(3)
@@ -1909,13 +2122,14 @@ elif menu.startswith("9."):
     c_m2.metric("Total de Chunks Indexados", len(indice_vetorial.chunks))
     c_m3.metric("Versão Atual do Índice", indice_vetorial.versao_indice)
 
-    st.markdown("##### Documentos Ativos e Detalhamento dos Trechos Indexados")
+    st.markdown("##### Documentos ativos e evidências indexadas")
     for d in docs_presentes:
         chunks_d = [c for c in indice_vetorial.chunks if c["documento_id"] == d]
         titulo_doc = chunks_d[0].get("titulo", d) if chunks_d else d
         qtd = len(chunks_d)
 
         with st.expander(f"{d} — {titulo_doc} ({qtd} trechos indexados)"):
+            st.caption(f"Natureza: {chunks_d[0].get('natureza', 'não classificada')} | Origem: {chunks_d[0].get('fonte_original', 'não classificada')}")
             for c in chunks_d:
                 t_id = c.get("trecho_id", "")
                 p = c.get("pagina", 1)
@@ -1925,13 +2139,17 @@ elif menu.startswith("9."):
                 st.text_area(f"Conteúdo do trecho {t_id}", value=conteudo, height=calcular_altura_dinamica(conteudo, min_height=40), disabled=True, label_visibility="collapsed")
 
     st.divider()
-    st.markdown("##### Expurgo Definitivo de Documento (Direito ao Esquecimento / RF24)")
-    st.caption("A exclusão definitiva remove o documento e expurga em cascata todos os seus fragmentos e vetores derivados do índice vetorial em disco, recalculando a versão.")
+    st.markdown("##### Exclusão da recuperação ativa (RF24)")
+    st.caption("Remove os chunks e vetores do índice. Fontes e resultados históricos permanecem como evidência, conforme a política de retenção documentada.")
     doc_sel = st.selectbox("Selecione o documento para expurgo definitivo:", docs_presentes if docs_presentes else ["Nenhum"])
 
     if st.button("Excluir e Expurgar Fragmentos Definitivamente", type="secondary"):
         if doc_sel and doc_sel != "Nenhum":
             removidos = indice_vetorial.excluir_documento(doc_sel)
+            audit_logger.registrar_execucao(
+                modalidade="exclusao_indice", arquivo_origem=doc_sel, provedor="local", modelo="indice",
+                versao_prompt="governanca_v3", parametros={}, resultado={"documento_id": doc_sel, "chunks_removidos": removidos},
+                duracao_segundos=0, versao_indice=indice_vetorial.versao_indice)
             st.success(f"Documento '{doc_sel}' excluído com sucesso! {removidos} fragmentos removidos definitivamente do índice.")
             st.rerun()
 
@@ -1939,7 +2157,8 @@ elif menu.startswith("9."):
 # MÓDULO 10: Matriz de Testes Automatizados T01 a T15 (RF23 / RF24)
 # ==============================================================================
 elif menu.startswith("10."):
-    st.subheader("10. Central de Execução e Verificação de Testes (T01 a T15 — RF23 / RF24)")
+    st.subheader("10. Central de testes e verificação")
+    st.caption("Matriz T01–T15 · RF23 / RF24")
     st.markdown(
         "Ambiente interativo de execução de testes em tempo real: execute a matriz contratual de 15 cenários (`T01` a `T15`), "
         "dispare asserções individuais sob demanda ou execute a suíte oficial do `pytest` com captura de terminal ao vivo."
@@ -1967,15 +2186,15 @@ elif menu.startswith("10."):
 
     # Painel de Disparo de Testes ao Vivo
     with st.container(border=True):
-        st.markdown("##### Painel de Disparo de Testes ao Vivo")
+        st.markdown("##### Executar testes")
         col_ctrl1, col_ctrl2 = st.columns([1.2, 1.8], gap="medium")
 
         with col_ctrl1:
-            st.markdown("**Execução da Matriz Contratual Completa:**")
+            st.markdown("**Matriz completa — T01–T15**")
             executar_todos = st.button("Executar Todos os Testes (T01 a T15) ao Vivo", type="primary", use_container_width=True)
 
         with col_ctrl2:
-            st.markdown("**Execução de Teste Específico sob Demanda:**")
+            st.markdown("**Teste individual**")
             col_sel, col_btn_ind = st.columns([2.5, 1.2])
             with col_sel:
                 teste_escolhido = st.selectbox(
@@ -2003,14 +2222,14 @@ elif menu.startswith("10."):
             c_ind1.metric("Status", ind.get("status"))
             c_ind2.metric("Tempo de Execução", f"{ind.get('duracao_ms', 0):.2f} ms")
             c_ind3.markdown(f"**Cenário Testado:**\n\n{ind.get('cenario')}")
-            st.markdown("**Evidência Factual das Asserções:**")
-            if isinstance(ind.get("evidencia"), dict):
-                st.json(ind.get("evidencia"))
-            elif isinstance(ind.get("evidencia"), list):
-                for ev in ind.get("evidencia"):
-                    st.write(f"- `{ev}`")
-            else:
-                st.info(str(ind.get("evidencia")))
+            with st.expander("Evidências das asserções", expanded=not st_ok):
+                if isinstance(ind.get("evidencia"), dict):
+                    st.json(ind.get("evidencia"))
+                elif isinstance(ind.get("evidencia"), list):
+                    for ev in ind.get("evidencia"):
+                        st.write(f"- `{ev}`")
+                else:
+                    st.info(str(ind.get("evidencia")))
 
     # Execução da Matriz Completa
     if executar_todos:
@@ -2102,24 +2321,30 @@ elif menu.startswith("10."):
         dur_tot_ms = rel_ativo.get("duracao_total_ms")
         dur_txt = f"{dur_tot_ms:.1f} ms" if dur_tot_ms else "—"
 
-        k1, k2, k3, k4, k5 = st.columns(5)
+        k1, k2, k3 = st.columns(3)
         k1.metric("Total de Testes", total_testes)
         k2.metric("Aprovados", f"{aprovados} / {total_testes}")
         k3.metric("Taxa de Sucesso", f"{taxa:.1f}%")
-        k4.metric("Duração da Bateria", dur_txt)
-        k5.metric("Origem dos Dados", tag_origem, help="Indica se os dados foram executados ao vivo nesta sessão ou lidos do disco")
+        k4, k5 = st.columns([1, 2])
+        with k4:
+            st.markdown("**Duração da bateria**")
+            st.write(dur_txt)
+        with k5:
+            st.markdown("**Origem dos dados**")
+            st.write(tag_origem)
+            st.caption(f"Relatório de {ts_formatado}")
 
         st.divider()
 
         tab_t_cards, tab_t_pytest, tab_t_chunking, tab_t_raw = st.tabs([
-            "1. Cards da Matriz Contratual (T01 a T15)",
-            "2. Terminal Pytest Oficial (Execução Real)",
-            "3. Comparativo de Chunking (RF18)",
-            "4. Evidências Fatuais / JSON Completo",
+            "1. Resultados T01–T15",
+            "2. Execução pytest",
+            "3. Comparativo de chunking (RF18)",
+            "4. Evidências e JSON completo",
         ])
 
         with tab_t_cards:
-            st.markdown("##### Inspeção Detalhada de Cada Teste Contratual")
+            st.markdown("##### Resultados por teste")
             f_col1, f_col2, f_col3 = st.columns([1, 1, 2])
 
             with f_col1:
@@ -2133,7 +2358,7 @@ elif menu.startswith("10."):
                 filtro_req = st.selectbox("Filtrar por Requisito:", ["Todos"] + reqs, key="filtro_req_testes")
 
             with f_col3:
-                filtro_busca = st.text_input("Buscar teste por texto (ex: T01, SQL, chunking, P6):", key="filtro_busca_testes")
+                filtro_busca = st.text_input("Buscar teste por texto (ex.: T01, SQL, chunking, P6):", key="filtro_busca_testes")
 
             testes_exibicao = []
             for t in testes_lista:
@@ -2241,9 +2466,9 @@ elif menu.startswith("10."):
                 py_res = st.session_state.pytest_resultado
                 c_py_k1, c_py_k2, c_py_k3 = st.columns(3)
                 if py_res["exit_code"] == 0:
-                    c_py_k1.success("Resultado: SUCESSO (Exit Code 0)")
+                    c_py_k1.success("Resultado: SUCESSO (código de saída 0)")
                 else:
-                    c_py_k1.error(f"Resultado: FALHA (Exit Code {py_res['exit_code']})")
+                    c_py_k1.error(f"Resultado: FALHA (código de saída {py_res['exit_code']})")
                 c_py_k2.metric("Tempo Total", f"{py_res['duracao_s']:.2f} s")
                 c_py_k3.metric("Arquivo Executado", py_res["alvo"].split("/")[-1])
 

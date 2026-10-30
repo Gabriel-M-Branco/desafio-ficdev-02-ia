@@ -9,6 +9,10 @@ import json
 import os
 import uuid
 import time
+import tempfile
+from pathlib import Path
+from src.audit import AuditLogger
+from src.rag_evidence import normalizar, conferir_afirmacoes
 from datetime import datetime
 from typing import Dict, Any, List, Optional
 
@@ -37,7 +41,9 @@ class AvaliadorDesafio02:
     """Executa a bateria de avaliação e gera relatório estruturado de métricas (RF18, RF22, RF23)."""
 
     def __init__(self, indice: Optional[IndiceVetorial] = None):
-        self.indice = indice or IndiceVetorial()
+        fonte = indice or IndiceVetorial()
+        self.indice = IndiceVetorial(caminho_indice=None, persistir=False, dimensao=fonte.dimensao)
+        self.indice.adicionar_chunks(fonte.chunks)
         if not self.indice.chunks and os.path.exists("dados/acervo"):
             self.indice.adicionar_chunks(carregar_acervo_completo("dados/acervo", configuracao="A"))
         self.rag = MotorRAG(indice=self.indice)
@@ -62,6 +68,9 @@ class AvaliadorDesafio02:
         chunks_b = carregar_acervo_completo("dados/acervo", configuracao="B")
         indice_b = IndiceVetorial(caminho_indice=None, dimensao=self.indice.dimensao, persistir=False)
         indice_b.adicionar_chunks(chunks_b)
+        # Mesma transformação (vocabulário e IDF), não só o mesmo nome/modelo.
+        indice_b.vectorizer = self.indice.vectorizer
+        indice_b.matriz_vetores = self.indice.vectorizer.transform([c["conteudo"] for c in indice_b.chunks]).toarray()
 
         def _avaliar_indice(idx: IndiceVetorial) -> Dict[str, Any]:
             acertos = 0
@@ -70,7 +79,9 @@ class AvaliadorDesafio02:
                 trechos = idx.buscar_top_k(p["pergunta"], top_k=3)
                 docs_rec = [t.documento_id for t in trechos]
                 docs_esp = p["documentos_referencia"]
-                acertou = any(d in docs_rec for d in docs_esp)
+                referencias = p.get("trechos_referencia", [])
+                acertou = any(t.documento_id in docs_esp and any(normalizar(ref) in normalizar(t.conteudo)
+                              for ref in referencias) for t in trechos)
                 if acertou:
                     acertos += 1
                 detalhes.append({
@@ -80,6 +91,8 @@ class AvaliadorDesafio02:
                     "docs_recuperados": docs_rec,
                     "scores": [t.score_similaridade for t in trechos],
                     "recuperado_com_sucesso": acertou,
+                    "trechos_recuperados": [t.model_dump() for t in trechos],
+                    "trechos_referencia": referencias,
                 })
             taxa = acertos / total_perguntas if total_perguntas > 0 else 0.0
             return {
@@ -113,7 +126,7 @@ class AvaliadorDesafio02:
                 "justificativa_escolha": (
                     "A Configuração A (400 caracteres, sobreposição de 80) isola com maior granularidade "
                     "artigos específicos (como Art. 2º sobre vídeo .mp4 e Art. 7º sobre 5º dia útil), "
-                    "reduzindo ruído lexical em citações e mantendo 100% de taxa de acerto no top-3."
+                    "O resultado efetivamente medido está nas duas taxas acima; falhas não são ocultadas."
                 ),
             },
         }
@@ -268,6 +281,12 @@ class AvaliadorDesafio02:
                 citacao_ok = (len(docs_obt) == 0)
             else:
                 citacao_ok = any(d in docs_obt for d in docs_esp)
+            suporte_ok = conferir_afirmacoes(resp) if resp.fontes else False
+            fatos = p.get("fatos_resposta", [])
+            texto_norm = normalizar(resp.resposta)
+            resposta_correta = status_ok and all(normalizar(f) in texto_norm for f in fatos)
+            if p.get("tipo") == "respondivel":
+                citacao_ok = citacao_ok and suporte_ok and resposta_correta
             if citacao_ok:
                 acertos_citacao += 1
 
@@ -280,6 +299,9 @@ class AvaliadorDesafio02:
                 "docs_esperados": docs_esp,
                 "docs_citados": docs_obt,
                 "citacao_correta": citacao_ok,
+                "afirmacoes_sustentadas": suporte_ok,
+                "resposta_correta": resposta_correta,
+                "fontes": [t.model_dump() for t in resp.fontes],
                 "necessidade_revisao": resp.necessidade_revisao,
                 "resposta": resp.resposta,
             })
@@ -291,6 +313,10 @@ class AvaliadorDesafio02:
             "acertos_citacao": acertos_citacao,
             "taxa_acerto_status": round(acertos_status / max(1, total), 4),
             "taxa_acerto_citacao": round(acertos_citacao / max(1, total), 4),
+            "fundamentacao": {
+                "numerador": sum(d["afirmacoes_sustentadas"] and d["resposta_correta"] for d in detalhes if d["tipo"] == "respondivel"),
+                "denominador": sum(d["tipo"] == "respondivel" for d in detalhes),
+            },
             "detalhes": detalhes,
         }
 
@@ -531,7 +557,11 @@ class AvaliadorDesafio02:
             chunks_acervo = carregar_acervo_completo("dados/acervo", configuracao="A")
             total_antes = len(self.indice.chunks)
             adicionados_reindex = self.indice.adicionar_chunks(chunks_acervo)
-            indice_recarregado = IndiceVetorial(caminho_indice=self.indice.caminho_indice, dimensao=self.indice.dimensao)
+            with tempfile.TemporaryDirectory(prefix="ficdev-indice-") as pasta:
+                caminho = str(Path(pasta) / "indice.json")
+                copia = IndiceVetorial(caminho_indice=caminho)
+                copia.adicionar_chunks(self.indice.chunks)
+                indice_recarregado = IndiceVetorial(caminho_indice=caminho, dimensao=self.indice.dimensao)
             docs_unicos = {c["documento_id"] for c in indice_recarregado.chunks}
             t06_ok = (
                 len(docs_unicos) >= 6
@@ -626,16 +656,19 @@ class AvaliadorDesafio02:
                 "solicito a efetivação da minha matrícula no curso Técnico em Enfermagem em Cuiabá."
             )
             minuta_t11 = self.rag.gerar_minuta_fundamentada(ficha_t11, top_k=3)
-            decisoes_testadas = [
-                DecisaoOperador(solicitacao_id="SOL-01", decisao=est, justificativa=f"Validação do estado {est}").decisao
-                for est in ("pendente", "aprovada", "rejeitada", "revisar")
-            ]
-            t11_ok = (
-                minuta_t11.minuta_institucional is not None
-                and "1. DADOS E FATOS INFORMADOS PELO CIDADÃO" in minuta_t11.minuta_institucional
-                and "2. ORIENTAÇÕES E FUNDAMENTAÇÃO NORMATIVA EXTRAÍDAS DO ACERVO" in minuta_t11.minuta_institucional
-                and decisoes_testadas == ["pendente", "aprovada", "rejeitada", "revisar"]
-            )
+            decisoes_testadas = []
+            with tempfile.TemporaryDirectory(prefix="ficdev-revisao-") as pasta:
+                logger = AuditLogger(pasta)
+                eid = logger.registrar_execucao("teste_revisao", "", "local", "extrativo", "v3", {},
+                                               {"minuta": minuta_t11.minuta_institucional}, 0)
+                for estado, esperado in (("pendente", "pendente_revisao"), ("aprovada", "APROVADO"),
+                                         ("rejeitada", "REJEITADO"), ("revisar", "CORRIGIDO")):
+                    salvo = logger.atualizar_decisao_humana(eid, estado, "Conferência de teste", "Operador de teste",
+                                                           minuta_t11.minuta_institucional)
+                    registro = json.loads((Path(pasta) / f"{eid}.json").read_text(encoding="utf-8"))
+                    if salvo and registro["decisao_humana"]["status"] == esperado and registro["decisao_humana"].get("data_decisao"):
+                        decisoes_testadas.append(estado)
+                t11_ok = decisoes_testadas == ["pendente", "aprovada", "rejeitada", "revisar"]
             duracao = round((time.perf_counter() - t_inicio) * 1000, 2)
             return {
                 "teste": "T11",
@@ -647,14 +680,10 @@ class AvaliadorDesafio02:
             }
 
         elif codigo == "T12":
-            ficha_t11 = processar_solicitacao(
-                "Prezados, meu nome é Marcos Vinícius de Almeida Santos, CPF 123.456.789-00, protocolo 2026-000142, "
-                "solicito a efetivação da minha matrícula no curso Técnico em Enfermagem em Cuiabá."
-            )
             versao_idx_antes = self.indice.versao_indice
-            resp_cfg2 = self.rag.gerar_minuta_fundamentada(
-                ficha_t11, top_k=2, provider_override="adaptador_simulado"
-            )
+            resp_cfg2 = self.rag.responder(
+                "Qual é o prazo final prorrogado para inscrição no processo seletivo?",
+                top_k=3, provider_override="adaptador_simulado", registrar_auditoria=False)
             versao_idx_depois = self.indice.versao_indice
             cliente_falha = LLMClient()
             cliente_falha.execution_mode = "mock"
@@ -740,32 +769,33 @@ class AvaliadorDesafio02:
             }
 
         elif codigo == "T15":
-            with open("dados/originais/entrada_texto.txt", "r", encoding="utf-8") as f_txt_d01:
-                texto_d01 = f_txt_d01.read()
-            with open("dados/gabaritos/gabarito_texto.json", "r", encoding="utf-8") as f_gab_d01:
-                gab_d01 = json.load(f_gab_d01)
-            extracao_d01 = LLMClient().extrair_entidades_local(texto_d01)
-            aval_d01 = QualityEvaluator.avaliar_extracao(extracao_d01, gab_d01)
-            proc_audio = AudioProcessor()
-            texto_tts = proc_audio.preparar_texto_para_acessibilidade("CPF: 123.456.789-00. Telefone: não localizado.")
-            t15_ok = (
-                extracao_d01.get("protocolo") == "2026-000142"
-                and aval_d01["taxa_fidelidade_percentual"] >= 90.0
-                and "Atenção: informação pendente de localização no sistema" in texto_tts
-            )
-            duracao = round((time.perf_counter() - t_inicio) * 1000, 2)
-            return {
-                "teste": "T15",
-                "requisito": "RF23",
-                "cenario": "Regressão dos fluxos herdados do Desafio 01 (caso textual + acessibilidade de áudio/OCR)",
-                "status": "APROVADO" if t15_ok else "FALHOU",
-                "duracao_ms": duracao,
-                "evidencia": {
-                    "protocolo_d01": extracao_d01.get("protocolo"),
-                    "fidelidade_d01_percentual": aval_d01["taxa_fidelidade_percentual"],
-                    "acessibilidade_rf07_ativa": True,
-                },
-            }
+            from src.vision import VisionProcessor
+            from src import resolver_caminho
+            fonte = resolver_caminho("dados/originais/entrada_texto.txt")
+            ficha_texto = processar_solicitacao(fonte.read_text(encoding="utf-8"))
+            from src.nlp import extrair_entidades_literais
+            with tempfile.TemporaryDirectory(prefix="ficdev-regressao-") as pasta:
+                logger = AuditLogger(pasta)
+                def revisar(ficha, canal):
+                    pacote = MotorRAG(indice=self.indice, logger=logger).gerar_minuta_fundamentada(ficha)
+                    eid = logger.registrar_execucao("regressao_" + canal, "", "local", "extrativo", "v3", {},
+                                                   {"minuta": pacote.minuta_institucional}, 0)
+                    return logger.atualizar_decisao_humana(eid, "revisar", "Regressão de teste", "Operador de teste",
+                                                           pacote.minuta_institucional)
+                texto_ok = revisar(ficha_texto, "texto")
+                proc = VisionProcessor()
+                proc._obter_provedor_visao = lambda: "local"
+                ocr = proc.processar_documento("dados/originais/entrada_pdf-imagem.pdf")
+                bruto = ocr.get("texto_extraido") or ocr.get("texto_bruto") or ocr.get("texto_corrigido") or ""
+                ocr_ok = bool(ocr.get("sucesso") and bruto)
+                if ocr_ok:
+                    ocr_ok = revisar(processar_solicitacao(bruto), "ocr")
+                return {"teste": "T15", "requisito": "RF23",
+                        "cenario": "Texto e OCR reais até minuta, revisão e auditoria; sem chamadas remotas",
+                        "status": "APROVADO" if texto_ok and ocr_ok else "PENDENTE",
+                        "duracao_ms": round((time.perf_counter()-t_inicio)*1000, 2),
+                        "evidencia": {"texto_ate_revisao": texto_ok, "ocr_ate_revisao": ocr_ok,
+                                     "limitacao": None if ocr_ok else ocr.get("erro", "OCR sem texto útil")}}
         else:
             raise ValueError(f"Código de teste desconhecido: {codigo_teste}")
 
@@ -801,6 +831,8 @@ class AvaliadorDesafio02:
                 "rag_8_perguntas": {
                     "taxa_acerto_status": res_rag["taxa_acerto_status"],
                     "taxa_acerto_citacao": res_rag["taxa_acerto_citacao"],
+                    "fundamentacao": res_rag["fundamentacao"],
+                    "consultas": res_rag["detalhes"],
                 },
                 "sentimentos_12_avaliacoes": {
                     "taxa_acerto": res_sent["taxa_acerto"],

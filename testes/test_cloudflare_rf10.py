@@ -123,9 +123,15 @@ def test_segredos_nao_sao_downloads_publicos(tmp_path, path):
     assert not arquivo_publico(tmp_path, path)
 
 
-@pytest.mark.parametrize("path", ["dados/originais/brasao.png", "dados/originais/entrada_audio.mp3", "resultados/audios/teste.wav"])
+@pytest.mark.parametrize("path", ["resultados/audios/teste.wav", "resultados/minutas/teste.pdf"])
 def test_downloads_existentes_preservados(tmp_path, path):
     assert arquivo_publico(tmp_path, path)
+
+
+@pytest.mark.parametrize("path", ["dados/originais/brasao.png", "dados/originais/entrada_audio.mp3",
+                                 "dados/processados/extracao.json", "resultados/logs/audit_trail.jsonl"])
+def test_fontes_e_logs_nao_sao_downloads_publicos(tmp_path, path):
+    assert not arquivo_publico(tmp_path, path)
 
 
 def test_validador_real_exige_comando_explicito(monkeypatch):

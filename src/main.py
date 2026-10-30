@@ -588,7 +588,7 @@ def listar_logs():
             try:
                 atual = json.loads((audit_logger.log_dir / f"{identificador}.json").read_text(encoding="utf-8"))
                 # Exibe o estado atual sem reescrever o evento histórico.
-                registro["decisao_humana_atual"] = atual.get("decisao_humana", {})
+                registro["decisao_humana_atual"] = audit_logger._mascarar_estrutura(atual.get("decisao_humana", {}))
             except (OSError, ValueError):
                 registro["decisao_humana_atual"] = {"status": "indisponivel"}
         teve_falha = not registro.get("resultado_resumo", {}).get("sucesso", True) or bool(registro.get("erros"))
@@ -612,7 +612,7 @@ def obter_detalhes_log(id_execucao: str):
     if not caminho.exists():
         raise HTTPException(status_code=404, detail="Registro de log não localizado.")
     try:
-        return json.loads(caminho.read_text(encoding="utf-8"))
+        return audit_logger._mascarar_estrutura(json.loads(caminho.read_text(encoding="utf-8")))
     except Exception as e:
         raise HTTPException(status_code=500, detail=f"Erro ao carregar log: {str(e)}")
 

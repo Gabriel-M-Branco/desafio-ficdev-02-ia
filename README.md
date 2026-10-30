@@ -1,5 +1,9 @@
 # Central Inteligente de Atendimento e Consulta Institucional (GOV.MT)
 
+> **Estado atual:** consulte [correções, limites e validação D02](documentacao/CORRECOES_D02.md).
+> Execute os testes em cópia descartável com `python -B testes/executar_isolado.py testes/ -v`.
+> Para recriar o índice após atualizar o acervo: `python -m src.ingestion` ou módulo 9.
+
 > **Desafios Práticos 01 e 02 — FIC_DEV: Programador de Sistemas com IA (2026)**  
 > **Órgão Atendido (Cenário Fictício):** Governo do Estado de Mato Grosso — Secretaria de Estado de Ciência, Tecnologia e Inovação (SECITECI/MT) e Escola Técnica Estadual de Cuiabá (ETEC).
 

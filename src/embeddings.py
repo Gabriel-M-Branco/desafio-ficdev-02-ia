@@ -134,6 +134,9 @@ class IndiceVetorial:
                     conteudo=chk["conteudo"],
                     score_similaridade=round(sim_final, 4),
                     score_distancia=round(distancia, 4),
+                    natureza=chk.get("natureza", "nao_classificado"),
+                    fonte_original=chk.get("fonte_original", ""),
+                    hash_arquivo=chk.get("hash_arquivo"),
                 )
             )
 

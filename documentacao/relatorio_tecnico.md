@@ -1,5 +1,9 @@
 # Relatório Técnico — Central Inteligente de Atendimento e Consulta Institucional (GOV.MT)
 
+> **Atualização após auditoria:** as afirmações e taxas abaixo pertencem ao relatório
+> anterior. O comportamento corrigido, suas limitações e as evidências atuais estão
+> em [CORRECOES_D02.md](CORRECOES_D02.md) e em `evidencias/validacao_d02.json`.
+
 **Programa:** FIC_DEV — Programador de Sistemas com IA (2026)  
 **Projeto:** Desafios Práticos 01 (`RF01–RF13`) e 02 (`RF14–RF24`) — Central Inteligente de Atendimento e Consulta Institucional  
 **Órgão Atendido (Fictício):** Governo do Estado de Mato Grosso / SECITECI-MT / ETEC Cuiabá  

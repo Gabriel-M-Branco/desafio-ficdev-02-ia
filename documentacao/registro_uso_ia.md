@@ -1,5 +1,18 @@
 # Registro de Uso da Inteligência Artificial no Desenvolvimento (Seção 10 do Edital)
 
+## Complemento: correções após auditorias
+
+Codex foi utilizado para revisar a versão corrente, corrigir a persistência da
+revisão, restringir respostas RAG a evidências verificáveis e avaliar os casos de
+regressão documental/NLP. Foram aceitas correções de contrato/interface, metadados
+de natureza das fontes e testes de persistência. A geração remota livre foi
+substituída por seleção estruturada validada; a implementação não presume
+equivalência de qualidade entre simulação e serviço real. Não foram adotadas
+troca obrigatória do corpus por PDFs oficiais, novas dependências de embeddings
+ou alterações estéticas. Originais e evidências anteriores foram preservados.
+Os resultados posteriores estão descritos em [CORRECOES_D02.md](CORRECOES_D02.md);
+as declarações anteriores de 100% são históricas.
+
 **Programa:** FIC_DEV — Programador de Sistemas com IA (2026)  
 **Projeto:** Central Inteligente de Atendimento e Consulta Institucional (GOV.MT) — Desafios 01 e 02  
 **Equipe de Desenvolvimento:** Gabriel Moreira Branco, Emilly Caroline dos Santos Arruda e Marcos Vinícius G. S. Campos

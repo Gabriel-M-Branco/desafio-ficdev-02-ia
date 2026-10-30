@@ -148,7 +148,7 @@ class ExtracaoFicha(BaseModel):
 
             if self.protocolo:
                 prot_digitos = re.sub(r"\D", "", self.protocolo)
-                if self.protocolo.lower() not in ref_norm and prot_digitos not in ref_digitos:
+                if self.protocolo.lower() not in ref_norm and (not prot_digitos or prot_digitos not in ref_digitos):
                     raise ValueError(
                         f"Coerência violada (T02): protocolo '{self.protocolo}' não está presente no texto original."
                     )
@@ -159,11 +159,32 @@ class ExtracaoFicha(BaseModel):
                         f"Coerência violada (T02): CPF '{self.cpf}' não está presente no texto original."
                     )
             if self.solicitante:
-                primeiro_nome = self.solicitante.split()[0].lower()
-                if primeiro_nome not in ref_norm:
+                nome = re.sub(r"\s+", " ", self.solicitante).lower()
+                if nome not in ref_norm:
                     raise ValueError(
                         f"Coerência violada (T02): solicitante '{self.solicitante}' não está presente no texto original."
                     )
+            meses = ("janeiro", "fevereiro", "março", "abril", "maio", "junho", "julho", "agosto", "setembro", "outubro", "novembro", "dezembro")
+            for campo in ("rg", "orgao_expedidor", "uf", "naturalidade", "nome_mae", "nome_pai", "curso",
+                          "eixo_tecnologico", "carga_horaria", "email", "telefone", "data", "data_nascimento", "inicio_curso"):
+                valor = getattr(self, campo)
+                if not valor:
+                    continue
+                presente = re.sub(r"\s+", " ", valor).lower() in ref_norm
+                if not presente and re.fullmatch(r"\d{2}/\d{2}/\d{4}", valor):
+                    dia, mes, ano = map(int, valor.split("/"))
+                    presente = 1 <= mes <= 12 and f"{dia} de {meses[mes-1]} de {ano}" in ref_norm
+                if not presente:
+                    raise ValueError(f"Coerência violada: {campo} não está presente no texto original.")
+            for grupo, valores in self.entidades.model_dump().items():
+                for valor in valores:
+                    literal = re.sub(r"\s+", " ", valor).lower()
+                    presente = literal in ref_norm
+                    if not presente and grupo == "datas" and re.fullmatch(r"\d{2}/\d{2}/\d{4}", valor):
+                        dia, mes, ano = map(int, valor.split("/"))
+                        presente = 1 <= mes <= 12 and f"{dia} de {meses[mes-1]} de {ano}" in ref_norm
+                    if not presente:
+                        raise ValueError(f"Coerência violada: entidade {grupo} não está presente no texto original.")
 
         # Regra de negócio: se solicitante ou pedido forem nulos, marca necessidade de revisão
         if not self.solicitante or not self.pedido:
@@ -298,6 +319,8 @@ class TrechoRecuperado(BaseModel):
     hash_arquivo: Optional[str] = None
     configuracao: Optional[str] = None
     chunk_hash: Optional[str] = None
+    natureza: str = "nao_classificado"
+    fonte_original: str = ""
 
 
 class RespostaRAG(BaseModel):
@@ -312,6 +335,7 @@ class RespostaRAG(BaseModel):
     citacoes_formatadas: List[str] = Field(default_factory=list)
     minuta_institucional: Optional[str] = None
     modo_geracao: str = "extrator_fundamentado_local"
+    metricas_geracao: Dict[str, Any] = Field(default_factory=dict)
 
     @field_validator("fontes", mode="before")
     @classmethod

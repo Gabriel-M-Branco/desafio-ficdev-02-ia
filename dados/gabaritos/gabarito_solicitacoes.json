@@ -28,7 +28,8 @@
         "orgao_expedidor",
         "uf",
         "nome_pai",
-        "telefone"
+        "telefone",
+        "inicio_curso"
       ],
       "necessidade_revisao": false,
       "fatos_essenciais": [
@@ -46,7 +47,8 @@
         "orgao_expedidor",
         "uf",
         "nome_pai",
-        "telefone"
+        "telefone",
+        "inicio_curso"
       ],
       "necessidade_revisao": false,
       "fatos_essenciais": [
@@ -64,7 +66,10 @@
         "naturalidade",
         "nome_mae",
         "nome_pai",
-        "telefone"
+        "telefone",
+        "inicio_curso",
+        "carga_horaria",
+        "eixo_tecnologico"
       ],
       "necessidade_revisao": false,
       "fatos_essenciais": [
@@ -114,5 +119,6 @@
         "pretende transferência indevida entre Barra do Garças e Cuiabá"
       ]
     }
-  ]
+  ],
+  "nota_revisao": "Ausências conferidas contra as solicitações originais: início do curso não é inferido da data de registro; carga/eixo não são deduzidos do nome do curso."
 }

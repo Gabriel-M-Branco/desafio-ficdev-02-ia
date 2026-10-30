@@ -21,6 +21,8 @@ MAX_TENTATIVAS_REPETICAO = 1
 
 # Padrões suspeitos para detecção de prompt injection (direta e indireta no corpus) e jailbreak
 PADROES_INJECAO = [
+    r"(?:ignore|desconsidere)\s+(?:(?:todas?|as|os|anteriores)\s+)*(?:instru[cç][oõ]es|regras|diretrizes|comandos)(?:\s+anteriores)?",
+    r"ignore\s+(?:all\s+)?previous\s+(?:instructions|rules)",
     r"ignore\s+(all\s+)?(previous\s+)?(instructions|rules|directions)",
     r"ignore\s+(as\s+)?(normas|regras|instruções|diretrizes)",
     r"desconsidere\s+(todas\s+as\s+)?(instruções|regras|diretrizes|normas)",

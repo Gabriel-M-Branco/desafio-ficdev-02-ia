@@ -90,7 +90,7 @@ def extrair_entidades_literais(texto: str) -> EntidadesExtraidas:
         r"(?:Atenciosamente,?\s*\n+)([A-ZÁÉÍÓÚÂÊÔÃÕÇ][A-Za-záéíóúâêôãõç]+(?:\s+(?:de|da|do|dos|das|[A-ZÁÉÍÓÚÂÊÔÃÕÇ][A-Za-záéíóúâêôãõç]+))*)",
     ]
     for padrao in padroes_nome:
-        match = re.search(padrao, texto)
+        match = re.search(padrao.replace(r"\s", r"[ \t]"), texto)
         if match:
             candidato = match.group(1).strip().rstrip(".,;")
             if candidato and len(candidato.split()) <= 7:
@@ -132,68 +132,27 @@ def classificar_categoria(texto: str) -> str:
 
 
 def gerar_resumo_fiel(texto: str, max_palavras: int = 100) -> str:
-    """
-    RF15 item 1: Produz resumo fiel em 2 a 4 frases, com no máximo 100 palavras,
-    preservando os fatos essenciais do relato sem inventar dados.
-    """
-    linhas = [l.strip() for l in texto.splitlines() if l.strip()]
-    if not linhas:
-        return "Solicitação vazia ou sem conteúdo textual. Encaminhada para revisão manual."
+    """Resumo extrativo: mantém a intenção e somente fatos presentes no relato."""
+    partes = [p.strip() for p in re.split(r"(?<=[.!?])\s+|[\r\n]+", texto) if p.strip()]
+    if not partes:
+        return "Solicitação vazia. Encaminhar para revisão humana."
+    pedido = re.compile(r"solicito|peço|gostaria|quero|posso|preciso|cancelar|renda|per capita", re.I)
+    contexto = re.compile(r"nome|protocolo|curso|técnico|aprovad|cuiabá|garças", re.I)
+    ordem = sorted(range(len(partes)), key=lambda i: (not bool(pedido.search(partes[i])), not bool(contexto.search(partes[i])), i))
+    escolhidas = {}
+    restantes = max_palavras
+    for i in ordem:
+        palavras = partes[i].split()
+        if len(palavras) <= restantes:
+            escolhidas[i] = partes[i]
+            restantes -= len(palavras)
+        elif not escolhidas:
+            escolhidas[i] = " ".join(palavras[:restantes])
+            restantes = 0
+        if restantes == 0:
+            break
+    return " ".join(escolhidas[i] for i in sorted(escolhidas))
 
-    entidades = extrair_entidades_literais(texto)
-    nome = entidades.pessoas[0] if entidades.pessoas else "Cidadão sem nome completo identificado"
-    protocolo = entidades.protocolos[0] if entidades.protocolos else "sem protocolo informado"
-    t_lower = texto.lower()
-
-    m_curso = re.search(
-        r"Técnico em\s+([A-ZÁÉÍÓÚÂÊÔÃÕÇ][a-záéíóúâêôãõç]+(?:\s+[A-ZÁÉÍÓÚÂÊÔÃÕÇ][a-záéíóúâêôãõç]+)*)",
-        texto,
-    )
-    curso = f"Técnico em {m_curso.group(1).strip()}" if m_curso else None
-
-    frases: List[str] = []
-    # Frase 1: Identificação e objeto principal
-    if curso:
-        frases.append(f"Solicitação registrada por {nome} (protocolo {protocolo}) referente ao curso {curso}.")
-    else:
-        frases.append(f"Solicitação apresentada por {nome} ({protocolo}) junto ao atendimento institucional da SECITECI-MT.")
-
-    # Frase 2: Fato essencial específico do pedido
-    if "auxílio" in t_lower or "renda per capita" in t_lower:
-        m_renda = re.search(r"per capita de\s*(R\$\s*[\d.,]+)", texto, re.I)
-        detalhe_renda = f" informando renda per capita de {m_renda.group(1)}" if m_renda else ""
-        frases.append(f"Requer concessão de Auxílio Alimentação e Auxílio Transporte{detalhe_renda}.")
-    elif "barra do garças" in t_lower and "cuiabá" in t_lower:
-        frases.append(
-            "Apresenta dúvida ambígua confundindo aprovação no polo de Barra do Garças com realização de matrícula e aulas em Cuiabá."
-        )
-    elif "ficha de matrícula" in t_lower:
-        loc_str = f" em {entidades.locais[0]}" if entidades.locais else ""
-        frases.append(f"Trata-se de ficha de matrícula digitalizada via OCR para {curso or 'curso técnico'}{loc_str}.")
-    elif "efetivação" in t_lower or "matrícula" in t_lower or "matriculado" in t_lower:
-        if protocolo == "sem protocolo informado" and not curso:
-            frases.append(
-                "Relato incompleto sem sobrenome, documento de identificação ou curso especificado, exigindo complementação cadastral."
-            )
-        else:
-            frases.append("Solicita efetivação de matrícula e consulta a relação de documentos pendentes para entrega.")
-    else:
-        frases.append("Requer orientação institucional conforme os dados submetidos no atendimento.")
-
-    # Frase 3: Contexto complementar de localidades/datas ou revisão
-    if entidades.locais or entidades.datas:
-        locs = ", ".join(entidades.locais) if entidades.locais else "unidade não especificada"
-        dts = ", ".join(entidades.datas[:2]) if entidades.datas else "data não informada"
-        frases.append(f"Menciona localidade ({locs}) e datas de referência ({dts}).")
-    else:
-        frases.append("Encaminhado para conferência documental conforme as normas vigentes do edital.")
-
-    resumo = " ".join(frases)
-    palavras = resumo.split()
-    if len(palavras) > max_palavras:
-        resumo = " ".join(palavras[:max_palavras]).rstrip(".,;") + "."
-
-    return resumo
 
 
 def processar_solicitacao(
@@ -307,13 +266,9 @@ def processar_solicitacao(
         re.I,
     )
     eixo_tecnologico = m_eixo.group(1).strip() if m_eixo else None
-    if not eixo_tecnologico and curso == "Técnico em Recursos Humanos":
-        eixo_tecnologico = "Gestão e Negócios"
 
     m_ch = re.search(r"\b\d{3,4}\s*h(?:oras)?\b", texto_original, re.I)
     ch = m_ch.group(0).lower() if m_ch else None
-    if not ch and curso == "Técnico em Recursos Humanos":
-        ch = "800 horas"
 
     m_turno = re.search(r"\b(noturno|matutino|vespertino)\b", texto_original, re.I)
     turno = m_turno.group(1).lower() if m_turno else ("noturno" if "turma da noite" in texto_original.lower() else None)
@@ -322,10 +277,6 @@ def processar_solicitacao(
     if not m_ini:
         m_ini = re.search(r"(?:adiadas para|começaram em)\s*(\d{2}/\d{2}/\d{4})", texto_original, re.I)
     inicio_curso = m_ini.group(1) if m_ini else None
-    if not inicio_curso and data_solic and curso:
-        # Nas fichas completas sem campo separado de início (ex: SOL-02, SOL-03, SOL-04), preserva referência temporal
-        inicio_curso = "01/02/2027" if "enfermagem" in (curso or "").lower() else data_solic
-
     # 10. Email e Telefone
     m_email = re.search(r"\b[A-Za-z0-9._%+-]+@[A-Za-z0-9.-]+\.[A-Za-z]{2,}\b", texto_original)
     email = m_email.group(0) if m_email else None
@@ -394,6 +345,7 @@ def processar_solicitacao(
             "modalidade_entrada": tipo,
         },
         resumo=resumo,
+        texto_original_referencia=f"{prot_ext_valido or ''} {data_externa or ''} {texto_original}",
         necessidade_revisao=necessidade_revisao,
     )
     return ficha
@@ -425,7 +377,8 @@ def processar_solicitacao_com_validacao_e_retry(
         "Extraia os dados da solicitação abaixo estritamente no formato JSON compatível com o esquema ExtracaoFicha.\n"
         "Não invente dados ausentes (use null). Categorias permitidas: "
         f"{CATEGORIAS_VALIDAS}.\n\n"
-        f"<conteudo_nao_confiavel>\n{texto_original}\n</conteudo_nao_confiavel>"
+        f"Esquema: {json.dumps(schema_json, ensure_ascii=False)}\n"
+        f"<conteudo_nao_confiavel>\n{texto_original.replace('</conteudo_nao_confiavel>', '[TAG_NEUTRALIZADA]')}\n</conteudo_nao_confiavel>"
     )
     erros_acumulados: List[str] = []
 
@@ -437,7 +390,7 @@ def processar_solicitacao_com_validacao_e_retry(
         resp = llm_client.generate(
             prompt=prompt_atual,
             system_instruction="Você é um extrator JSON estrito da SECITECI-MT. Responda apenas JSON válido.",
-            response_format={"type": "json_object", "schema": schema_json},
+            response_format={"type": "json_object"},
         )
         if resp.status != "success" or not resp.text:
             erros_acumulados.append(f"status_llm:{resp.status}")
