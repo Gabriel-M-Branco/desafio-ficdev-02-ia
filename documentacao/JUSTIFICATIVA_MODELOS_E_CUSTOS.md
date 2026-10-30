@@ -12,7 +12,7 @@ A seleção da arquitetura de inteligência artificial da Central de Atendimento
 1. **Eficiência Orçamentária e Previsibilidade:** Eliminar cobranças desnecessárias em tarefas passíveis de resolução local e adotar modelos de nuvem de custo unitário ínfimo por atendimento ao cidadão.
 2. **Alta Fidelidade Documental e Alucinação Zero:** Suporte rigoroso a esquemas estruturados (`Pydantic v2` com `extra="forbid"`), garantindo que dados não localizados permaneçam nulos ou marcados como `"não localizado"`, separando extração literal de fatos inferidos (`RF14`, `RF15`).
 3. **Desacoplamento e Portabilidade de Provedores (`RF21`):** A camada de geração textual e os motores multimodais podem ser alternados dinamicamente (OpenAI, Hugging Face, OpenRouter ou Adaptador Local Simulado) sem qualquer necessidade de reconstrução do índice vetorial do RAG.
-4. **Segurança de Custos e Guardrails Operacionais (`RF16`):** Travas programáticas de limite de caracteres (8.000), tamanho de anexos (10 MB), teto de chamadas por execução (máximo de 8) e timeouts rígidos (60s) para impedir gastos descontrolados.
+4. **Segurança de Custos e Guardrails Operacionais (`RF16`):** Travas programáticas de limite de caracteres (8.000), tamanho de anexos (10 MB), teto de chamadas por execução (máximo de 3 chamadas pelo guardrail `MAX_CHAMADAS_POR_EXECUCAO`) e timeouts rígidos (60s) para impedir gastos descontrolados.
 
 ---
 

@@ -97,7 +97,7 @@ def selecionar(pergunta, trechos):
             if numero == "5" and any(x in q for x in ("particip", "requisit", "document")):
                 predicado = lambda l: l.startswith("5ª chamada:") and "participaram" in l
             else:
-                predicado = lambda l: (f"{numero}ª chamada" in l or f"{numero}a chamada" in l) and any(w in l for w in ("matricula", "2026", "08/07/2026", "15 a 19/06/2026"))
+                predicado = lambda l: (f"{numero}ª chamada" in l or f"{numero}a chamada" in l) and "matricula" in l and bool(re.search(r"\d{2}/\d{2}/\d{4}|\d{2}\s+a\s+\d{2}", l))
     elif "cota" in q or "percentua" in q:
         predicado = lambda l: bool(re.search(r"(?:ac \(|l[1-4] \().*\d+%", l))
     elif "auxilio" in q and "valor" in q:
