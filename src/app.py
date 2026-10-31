@@ -79,6 +79,50 @@ raiz.setAttribute('translate', 'no');
 raiz.classList.add('notranslate');
 </script>""", height=1)
 
+# Estilos globais: força 100% de opacidade e máxima legibilidade em campos não editáveis
+st.markdown("""
+<style>
+textarea:disabled,
+input:disabled,
+[disabled],
+[aria-disabled="true"],
+.stTextArea textarea:disabled,
+.stTextInput input:disabled,
+[data-baseweb="input"] input:disabled,
+[data-baseweb="textarea"] textarea:disabled,
+[data-testid="stTextArea"] textarea:disabled,
+[data-testid="stTextInput"] input:disabled {
+    opacity: 1.0 !important;
+    -webkit-text-fill-color: #0f172a !important;
+    color: #0f172a !important;
+    background-color: #ffffff !important;
+    border: 1px solid #94a3b8 !important;
+    cursor: default !important;
+}
+
+[data-baseweb="base-input"],
+[data-baseweb="textarea"],
+.stTextArea div[data-baseweb="textarea"],
+.stTextInput div[data-baseweb="base-input"] {
+    opacity: 1.0 !important;
+    background-color: #ffffff !important;
+}
+
+blockquote {
+    opacity: 1.0 !important;
+    color: #0f172a !important;
+    font-style: normal !important;
+    border-left: 4px solid #2563eb !important;
+    background-color: #ffffff !important;
+}
+
+.stCaption, [data-testid="stCaptionContainer"] {
+    opacity: 1.0 !important;
+    color: #1e293b !important;
+}
+</style>
+""", unsafe_allow_html=True)
+
 # ==============================================================================
 # Singletons de Serviços Centrais
 # ==============================================================================
@@ -111,6 +155,24 @@ def obter_indice_vetorial() -> IndiceVetorial:
 
 indice_vetorial = obter_indice_vetorial()
 rag_motor = MotorRAG(indice=indice_vetorial, llm_client=llm_client, logger=audit_logger)
+
+def obter_provedores_disponiveis_rag():
+    """Retorna apenas provedores configurados e prontos para uso (RF21)."""
+    opcoes = ["extrator_fundamentado_local"]
+    tem_oa = bool(os.getenv("OPENAI_API_KEY", "").strip())
+    tem_or = bool(os.getenv("OPENROUTER_API_KEY", "").strip())
+    tem_hf = bool(os.getenv("HF_TOKEN", "").strip())
+
+    if tem_oa:
+        opcoes.append("openai")
+    if tem_or:
+        opcoes.append("openrouter")
+    if tem_hf:
+        opcoes.append("huggingface")
+    
+    opcoes.append("adaptador_simulado")
+    return opcoes
+
 
 # ==============================================================================
 # Gerenciamento de Estado de Sessão
@@ -1662,7 +1724,14 @@ elif menu.startswith("6."):
         with c_cfg2:
             prov_rag = st.selectbox(
                 "Provedor/Adaptador (RF21):",
-                ["extrator_fundamentado_local", "adaptador_simulado", "openai", "openrouter", "huggingface"],
+                obter_provedores_disponiveis_rag(),
+                format_func=lambda p: {
+                    "extrator_fundamentado_local": "Extrator Local (Tolerância Zero à Alucinação)",
+                    "openai": "OpenAI API (gpt-4o-mini / gpt-4o)",
+                    "openrouter": "OpenRouter API",
+                    "huggingface": "Hugging Face Inference",
+                    "adaptador_simulado": "Adaptador Simulado (Demonstração T12)",
+                }.get(p, p),
                 help="Demonstra a troca de provedor/adaptador sem reconstruir o índice vetorial (T12)."
             )
 
@@ -1693,20 +1762,69 @@ elif menu.startswith("6."):
             else:
                 st.warning("SEM EVIDÊNCIA SUFICIENTE NO ACERVO (ABSTENÇÃO SEGURA)")
 
-            st.info(resp.resposta)
+            # Renderização estruturada e legível da resposta e das fontes citadas
+            linhas_resp = [l.strip() for l in resp.resposta.splitlines() if l.strip()]
+            padrao_citacao = re.compile(r'^"(.+?)"\s*\[(.+)\]$')
+            passagens_encontradas = []
+            textos_gerais = []
+
+            for l in linhas_resp:
+                m = padrao_citacao.match(l)
+                if m:
+                    passagens_encontradas.append((m.group(1).strip(), m.group(2).strip()))
+                else:
+                    textos_gerais.append(l)
+
+            if passagens_encontradas:
+                if textos_gerais:
+                    st.info("\n\n".join(textos_gerais))
+
+                # 1. Resposta sintetizada do Assistente: somente para provedores LLM (OpenAI, etc.), omitida no Extrator Local
+                if res_c.get("provedor") != "extrator_fundamentado_local":
+                    st.markdown("##### Resposta do Assistente")
+                    itens_sintese = []
+                    for num_p, (cit, _) in enumerate(passagens_encontradas, start=1):
+                        cit_limpa = cit.lstrip("- ").strip()
+                        itens_sintese.append(f"• {cit_limpa}")
+                    texto_resposta_montada = "\n\n".join(itens_sintese)
+                    st.markdown(
+                        f"<div style='background-color: #ffffff; border: 1.5px solid #2563eb; border-radius: 8px; padding: 16px; margin-bottom: 16px; box-shadow: 0 1px 3px rgba(0,0,0,0.08); font-size: 1.02rem; line-height: 1.6; color: #0f172a;'>{texto_resposta_montada}</div>",
+                        unsafe_allow_html=True
+                    )
+                    st.markdown(f"##### Citações e Fontes Normativas ({len(passagens_encontradas)})")
+                else:
+                    st.markdown(f"##### Fontes Normativas e Evidências Recuperadas ({len(passagens_encontradas)})")
+
+                for num_p, (cit, metadado_fonte) in enumerate(passagens_encontradas, start=1):
+                    cit_formatada = cit.lstrip("- ").strip()
+                    st.markdown(
+                        f"""<div style='background-color: #ffffff; border: 1.5px solid #cbd5e1; border-radius: 8px; padding: 16px; margin-bottom: 12px; box-shadow: 0 1px 3px rgba(0,0,0,0.06); opacity: 1.0;'>
+                            <div style='font-size: 0.88rem; font-weight: 700; color: #1e3a8a; text-transform: uppercase; margin-bottom: 8px; letter-spacing: 0.5px;'>Trecho {num_p}:</div>
+                            <div style='font-size: 1.04rem; font-weight: 600; color: #0f172a; line-height: 1.55; margin-bottom: 10px; opacity: 1.0;'>"{cit_formatada}"</div>
+                            <div style='border-top: 1px solid #e2e8f0; padding-top: 8px; font-size: 0.86rem; color: #1e293b; opacity: 1.0;'>
+                                <strong>📌 Fonte:</strong> <span style='color: #0369a1; font-weight: 500; opacity: 1.0;'>{metadado_fonte}</span>
+                            </div>
+                        </div>""",
+                        unsafe_allow_html=True
+                    )
+            else:
+                st.info(resp.resposta)
 
             if resp.divergencia_identificada:
                 st.warning(f"**Divergência Normativa Identificada:** {resp.divergencia_identificada}")
 
             if resp.fontes:
-                st.markdown("##### Fontes e trechos recuperados")
+                st.markdown("##### Trechos Recuperados no Acervo")
                 st.caption(" • ".join(dict.fromkeys(
                     f"{t.documento_id} · versão {t.versao} · página {t.pagina or 1}" for t in resp.fontes
                 )))
                 for idx, t in enumerate(resp.fontes, start=1):
-                    with st.expander(f"Trecho {idx}: {t.documento_id} v{t.versao} (Pág. {t.pagina or '1'}) — Similaridade: {t.score_similaridade:.4f}"):
+                    with st.expander(f"Documento {idx}: {t.documento_id} v{t.versao} (Pág. {t.pagina or '1'}) — Similaridade: {t.score_similaridade:.4f}"):
                         st.caption(f"ID: {t.trecho_id} | Seção: {t.secao or 'Geral'} | Distância: {t.score_distancia:.4f}")
-                        st.text_area("Fragmento:", value=t.conteudo, height=calcular_altura_dinamica(t.conteudo, min_height=40), disabled=True, key=f"rag_{t.trecho_id}")
+                        st.markdown(
+                            f"<div style='background-color: #ffffff; border: 1px solid #94a3b8; border-radius: 6px; padding: 12px; font-family: monospace; font-size: 0.88rem; color: #0f172a; white-space: pre-wrap; line-height: 1.5; opacity: 1.0;'>{t.conteudo}</div>",
+                            unsafe_allow_html=True
+                        )
             else:
                 st.caption("Nenhum trecho documental recuperado ou aplicável para esta resposta.")
             with st.expander("Detalhes da consulta — RF18 / RF21"):
@@ -1726,7 +1844,14 @@ elif menu.startswith("6."):
         with c_sel2:
             prov_int = st.selectbox(
                 "Configuração de Geração (RF21):",
-                ["extrator_fundamentado_local", "adaptador_simulado", "openai", "openrouter", "huggingface"],
+                obter_provedores_disponiveis_rag(),
+                format_func=lambda p: {
+                    "extrator_fundamentado_local": "Extrator Local (Tolerância Zero à Alucinação)",
+                    "openai": "OpenAI API (gpt-4o-mini / gpt-4o)",
+                    "openrouter": "OpenRouter API",
+                    "huggingface": "Hugging Face Inference",
+                    "adaptador_simulado": "Adaptador Simulado (Demonstração T12)",
+                }.get(p, p),
                 key="prov_int_select"
             )
 

@@ -4,7 +4,7 @@
   "total_campos": 23,
   "campos_esperados": {
     "codigo": "2026-000142",
-    "nome": "Marcos Vinícius de Almeida Santos",
+    "nome": "Marcus Vinícius de Almeida Santos",
     "data_nascimento": "12/08/2008",
     "cpf": "123.456.789-00",
     "rg": "1234567-8",
@@ -17,13 +17,13 @@
     "ch": "1200 horas",
     "eixo_tecnologico": "Saude",
     "turma": "não localizado",
-    "municipio": "Cuiabá",
+    "municipio": "não localizado",
     "turno": "Noturno",
     "inicio_curso": "01/02/2027",
     "termino_curso": "não localizado",
     "tel_celular": "não localizado",
     "tel_residencial": "não localizado",
-    "email": "marcos.almeida.teste@examplo.com",
+    "email": "marcos.almeida.teste@exomplo.com",
     "data_matricula": "14/10/2026",
     "assinatura_aluno": "Consta assinatura do aluno"
   }

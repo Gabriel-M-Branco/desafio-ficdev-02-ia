@@ -4,10 +4,10 @@
   "provedor": "OpenAI (gpt-4o)",
   "exige_confirmacao_humana": true,
   "sucesso": true,
-  "texto_bruto": "CODIGO: 2022-000142\nNOME: MARCUS VINICIUS DE ALMEIDA SANTOS\nDATA DE NASCIMENTO: 12/03/2008\nCPF: 123.456.789-00\nRG: 1234567-8\nORGAO EXPEDIDOR: não localizado\nNATURALIDADE: CUIABÁ\nUF: não localizado\nNOME DA MAE: LUCIA HELENA DE ALMEIDA SANTOS\nNOME DO PAI: não localizado\nCURSO: TÉCNICO EM ENFERMAGEM\nCH: 1200 HORAS\nEIXO TECNOLOGICO: SAÚDE\nTURMA: não localizado\nMUNICIPIO: não localizado\nTURNO: NOTURNO\nINICIO DO CURSO: 01/02/2027\nTERMINO DO CURSO: não localizado\nTEL. CELULAR: não localizado\nTELEFONE RESIDENCIAL: não localizado\nEMAIL: MARCUS.ALMEIDA.TESTE@EXEMPLO.COM\nDATA MATRICULA: 01/01/2026\nASSINATURA DO ALUNO: Consta assinatura do aluno",
-  "texto_corrigido": "CODIGO: 2022-000142\nNOME: MARCUS VINICIUS DE ALMEIDA SANTOS\nDATA DE NASCIMENTO: 12/03/2008\nCPF: 123.456.789-00\nRG: 1234567-8\nORGAO EXPEDIDOR: não localizado\nNATURALIDADE: CUIABÁ\nUF: não localizado\nNOME DA MAE: LUCIA HELENA DE ALMEIDA SANTOS\nNOME DO PAI: não localizado\nCURSO: TÉCNICO EM ENFERMAGEM\nCH: 1200 HORAS\nEIXO TECNOLOGICO: SAÚDE\nTURMA: não localizado\nMUNICIPIO: não localizado\nTURNO: NOTURNO\nINICIO DO CURSO: 01/02/2027\nTERMINO DO CURSO: não localizado\nTEL. CELULAR: não localizado\nTELEFONE RESIDENCIAL: não localizado\nEMAIL: MARCUS.ALMEIDA.TESTE@EXEMPLO.COM\nDATA MATRICULA: 01/01/2026\nASSINATURA DO ALUNO: Consta assinatura do aluno",
+  "texto_bruto": "CODIGO: 2024-000142\nNOME: MARCUS VINICIUS DE ALMEIDA SANTOS\nDATA DE NASCIMENTO: 12/03/2008\nCPF: 123.456.789-00\nRG: 1234567-8\nORGAO EXPEDIDOR: não localizado\nNATURALIDADE: CUIABÁ\nUF: não localizado\nNOME DA MAE: LUCIA HELENA DE ALMEIDA SANTOS\nNOME DO PAI: não localizado\nCURSO: TECNICO EM ENFERMAGEM\nCH: 1200 HORAS\nEIXO TECNOLOGICO: SAÚDE\nTURMA: não localizado\nMUNICIPIO: não localizado\nTURNO: NOTURNO\nINICIO DO CURSO: 01/02/2027\nTERMINO DO CURSO: não localizado\nTEL. CELULAR: não localizado\nTELEFONE RESIDENCIAL: não localizado\nEMAIL: MARCUS.ALMEIDA.TESTE@EXEMPLO.COM\nDATA MATRICULA: 01/01/2026\nASSINATURA DO ALUNO: Consta assinatura do aluno",
+  "texto_corrigido": "CODIGO: 2024-000142\nNOME: MARCUS VINICIUS DE ALMEIDA SANTOS\nDATA DE NASCIMENTO: 12/03/2008\nCPF: 123.456.789-00\nRG: 1234567-8\nORGAO EXPEDIDOR: não localizado\nNATURALIDADE: CUIABÁ\nUF: não localizado\nNOME DA MAE: LUCIA HELENA DE ALMEIDA SANTOS\nNOME DO PAI: não localizado\nCURSO: TECNICO EM ENFERMAGEM\nCH: 1200 HORAS\nEIXO TECNOLOGICO: SAÚDE\nTURMA: não localizado\nMUNICIPIO: não localizado\nTURNO: NOTURNO\nINICIO DO CURSO: 01/02/2027\nTERMINO DO CURSO: não localizado\nTEL. CELULAR: não localizado\nTELEFONE RESIDENCIAL: não localizado\nEMAIL: MARCUS.ALMEIDA.TESTE@EXEMPLO.COM\nDATA MATRICULA: 01/01/2026\nASSINATURA DO ALUNO: Consta assinatura do aluno",
   "campos_extraidos": {
-    "codigo": "2022-000142",
+    "codigo": "2024-000142",
     "nome": "MARCUS VINICIUS DE ALMEIDA SANTOS",
     "data_nascimento": "12/03/2008",
     "cpf": "123.456.789-00",
@@ -17,7 +17,7 @@
     "uf": "não localizado",
     "nome_mae": "LUCIA HELENA DE ALMEIDA SANTOS",
     "nome_pai": "não localizado",
-    "curso": "TÉCNICO EM ENFERMAGEM",
+    "curso": "TECNICO EM ENFERMAGEM",
     "ch": "1200 HORAS",
     "eixo_tecnologico": "SAÚDE",
     "turma": "não localizado",
@@ -38,9 +38,9 @@
   "erros_regioes": [],
   "versoes_ocr": {
     "openai_vision": {
-      "texto_bruto": "CODIGO: 2022-000142\nNOME: MARCUS VINICIUS DE ALMEIDA SANTOS\nDATA DE NASCIMENTO: 12/03/2008\nCPF: 123.456.789-00\nRG: 1234567-8\nORGAO EXPEDIDOR: não localizado\nNATURALIDADE: CUIABÁ\nUF: não localizado\nNOME DA MAE: LUCIA HELENA DE ALMEIDA SANTOS\nNOME DO PAI: não localizado\nCURSO: TÉCNICO EM ENFERMAGEM\nCH: 1200 HORAS\nEIXO TECNOLOGICO: SAÚDE\nTURMA: não localizado\nMUNICIPIO: não localizado\nTURNO: NOTURNO\nINICIO DO CURSO: 01/02/2027\nTERMINO DO CURSO: não localizado\nTEL. CELULAR: não localizado\nTELEFONE RESIDENCIAL: não localizado\nEMAIL: MARCUS.ALMEIDA.TESTE@EXEMPLO.COM\nDATA MATRICULA: 01/01/2026\nASSINATURA DO ALUNO: Consta assinatura do aluno",
+      "texto_bruto": "CODIGO: 2024-000142\nNOME: MARCUS VINICIUS DE ALMEIDA SANTOS\nDATA DE NASCIMENTO: 12/03/2008\nCPF: 123.456.789-00\nRG: 1234567-8\nORGAO EXPEDIDOR: não localizado\nNATURALIDADE: CUIABÁ\nUF: não localizado\nNOME DA MAE: LUCIA HELENA DE ALMEIDA SANTOS\nNOME DO PAI: não localizado\nCURSO: TECNICO EM ENFERMAGEM\nCH: 1200 HORAS\nEIXO TECNOLOGICO: SAÚDE\nTURMA: não localizado\nMUNICIPIO: não localizado\nTURNO: NOTURNO\nINICIO DO CURSO: 01/02/2027\nTERMINO DO CURSO: não localizado\nTEL. CELULAR: não localizado\nTELEFONE RESIDENCIAL: não localizado\nEMAIL: MARCUS.ALMEIDA.TESTE@EXEMPLO.COM\nDATA MATRICULA: 01/01/2026\nASSINATURA DO ALUNO: Consta assinatura do aluno",
       "campos_extraidos": {
-        "codigo": "2022-000142",
+        "codigo": "2024-000142",
         "nome": "MARCUS VINICIUS DE ALMEIDA SANTOS",
         "data_nascimento": "12/03/2008",
         "cpf": "123.456.789-00",
@@ -50,7 +50,7 @@
         "uf": "não localizado",
         "nome_mae": "LUCIA HELENA DE ALMEIDA SANTOS",
         "nome_pai": "não localizado",
-        "curso": "TÉCNICO EM ENFERMAGEM",
+        "curso": "TECNICO EM ENFERMAGEM",
         "ch": "1200 HORAS",
         "eixo_tecnologico": "SAÚDE",
         "turma": "não localizado",
@@ -67,18 +67,18 @@
       },
       "comparacao_gabarito": {
         "total_campos": 23,
-        "campos_conferidos": 10,
-        "taxa_acuracia_percentual": "43.5%",
+        "campos_conferidos": 11,
+        "taxa_acuracia_percentual": "47.8%",
         "detalhes": {
           "codigo": {
             "esperado": "2026-000142",
-            "extraido": "2022-000142",
+            "extraido": "2024-000142",
             "conferido_com_sucesso": false
           },
           "nome": {
-            "esperado": "Marcos Vinícius de Almeida Santos",
+            "esperado": "Marcus Vinícius de Almeida Santos",
             "extraido": "MARCUS VINICIUS DE ALMEIDA SANTOS",
-            "conferido_com_sucesso": false
+            "conferido_com_sucesso": true
           },
           "data_nascimento": {
             "esperado": "12/08/2008",
@@ -122,7 +122,7 @@
           },
           "curso": {
             "esperado": "Tecnico em Enfermagem",
-            "extraido": "TÉCNICO EM ENFERMAGEM",
+            "extraido": "TECNICO EM ENFERMAGEM",
             "conferido_com_sucesso": true
           },
           "ch": {
@@ -141,7 +141,7 @@
             "conferido_com_sucesso": false
           },
           "municipio": {
-            "esperado": "Cuiabá",
+            "esperado": "não localizado",
             "extraido": "não localizado",
             "conferido_com_sucesso": false
           },
@@ -171,7 +171,7 @@
             "conferido_com_sucesso": false
           },
           "email": {
-            "esperado": "marcos.almeida.teste@examplo.com",
+            "esperado": "marcos.almeida.teste@exomplo.com",
             "extraido": "MARCUS.ALMEIDA.TESTE@EXEMPLO.COM",
             "conferido_com_sucesso": false
           },
@@ -215,18 +215,18 @@
   ],
   "comparacao_gabarito": {
     "total_campos": 23,
-    "campos_conferidos": 10,
-    "taxa_acuracia_percentual": "43.5%",
+    "campos_conferidos": 11,
+    "taxa_acuracia_percentual": "47.8%",
     "detalhes": {
       "codigo": {
         "esperado": "2026-000142",
-        "extraido": "2022-000142",
+        "extraido": "2024-000142",
         "conferido_com_sucesso": false
       },
       "nome": {
-        "esperado": "Marcos Vinícius de Almeida Santos",
+        "esperado": "Marcus Vinícius de Almeida Santos",
         "extraido": "MARCUS VINICIUS DE ALMEIDA SANTOS",
-        "conferido_com_sucesso": false
+        "conferido_com_sucesso": true
       },
       "data_nascimento": {
         "esperado": "12/08/2008",
@@ -270,7 +270,7 @@
       },
       "curso": {
         "esperado": "Tecnico em Enfermagem",
-        "extraido": "TÉCNICO EM ENFERMAGEM",
+        "extraido": "TECNICO EM ENFERMAGEM",
         "conferido_com_sucesso": true
       },
       "ch": {
@@ -289,7 +289,7 @@
         "conferido_com_sucesso": false
       },
       "municipio": {
-        "esperado": "Cuiabá",
+        "esperado": "não localizado",
         "extraido": "não localizado",
         "conferido_com_sucesso": false
       },
@@ -319,7 +319,7 @@
         "conferido_com_sucesso": false
       },
       "email": {
-        "esperado": "marcos.almeida.teste@examplo.com",
+        "esperado": "marcos.almeida.teste@exomplo.com",
         "extraido": "MARCUS.ALMEIDA.TESTE@EXEMPLO.COM",
         "conferido_com_sucesso": false
       },
@@ -336,16 +336,16 @@
     }
   },
   "justificativa_soberania_privacidade": "Processamento via modelo multimodal com revisão e deliberação humana prévia.",
-  "tempo_processamento_segundos": 3.950108100001671,
+  "tempo_processamento_segundos": 4.020764400000189,
   "metadados_execucao": {
     "provedor": "openai",
     "modelo": "gpt-4o",
     "tokens": {
       "prompt_tokens": 1571,
-      "completion_tokens": 255,
-      "total_tokens": 1826,
+      "completion_tokens": 254,
+      "total_tokens": 1825,
       "prompt_tokens_details": {
-        "cached_tokens": 1408,
+        "cached_tokens": 0,
         "audio_tokens": 0
       },
       "completion_tokens_details": {
