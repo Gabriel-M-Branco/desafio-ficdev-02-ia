@@ -197,7 +197,6 @@ def obter_provedores_disponiveis_rag():
     if tem_hf:
         opcoes.append("huggingface")
     
-    opcoes.append("adaptador_simulado")
     return opcoes
 
 
