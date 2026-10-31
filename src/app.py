@@ -1806,8 +1806,8 @@ elif menu.startswith("6."):
                 if textos_gerais:
                     st.info("\n\n".join(textos_gerais))
 
-                # 1. Resposta sintetizada do Assistente: somente para provedores LLM (OpenAI, etc.), omitida no Extrator Local
-                if res_c.get("provedor") != "extrator_fundamentado_local":
+                # 1. Resposta sintetizada do Assistente: somente para provedores LLM remotos (OpenAI, OpenRouter, HF), omitida no Local e Simulado
+                if res_c.get("provedor") not in ("extrator_fundamentado_local", "adaptador_simulado"):
                     st.markdown("##### Resposta do Assistente")
                     itens_sintese = []
                     for num_p, (cit, _) in enumerate(passagens_encontradas, start=1):
