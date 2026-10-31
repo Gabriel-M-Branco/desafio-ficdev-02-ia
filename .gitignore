@@ -28,3 +28,8 @@ prompts/experimento_*/
 scratch/
 documentacao/relatorio_lgpd_execucao.json
 
+# Logs de execuções efêmeras/locais (RF11, RF21)
+resultados/logs/EXEC_*.json
+resultados/logs/*.tmp
+!resultados/logs/.gitkeep
+!resultados/logs/audit_trail.jsonl

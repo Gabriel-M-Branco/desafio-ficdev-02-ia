@@ -24,6 +24,48 @@ CHAVES_METRICAS_TOKENS_PERMITIDAS = {
     "tokens_estimados",
 }
 
+# Prefixos e modalidades de negócio institucionais que geram arquivo de auditoria individual detalhado
+PREFIXOS_MODALIDADES_RELEVANTES = (
+    "texto",
+    "atendimento",
+    "solicitacao",
+    "minuta",
+    "rag",
+    "audio",
+    "tts",
+    "stt",
+    "visao",
+    "ocr",
+    "imagem",
+    "exclusao",
+    "revisao",
+    "decisao",
+    "regressao_",
+)
+
+MODALIDADES_RELEVANTES = {
+    "texto",
+    "texto_formato",
+    "atendimento_integrado",
+    "atendimento_integrado_rag",
+    "solicitacao",
+    "minuta",
+    "rag",
+    "rag_minuta",
+    "rag_consulta",
+    "audio",
+    "tts",
+    "stt",
+    "visao",
+    "ocr",
+    "imagem",
+    "imagem_revisao",
+    "exclusao_indice",
+    "revisao_humana",
+    "decisao",
+    "teste_revisao",
+}
+
 
 class AuditLogger:
     """
@@ -91,12 +133,27 @@ class AuditLogger:
         consulta: Optional[str] = None,
         ids_recuperados: Optional[List[str]] = None,
         versao_indice: Optional[str] = None,
+        relevante: Optional[bool] = None,
+        salvar_individual: Optional[bool] = None,
     ) -> str:
         """
         Salva um evento no log de auditoria sem expor senhas/chaves de API (RF11, RF21),
         preservando métricas numéricas de tokens (como max_tokens).
+        Gera arquivo individual .json apenas para execuções relevantes (atendimentos, minutas,
+        revisões humanas e operações multimodais institucionais).
         """
         exec_id = f"EXEC_{datetime.now().strftime('%Y%m%d_%H%M%S')}_{uuid.uuid4().hex[:6]}"
+
+        # Determina se a execução deve gerar arquivo individual detalhado
+        if salvar_individual is not None:
+            gravar_arquivo_individual = bool(salvar_individual)
+        elif relevante is not None:
+            gravar_arquivo_individual = bool(relevante)
+        else:
+            gravar_arquivo_individual = (
+                modalidade in MODALIDADES_RELEVANTES
+                or modalidade.startswith(PREFIXOS_MODALIDADES_RELEVANTES)
+            )
 
         # Sanitiza parâmetros removendo possíveis chaves de API sem mascarar contadores numéricos de tokens
         params_limpos = {}
@@ -154,11 +211,12 @@ class AuditLogger:
         with open(self.trail_file, "a", encoding="utf-8") as f:
             f.write(json.dumps(registro, ensure_ascii=False) + "\n")
 
-        # Grava arquivo individual detalhado para o caso com PII e segredos mascarados (RF12, RF21)
-        detalhes_limpos = self._mascarar_estrutura(resultado)
-        individual_file = self.log_dir / f"{exec_id}.json"
-        with open(individual_file, "w", encoding="utf-8") as f:
-            json.dump({**registro, "detalhes_completos": detalhes_limpos}, f, ensure_ascii=False, indent=2)
+        # Grava arquivo individual detalhado apenas para execuções relevantes com PII e segredos mascarados (RF12, RF21)
+        if gravar_arquivo_individual:
+            detalhes_limpos = self._mascarar_estrutura(resultado)
+            individual_file = self.log_dir / f"{exec_id}.json"
+            with open(individual_file, "w", encoding="utf-8") as f:
+                json.dump({**registro, "detalhes_completos": detalhes_limpos}, f, ensure_ascii=False, indent=2)
 
         return exec_id
 
