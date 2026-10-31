@@ -79,13 +79,44 @@ raiz.setAttribute('translate', 'no');
 raiz.classList.add('notranslate');
 </script>""", height=1)
 
-# Estilos globais: força 100% de opacidade e máxima legibilidade em campos não editáveis
+# Estilos globais: unifica padrão visual dos campos de texto com 100% de opacidade e legibilidade nativa
 st.markdown("""
 <style>
+/* Força opacidade total nos containers do Streamlit */
+[data-testid="stTextArea"],
+[data-testid="stTextInput"],
+.stTextArea,
+.stTextInput {
+    opacity: 1.0 !important;
+}
+
+/* Moldura externa BaseWeb unificada (input e textarea) */
+[data-baseweb="base-input"],
+[data-baseweb="textarea"],
+div[data-baseweb="base-input"],
+div[data-baseweb="textarea"],
+div[data-baseweb="base-input"][aria-disabled="true"],
+div[data-baseweb="textarea"][aria-disabled="true"] {
+    opacity: 1.0 !important;
+    background-color: #ffffff !important;
+    border: 1px solid #cbd5e1 !important;
+    border-radius: 8px !important;
+    box-shadow: 0 1px 2px rgba(0, 0, 0, 0.04) !important;
+}
+
+div[data-baseweb="base-input"]:focus-within,
+div[data-baseweb="textarea"]:focus-within {
+    border-color: #2563eb !important;
+    box-shadow: 0 0 0 1px #2563eb !important;
+}
+
+/* Elementos internos textarea e input: texto nítido, sem borda interna dupla e sem fundo conflitante */
+textarea,
+input,
 textarea:disabled,
 input:disabled,
-[disabled],
-[aria-disabled="true"],
+.stTextArea textarea,
+.stTextInput input,
 .stTextArea textarea:disabled,
 .stTextInput input:disabled,
 [data-baseweb="input"] input:disabled,
@@ -93,19 +124,15 @@ input:disabled,
 [data-testid="stTextArea"] textarea:disabled,
 [data-testid="stTextInput"] input:disabled {
     opacity: 1.0 !important;
-    -webkit-text-fill-color: #0f172a !important;
+    -webkit-opacity: 1.0 !important;
     color: #0f172a !important;
-    background-color: #ffffff !important;
-    border: 1px solid #94a3b8 !important;
+    -webkit-text-fill-color: #0f172a !important;
+    background-color: transparent !important;
+    border: none !important;
+    font-size: 0.95rem !important;
+    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif !important;
+    line-height: 1.55 !important;
     cursor: default !important;
-}
-
-[data-baseweb="base-input"],
-[data-baseweb="textarea"],
-.stTextArea div[data-baseweb="textarea"],
-.stTextInput div[data-baseweb="base-input"] {
-    opacity: 1.0 !important;
-    background-color: #ffffff !important;
 }
 
 blockquote {
@@ -1787,9 +1814,13 @@ elif menu.startswith("6."):
                         cit_limpa = cit.lstrip("- ").strip()
                         itens_sintese.append(f"• {cit_limpa}")
                     texto_resposta_montada = "\n\n".join(itens_sintese)
-                    st.markdown(
-                        f"<div style='background-color: #ffffff; border: 1.5px solid #2563eb; border-radius: 8px; padding: 16px; margin-bottom: 16px; box-shadow: 0 1px 3px rgba(0,0,0,0.08); font-size: 1.02rem; line-height: 1.6; color: #0f172a;'>{texto_resposta_montada}</div>",
-                        unsafe_allow_html=True
+                    st.text_area(
+                        "Resposta Fundamentada:",
+                        value=texto_resposta_montada,
+                        height=calcular_altura_dinamica(texto_resposta_montada, min_height=80),
+                        disabled=True,
+                        key="rag_resp_assistente_area",
+                        label_visibility="collapsed"
                     )
                     st.markdown(f"##### Citações e Fontes Normativas ({len(passagens_encontradas)})")
                 else:
@@ -1797,16 +1828,16 @@ elif menu.startswith("6."):
 
                 for num_p, (cit, metadado_fonte) in enumerate(passagens_encontradas, start=1):
                     cit_formatada = cit.lstrip("- ").strip()
-                    st.markdown(
-                        f"""<div style='background-color: #ffffff; border: 1.5px solid #cbd5e1; border-radius: 8px; padding: 16px; margin-bottom: 12px; box-shadow: 0 1px 3px rgba(0,0,0,0.06); opacity: 1.0;'>
-                            <div style='font-size: 0.88rem; font-weight: 700; color: #1e3a8a; text-transform: uppercase; margin-bottom: 8px; letter-spacing: 0.5px;'>Trecho {num_p}:</div>
-                            <div style='font-size: 1.04rem; font-weight: 600; color: #0f172a; line-height: 1.55; margin-bottom: 10px; opacity: 1.0;'>"{cit_formatada}"</div>
-                            <div style='border-top: 1px solid #e2e8f0; padding-top: 8px; font-size: 0.86rem; color: #1e293b; opacity: 1.0;'>
-                                <strong>📌 Fonte:</strong> <span style='color: #0369a1; font-weight: 500; opacity: 1.0;'>{metadado_fonte}</span>
-                            </div>
-                        </div>""",
-                        unsafe_allow_html=True
+                    st.markdown(f"**Trecho {num_p}:**")
+                    st.text_area(
+                        f"Evidência {num_p}:",
+                        value=f'"{cit_formatada}"',
+                        height=calcular_altura_dinamica(cit_formatada, min_height=40),
+                        disabled=True,
+                        key=f"rag_evid_box_{num_p}",
+                        label_visibility="collapsed"
                     )
+                    st.caption(f"📌 **Fonte:** {metadado_fonte}")
             else:
                 st.info(resp.resposta)
 
@@ -1821,9 +1852,13 @@ elif menu.startswith("6."):
                 for idx, t in enumerate(resp.fontes, start=1):
                     with st.expander(f"Documento {idx}: {t.documento_id} v{t.versao} (Pág. {t.pagina or '1'}) — Similaridade: {t.score_similaridade:.4f}"):
                         st.caption(f"ID: {t.trecho_id} | Seção: {t.secao or 'Geral'} | Distância: {t.score_distancia:.4f}")
-                        st.markdown(
-                            f"<div style='background-color: #ffffff; border: 1px solid #94a3b8; border-radius: 6px; padding: 12px; font-family: monospace; font-size: 0.88rem; color: #0f172a; white-space: pre-wrap; line-height: 1.5; opacity: 1.0;'>{t.conteudo}</div>",
-                            unsafe_allow_html=True
+                        st.text_area(
+                            f"Conteúdo do fragmento ({t.trecho_id}):",
+                            value=t.conteudo,
+                            height=calcular_altura_dinamica(t.conteudo, min_height=50),
+                            disabled=True,
+                            key=f"rag_frag_{idx}_{t.trecho_id}",
+                            label_visibility="collapsed"
                         )
             else:
                 st.caption("Nenhum trecho documental recuperado ou aplicável para esta resposta.")
