@@ -25,6 +25,8 @@
   },
   "DOC-SECITECI-007": {
     "natureza": "adaptado",
-    "fonte_original": "Edital Retificador nº 07/2026/SECITECI-MT; consolidação das 14 ofertas descentralizadas e calendário da Retificação 06"
+    "fonte_original": "Edital Retificador nº 07/2026/SECITECI-MT; consolidação das 14 ofertas descentralizadas e calendário da Retificação 06",
+    "documento_pai": "DOC-SECITECI-001",
+    "precedencia": "Prevalece sobre calendários de início de aulas e chamadas dos editais anteriores"
   }
 }

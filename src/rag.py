@@ -11,6 +11,7 @@ import time
 import unicodedata
 
 from src.schemas import ExtracaoFicha, RespostaRAG, TrechoRecuperado
+from src.rag_evidence import extrair_json_selecao
 from src.embeddings import IndiceVetorial
 from src.llm_client import LLMClient
 from src.guardrails import GuardrailManager
@@ -221,7 +222,7 @@ class MotorRAG:
                             mensagem = "Geração indisponível ou sem citações literais válidas. Encaminhar para revisão humana."
                             modo += ":saida_retida"
                         else:
-                            pares = {(p["trecho_id"], p["citacao"]) for p in json.loads(remoto.text)["passagens"]}
+                            pares = {(p["trecho_id"], p["citacao"]) for p in extrair_json_selecao(remoto.text)["passagens"]}
                             evidencias = [(t, l) for t, l in evidencias if (t.trecho_id, l) in pares]
                             fontes = [t for t in fontes if any(e.trecho_id == t.trecho_id for e, _ in evidencias)]
         if evidencias:
