@@ -173,7 +173,11 @@ class MotorRAG:
             else:
                 # Candidatos ampliados e seleção de passagens: os chunks do cabeçalho
                 # não contam como apoio factual só por repetirem o título da norma.
-                candidatos = self.indice.buscar_top_k(pergunta, top_k=max(20, top_k * 5),
+                consulta_busca = (
+                    f"{pergunta} documento documentação identidade cpf histórico contracheques comprovante residência"
+                    if "document" in pergunta.lower() else pergunta
+                )
+                candidatos = self.indice.buscar_top_k(consulta_busca, top_k=max(20, top_k * 5),
                                                       limiar_minimo=LIMIAR_SIMILARIDADE_MINIMA)
                 limpos = []
                 for t in candidatos:
@@ -186,7 +190,7 @@ class MotorRAG:
                 for t, _ in evidencias:
                     if not any(f.trecho_id == t.trecho_id for f in fontes):
                         fontes.append(t)
-                fontes = fontes[:max(1, min(top_k, 10))]
+                fontes = fontes[:max(1, top_k)]
                 evidencias = [(t, l) for t, l in evidencias if t.trecho_id in {f.trecho_id for f in fontes}]
                 if evidencias and (usar_llm_remota or provider_override):
                     limite = self.guardrails.registrar_chamada_modelo(tokens_estimados=400)
@@ -197,6 +201,9 @@ class MotorRAG:
                         prompt = (
                             "Você é um assistente institucional do GOV.MT / SECITECI-MT com política estrita de TOLERÂNCIA ZERO À ALUCINAÇÃO.\n"
                             "Selecione SOMENTE passagens desta lista que respondem DIRETAMENTE e EXATAMENTE à pergunta informada.\n"
+                            "IMPORTANTE: Quando as passagens fornecidas forem alíneas, itens ou documentos complementares/cumulativos de uma mesma norma "
+                            "(por exemplo: contracheques + comprovante de residência + imposto de renda/DIRPF, ou lista de documentos de matrícula), "
+                            "inclua TODAS as passagens complementares na lista 'passagens' para não omitir nenhum documento exigido.\n"
                             "REGRA DE FECHAMENTO NEGATIVO: Se a pergunta mencionar entidades, cursos, auxílios, benefícios, anos ou requisitos "
                             "que não constem de forma idêntica e expressa nas passagens fornecidas, NÃO deduza, NÃO generalize e NÃO responda por analogia. "
                             "Nesse caso, retorne uma lista vazia de passagens: {\"passagens\": []}.\n"
@@ -222,9 +229,38 @@ class MotorRAG:
                             mensagem = "Geração indisponível ou sem citações literais válidas. Encaminhar para revisão humana."
                             modo += ":saida_retida"
                         else:
-                            pares = {(p["trecho_id"], p["citacao"]) for p in extrair_json_selecao(remoto.text)["passagens"]}
-                            evidencias = [(t, l) for t, l in evidencias if (t.trecho_id, l) in pares]
+                            selecionadas_json = extrair_json_selecao(remoto.text)["passagens"]
+                            pares = {(p["trecho_id"], p["citacao"]) for p in selecionadas_json}
+                            ids_selecionados = {p["trecho_id"] for p in selecionadas_json}
+                            docs_aprovados = {
+                                t.documento_id for t, l in evidencias
+                                if (t.trecho_id, l) in pares or t.trecho_id in ids_selecionados
+                            }
+                            evidencias = [
+                                (t, l) for t, l in evidencias
+                                if (t.trecho_id, l) in pares or t.documento_id in docs_aprovados
+                            ]
                             fontes = [t for t in fontes if any(e.trecho_id == t.trecho_id for e, _ in evidencias)]
+        sintese_ia = None
+        if evidencias and (usar_llm_remota or provider_override) and provider_override != "adaptador_simulado":
+            try:
+                passagens_texto = "\n".join(f"- {l} ({t.documento_id})" for t, l in evidencias)
+                prompt_sintese = (
+                    "Você é um assistente institucional do GOV.MT / SECITECI-MT.\n"
+                    "Responda à dúvida do cidadão de forma clara, educada e direta, REDIGINDO uma explicação fluida e coesa em português brasileiro.\n"
+                    "REGRAS OBRIGATÓRIAS:\n"
+                    "1. Utilize ESTRITAMENTE as informações presentes nas seguintes passagens normativas oficiais:\n"
+                    f"{passagens_texto}\n"
+                    "2. NÃO invente prazos, valores, nomes ou regras além do informado.\n"
+                    "3. NÃO devolva apenas as citações brutas entre aspas. Elabore um parágrafo ou tópicos bem estruturados respondendo à pergunta.\n"
+                    f"Pergunta do cidadão: {pergunta}"
+                )
+                resp_sintese = self.llm_client.generate(prompt=prompt_sintese, provider_override=provider_override)
+                if resp_sintese.status == "success" and resp_sintese.text.strip():
+                    sintese_ia = resp_sintese.text.strip()
+            except Exception:
+                sintese_ia = None
+
         if evidencias:
             mensagem = "\n".join(f'"{linha}" {self._formatar_citacao(t)}' for t, linha in evidencias)
             if conflito:
@@ -236,6 +272,7 @@ class MotorRAG:
         resp = RespostaRAG(pergunta=pergunta, resposta=mensagem, fontes=fontes, status=status,
                           divergencia_identificada=mensagem if conflito and evidencias else ("; ".join(alertas) or None),
                           necessidade_revisao=True, modo_geracao=modo,
+                          resposta_sintetizada=sintese_ia,
                           metricas_geracao=metricas,
                           citacoes_formatadas=[self._formatar_citacao(t) for t in fontes])
         if registrar_auditoria:

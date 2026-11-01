@@ -334,6 +334,7 @@ class RespostaRAG(BaseModel):
     necessidade_revisao: bool = False
     citacoes_formatadas: List[str] = Field(default_factory=list)
     minuta_institucional: Optional[str] = None
+    resposta_sintetizada: Optional[str] = None
     modo_geracao: str = "extrator_fundamentado_local"
     metricas_geracao: Dict[str, Any] = Field(default_factory=dict)
 

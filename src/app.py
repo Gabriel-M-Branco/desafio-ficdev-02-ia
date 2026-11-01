@@ -1716,7 +1716,7 @@ elif menu.startswith("6."):
             sugestoes = [
                 "Personalizada (digitar abaixo)",
                 "P1: Qual é o prazo final prorrogado para inscrição no processo seletivo?",
-                "P2: Quais documentos assalariados devem apresentar para comprovar renda?",
+                "P2: Quais documentos os assalariados devem apresentar para comprovar renda?",
                 "P3: Quando iniciam as aulas de Enfermagem na sede em Barra do Garças?",
                 "P4: Quando iniciam as aulas de Enfermagem na sede em Cuiabá?",
                 "P5: Qual o formato e duração do vídeo de heteroidentificação?",
@@ -1766,6 +1766,8 @@ elif menu.startswith("6."):
                 st.warning("Informe a pergunta.")
             else:
                 with st.spinner("Buscando no acervo vetorial e analisando fundamentação..."):
+                    # Garante limpeza de cache anterior ao disparar nova busca
+                    st.session_state.rag_consulta_resultado = None
                     override = None if prov_rag == "extrator_fundamentado_local" else prov_rag
                     resp = rag_motor.responder(pergunta_digitada, top_k=top_k, provider_override=override)
                     st.session_state.rag_consulta_resultado = {
@@ -1773,6 +1775,7 @@ elif menu.startswith("6."):
                         "provedor": prov_rag,
                         "versao_indice": indice_vetorial.versao_indice,
                         "resposta_obj": resp,
+                        "timestamp": time.time(),
                     }
 
         res_c = st.session_state.rag_consulta_resultado
@@ -1805,25 +1808,34 @@ elif menu.startswith("6."):
                 if textos_gerais:
                     st.info("\n\n".join(textos_gerais))
 
-                # 1. Resposta sintetizada do Assistente: somente para provedores LLM remotos (OpenAI, OpenRouter, HF), omitida no Local e Simulado
-                if res_c.get("provedor") not in ("extrator_fundamentado_local", "adaptador_simulado"):
-                    st.markdown("##### Resposta do Assistente")
-                    itens_sintese = []
+                # 1. Resposta sintetizada do Assistente: se houver síntese redigida por IA (ou montada a partir das normas)
+                st.markdown("##### Resposta Fundamentada do Assistente")
+                if getattr(resp, "resposta_sintetizada", None):
+                    texto_resposta_montada = resp.resposta_sintetizada
+                else:
+                    docs_citados_unicos = list(dict.fromkeys(
+                        f"{t.documento_id} (v{t.versao})" for t in resp.fontes
+                    ))
+                    cabecalho_sintese = (
+                        f"Com base nas normas institucionais recuperadas ({', '.join(docs_citados_unicos)}), "
+                        "aplicam-se as seguintes disposições e requisitos obrigatórios:"
+                        if docs_citados_unicos else "Disposições normativas localizadas no acervo:"
+                    )
+                    itens_sintese = [cabecalho_sintese]
                     for num_p, (cit, _) in enumerate(passagens_encontradas, start=1):
                         cit_limpa = cit.lstrip("- ").strip()
                         itens_sintese.append(f"• {cit_limpa}")
                     texto_resposta_montada = "\n\n".join(itens_sintese)
-                    st.text_area(
-                        "Resposta Fundamentada:",
-                        value=texto_resposta_montada,
-                        height=calcular_altura_dinamica(texto_resposta_montada, min_height=80),
-                        disabled=True,
-                        key="rag_resp_assistente_area",
-                        label_visibility="collapsed"
-                    )
-                    st.markdown(f"##### Citações e Fontes Normativas ({len(passagens_encontradas)})")
-                else:
-                    st.markdown(f"##### Fontes Normativas e Evidências Recuperadas ({len(passagens_encontradas)})")
+
+                st.text_area(
+                    "Resposta Fundamentada:",
+                    value=texto_resposta_montada,
+                    height=calcular_altura_dinamica(texto_resposta_montada, min_height=90),
+                    disabled=True,
+                    key=f"rag_resp_assistente_area_{res_c.get('timestamp', 0)}",
+                    label_visibility="collapsed"
+                )
+                st.markdown(f"##### Fontes Normativas e Evidências Recuperadas ({len(passagens_encontradas)})")
 
                 for num_p, (cit, metadado_fonte) in enumerate(passagens_encontradas, start=1):
                     cit_formatada = cit.lstrip("- ").strip()
@@ -1833,7 +1845,7 @@ elif menu.startswith("6."):
                         value=f'"{cit_formatada}"',
                         height=calcular_altura_dinamica(cit_formatada, min_height=40),
                         disabled=True,
-                        key=f"rag_evid_box_{num_p}",
+                        key=f"rag_evid_box_{num_p}_{res_c.get('timestamp', 0)}",
                         label_visibility="collapsed"
                     )
                     st.caption(f"📌 **Fonte:** {metadado_fonte}")
@@ -1843,24 +1855,6 @@ elif menu.startswith("6."):
             if resp.divergencia_identificada:
                 st.warning(f"**Divergência Normativa Identificada:** {resp.divergencia_identificada}")
 
-            if resp.fontes:
-                st.markdown("##### Trechos Recuperados no Acervo")
-                st.caption(" • ".join(dict.fromkeys(
-                    f"{t.documento_id} · versão {t.versao} · página {t.pagina or 1}" for t in resp.fontes
-                )))
-                for idx, t in enumerate(resp.fontes, start=1):
-                    with st.expander(f"Documento {idx}: {t.documento_id} v{t.versao} (Pág. {t.pagina or '1'}) — Similaridade: {t.score_similaridade:.4f}"):
-                        st.caption(f"ID: {t.trecho_id} | Seção: {t.secao or 'Geral'} | Distância: {t.score_distancia:.4f}")
-                        st.text_area(
-                            f"Conteúdo do fragmento ({t.trecho_id}):",
-                            value=t.conteudo,
-                            height=calcular_altura_dinamica(t.conteudo, min_height=50),
-                            disabled=True,
-                            key=f"rag_frag_{idx}_{t.trecho_id}",
-                            label_visibility="collapsed"
-                        )
-            else:
-                st.caption("Nenhum trecho documental recuperado ou aplicável para esta resposta.")
             with st.expander("Detalhes da consulta — RF18 / RF21"):
                 st.caption(f"Índice: `{res_c['versao_indice']}` | Adaptador: `{res_c['provedor']}`")
 
@@ -2176,7 +2170,7 @@ elif menu.startswith("8."):
         with cf2:
             d_ini = st.date_input(
                 "Data Inicial:",
-                value=date(2026, 6, 1),
+                value=date(2026, 1, 1),
                 format="DD/MM/YYYY",
                 help="Data de início do recorte temporal (padrão amplo cobrindo todo o exercício de 2026)."
             )
@@ -2201,7 +2195,25 @@ elif menu.startswith("8."):
                 data_fim=dt_fim,
             )
 
-        classificacoes = [classificar_sentimento_avaliacao(a["id"], a["texto"]) for a in avaliacoes_filtradas]
+        col_m1, col_m2 = st.columns([2, 1])
+        with col_m1:
+            modo_sent_lote = st.radio(
+                "Motor de Classificação:",
+                ["Classificação Local (Vetorial)", "Classificação com IA (LLM)"],
+                horizontal=True,
+                key="modo_sent_lote_sel",
+            )
+        usar_ia_lote = ("IA" in modo_sent_lote)
+
+        classificacoes = [
+            classificar_sentimento_avaliacao(
+                a["id"],
+                a["texto"],
+                llm_client=llm_client,
+                usar_ia=usar_ia_lote,
+            )
+            for a in avaliacoes_filtradas
+        ]
         agregacao = agregar_sentimentos_determinístico(classificacoes)
 
         periodo_txt = f"{d_ini.strftime('%d/%m/%Y')} até {d_fim.strftime('%d/%m/%Y')}" if (d_ini and d_fim) else "Período Completo"
@@ -2294,6 +2306,46 @@ elif menu.startswith("8."):
                     st.write(f"**Texto:** {av['texto']}")
                     st.write(f"**Justificativa:** {cl.justificativa}")
                     st.caption(f"Confiança Estimada: {cl.confianca_estimada:.2f} | Requer Revisão: {cl.necessidade_revisao}")
+
+            st.markdown("---")
+            st.markdown("##### Testar Avaliação em Tempo Real")
+            st.markdown("Classifique qualquer manifestação livre do cidadão utilizando o Modelo de Linguagem (IA) ou a classificação local:")
+            col_in1, col_in2 = st.columns([3, 1])
+            with col_in1:
+                txt_teste = st.text_area(
+                    "Mensagem do Cidadão:",
+                    placeholder="Ex: O atendimento na secretaria foi muito atencioso, mas o portal online ficou fora do ar e quase perdi o prazo!",
+                    height=90,
+                    key="txt_teste_sentimento",
+                )
+            with col_in2:
+                motor_teste = st.selectbox(
+                    "Motor de Análise:",
+                    ["Classificação com IA (LLM)", "Classificação Local"],
+                    key="motor_teste_sent",
+                )
+                btn_testar = st.button("Classificar Mensagem", key="btn_classificar_sent", type="primary")
+
+            if btn_testar and txt_teste.strip():
+                usar_ia_teste = ("IA Generativa" in motor_teste)
+                with st.spinner("Analisando sentimento..."):
+                    res_teste = classificar_sentimento_avaliacao(
+                        "AV-MANUAL",
+                        txt_teste.strip(),
+                        llm_client=llm_client,
+                        usar_ia=usar_ia_teste,
+                    )
+                col_r1, col_r2, col_r3 = st.columns(3)
+                with col_r1:
+                    st.metric("Polaridade Detectada", res_teste.polaridade.upper())
+                with col_r2:
+                    st.metric("Confiança Estimada", f"{res_teste.confianca_estimada:.2f}")
+                with col_r3:
+                    st.metric("Requer Revisão Humana", "SIM (Indeterminada/Mista)" if res_teste.necessidade_revisao else "NÃO")
+                st.info(f"**Justificativa Técnica:** {res_teste.justificativa}")
+                with st.expander("Ver Prompt Isolado XML e Resposta Estruturada"):
+                    st.code(montar_prompt_sentimento_isolado("AV-MANUAL", txt_teste.strip()), language="xml")
+                    st.json(res_teste.model_dump())
 
 
 # ==============================================================================
