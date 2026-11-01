@@ -143,7 +143,7 @@ def ler_arquivo(caminho_arquivo: str) -> List[Dict[str, Any]]:
     paginas = []
 
     if caminho_arquivo.lower().endswith(".txt"):
-        texto = conteudo_bytes.decode("utf-8", errors="replace")
+        texto = conteudo_bytes.decode("utf-8", errors="replace").replace("\r\r\n", "\n").replace("\r\n", "\n").replace("\r", "\n")
         meta = extrair_metadados_cabecalho(texto)
         paginas.append({
             "pagina": 1,
@@ -155,7 +155,7 @@ def ler_arquivo(caminho_arquivo: str) -> List[Dict[str, Any]]:
 
     elif caminho_arquivo.lower().endswith(".pdf"):
         doc = pymupdf.open(caminho_arquivo)
-        textos_pags = [_normalizar_quebras_pdf(page.get_text()) for page in doc]
+        textos_pags = [_normalizar_quebras_pdf(page.get_text().replace("\r\r\n", "\n").replace("\r\n", "\n").replace("\r", "\n")) for page in doc]
         texto_completo = "\n".join(textos_pags)
         meta = extrair_metadados_cabecalho(texto_completo)
         for i, t in enumerate(textos_pags):
@@ -226,10 +226,24 @@ def dividir_em_chunks(
             trecho = texto[inicio:fim]
 
             if fim < tamanho_texto:
-                ultimo_espaco = trecho.rfind(" ")
-                if ultimo_espaco > tamanho_chunk // 2:
-                    trecho = trecho[:ultimo_espaco]
-                    fim = inicio + ultimo_espaco
+                # Prioriza quebras naturais de parágrafo, linha ou sentença para evitar truncar itens normativos
+                p_dupla = trecho.rfind("\n\n")
+                p_linha = trecho.rfind("\n")
+                p_ponto = max(trecho.rfind(". "), trecho.rfind(".\n"))
+                p_espaco = trecho.rfind(" ")
+
+                if p_dupla > int(tamanho_chunk * 0.4):
+                    fim = inicio + p_dupla
+                    trecho = texto[inicio:fim]
+                elif p_linha > int(tamanho_chunk * 0.5):
+                    fim = inicio + p_linha
+                    trecho = texto[inicio:fim]
+                elif p_ponto > int(tamanho_chunk * 0.5):
+                    fim = inicio + p_ponto + 1
+                    trecho = texto[inicio:fim]
+                elif p_espaco > int(tamanho_chunk * 0.5):
+                    fim = inicio + p_espaco
+                    trecho = texto[inicio:fim]
 
             trecho_limpo = trecho.strip()
             if trecho_limpo:
@@ -253,7 +267,15 @@ def dividir_em_chunks(
 
             if fim >= tamanho_texto:
                 break
-            inicio = max(inicio + 1, fim - sobreposicao)
+
+            cand_inicio = max(inicio + 1, fim - sobreposicao)
+            # Evita iniciar o chunk no meio de uma palavra
+            if cand_inicio < fim and cand_inicio > 0:
+                if texto[cand_inicio - 1].isalnum() and texto[cand_inicio].isalnum():
+                    prox_espaco = texto.find(" ", cand_inicio)
+                    if prox_espaco != -1 and prox_espaco < fim:
+                        cand_inicio = prox_espaco + 1
+            inicio = cand_inicio
 
     return chunks_resultado
 
